@@ -1,18 +1,20 @@
-# [Nome do projeto]
+# CoinSage
 
 [Escreva um ou dois  parágrafo resumindo o objetivo do seu projeto.]
 
 ## Alunos integrantes da equipe
 
-* [Nome completo do aluno 1]
-* [Nome completo do aluno 2]
-* [Nome completo do aluno 3]
-* [Nome completo do aluno 4]
+* Frederico Martins Rodrigues
+* João Gabriel Amorim Pádua
+* [José Victor Mendes Dias](https://github.com/zezit)
+* [Kimberly Liz Spencer Lourenço](https://github.com/kspencerl)
+* Rubens Marcelo Ramos dos Santos
 
 ## Professores responsáveis
 
-* [Nome completo do professor 1]
-* [Nome completo do professor 2]
+* Eveline Alonso Veloso
+* Lucas Henrique Pereira
+* Pedro Pongelupe Lopes
 
 ## Instruções de utilização
 
