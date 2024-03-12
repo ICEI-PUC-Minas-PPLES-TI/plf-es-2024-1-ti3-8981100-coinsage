@@ -8,7 +8,7 @@
 * João Gabriel Amorim Pádua
 * [José Victor Mendes Dias](https://github.com/zezit)
 * [Kimberly Liz Spencer Lourenço](https://github.com/kspencerl)
-* Rubens Marcelo Ramos dos Santos
+* [Rubens Marcelo Ramos dos Santos](https://github.com/rubensm33)
 
 ## Professores responsáveis
 
