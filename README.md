@@ -4,7 +4,7 @@
 
 ## Alunos integrantes da equipe
 
-* Frederico Martins Rodrigues
+* [Frederico Martins Rodrigues](https://github.com/fredmrodrigues)
 * João Gabriel Amorim Pádua
 * [José Victor Mendes Dias](https://github.com/zezit)
 * [Kimberly Liz Spencer Lourenço](https://github.com/kspencerl)
