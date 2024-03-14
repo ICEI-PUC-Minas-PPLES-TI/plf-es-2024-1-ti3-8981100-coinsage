@@ -3,9 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 'feature/**'
-      - 'fix/**'
-      - 'hotfix/**'
+      - '*'
   pull_request:
     branches:
       - 'feature/**'
