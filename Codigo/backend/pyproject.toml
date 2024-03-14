@@ -1,0 +1,60 @@
+[project]
+name = "CoinSage API"
+version = "0.0.1"
+description = "API from the crypto currency analyser software CoinSage"
+authors = [
+]
+classifiers = [
+]
+
+dynamic = ["dependencies"]
+readme = "README.md"
+requires-python = ">=3.11"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.black]
+color=true
+exclude = '''
+    /(
+        \.git
+        | \._build
+        | \.back.out
+        | \.build
+        | \.coverage
+        | \.dist
+        | \.hg
+        | \.mypy_cache
+        | \.tox
+        | \.venv
+        | ./src/coverage
+        | blib2to3
+        | tests/data
+    )/
+'''
+include = '\.pyi?$'
+line-length = 119
+
+[tool.pytest.ini_options]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test", "Acceptance"]
+python_functions = ["test_*"]
+testpaths = "tests"
+filterwarnings = "error"
+addopts = '''
+    --verbose
+    -p no:warnings
+    --strict-markers
+    --tb=short
+    --cov=src
+    --cov=tests
+    --cov-branch
+    --cov-report=term-missing
+    --cov-report=html:coverage/cov.html
+    --cov-report=xml:coverage/cov.xml
+    --no-cov-on-fail
+    --cov-fail-under=63
+    --numprocesses=auto
+    --asyncio-mode=auto
+'''

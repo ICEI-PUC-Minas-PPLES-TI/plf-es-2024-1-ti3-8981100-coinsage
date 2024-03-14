@@ -1,0 +1,13 @@
+black
+fastapi
+pre-commit
+python-dotenv
+uvicorn
+pytest
+pytest-asyncio
+pytest-cov
+pytest-xdist
+python-decouple
+pydantic-settings
+asgi_lifespan
+httpx
