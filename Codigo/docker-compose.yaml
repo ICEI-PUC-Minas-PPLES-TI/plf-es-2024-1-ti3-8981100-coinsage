@@ -1,0 +1,21 @@
+version: '3.9'
+
+services:
+  backend_app:
+    container_name: coinsage_api
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./backend/
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - DEBUG=${DEBUG}
+      - SERVER_HOST=${SERVER_HOST}
+      - SERVER_PORT=${SERVER_PORT}
+      - SERVER_WORKERS=${SERVER_WORKERS}
+    volumes:
+      - ./backend/:/usr/backend/
+    expose:
+      - 8000
+    ports:
+      - 8000:8000
