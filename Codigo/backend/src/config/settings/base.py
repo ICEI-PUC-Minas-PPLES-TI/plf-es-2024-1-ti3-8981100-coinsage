@@ -15,9 +15,9 @@ class BackendBaseSettings(BaseSettings):
     DESCRIPTION: str | None = None
     DEBUG: bool = False
 
-    SERVER_HOST: str = decouple.config("SERVER_HOST", cast=str)  # type: ignore
-    SERVER_PORT: int = decouple.config("SERVER_PORT", cast=int)  # type: ignore
-    SERVER_WORKERS: int = decouple.config("SERVER_WORKERS", cast=int)  # type: ignore
+    SERVER_HOST: str = decouple.config("SERVER_HOST", default="127.0.0.1", cast=str)  # type: ignore
+    SERVER_PORT: int = decouple.config("SERVER_PORT", default=8000, cast=int)  # type: ignore
+    SERVER_WORKERS: int = decouple.config("SERVER_WORKERS", default=4, cast=int)  # type: ignore
     API_PREFIX: str = "/api"
     DOCS_URL: str = "/docs"
     OPENAPI_URL: str = "/openapi.json"
