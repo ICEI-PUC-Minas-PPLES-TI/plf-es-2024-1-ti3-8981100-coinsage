@@ -1,7 +1,7 @@
 default_install_hook_types: [pre-commit]
 default_stages: [commit, push]
 default_language_version:
-  python: python3.11
+    python: python3.11
 ci:
     # TODO - elaborate the default autofix message
     autofix_commit_msg: |
@@ -49,3 +49,10 @@ repos:
     -   id: mypy
         args:
         - --config-file=Codigo/backend/pyproject.toml
+-   repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
+    hooks:
+    -   id: flake8
+        exclude: ^env/
+        args:
+          - --config=Codigo/backend/.flake8

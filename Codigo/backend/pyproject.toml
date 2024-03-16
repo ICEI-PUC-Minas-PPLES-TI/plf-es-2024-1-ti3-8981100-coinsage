@@ -79,23 +79,6 @@ strict_optional = true
 warn_no_return = true
 warn_return_any = false
 
-[tool.interrogate]
-ignore-init-method = true
-ignore-init-module = false
-ignore-magic = false
-ignore-semiprivate = false
-ignore-private = false
-ignore-module = false
-ignore-property-decorators = false
-fail-under = 95
-exclude = ["tests/", "setup.py", "docs/"]
-verbose = 0
-omit-covered-files = false
-quiet = false
-whitelist-regex = []
-ignore-regex = []
-color = true
-
 [tool.pytest.ini_options]
 python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test", "Acceptance"]
