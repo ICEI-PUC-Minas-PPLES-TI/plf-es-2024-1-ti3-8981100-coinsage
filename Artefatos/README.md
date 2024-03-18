@@ -1,16 +1,11 @@
 # Artefatos do projeto
 
-Este diretório mantém os artefatos do projeto.
+Este diretório mantém os artefatos do projeto. Para visualizar [versões antigas dos documentos](versoes-antigas/).
 
+## Documentos
+- [Documento de Visão CoinSage](atas/Documento-de-Visão-CoinSage.pdf)
+- [Termo de Sigilo e Confidencialidade](docs/termos/Termo-de-Sigilo-e-Confidencialidade.pdf)
+- [Termo de ciência e compromisso CoinSage](docs/termos/Termo-de-ciência-e-compromisso-CoinSage.pdf)
 
-Liste os artefatos produzidos, com suas localizações e descrição do conteúdo.
-
-Por exemplo, pode-se criar um diretório "atas", que seria descrito da seguinte forma:
-* `/atas`
-	* **Ata_xx_ago_2020.docx**: Ata de reunião do dia xx de agosto de 2020.
-
-Pode-se também criar um diretório "canvas", que seria descrito da seguinte forma:
-* `/canvas`
-	* **BusinessModelCanvas.pdf**: Canvas do modelo de negócios.
-
-Assim, sucessivamente para outros artefatos como `processos` e `DER`, etc.
+## Atas
+- [Ata de Reunião com o cliente CoinSage 2024-02-26](atas/Ata-Reuniao-CoinSage-2024-02-26.pdf)
