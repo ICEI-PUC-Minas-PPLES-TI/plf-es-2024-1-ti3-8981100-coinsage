@@ -5,11 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.api.endpoints import router as api_endpoint_router
 from src.config.manager import settings
 from src.models.db.base import Base
-from src.repository.database import engine
-from src.repository.database import SessionLocal
+from src.repository.database import engine, SessionLocal
 from src.schedules.update_currencies_info import start_schedules
 
 Base.metadata.create_all(bind=engine)
+
 
 def initialize_backend_application() -> fastapi.FastAPI:
     app = fastapi.FastAPI(**settings.set_backend_app_attributes)  # type: ignore
@@ -21,8 +21,7 @@ def initialize_backend_application() -> fastapi.FastAPI:
         allow_methods=settings.ALLOWED_METHODS,
         allow_headers=settings.ALLOWED_HEADERS,
     )
-    
-    
+
     app.include_router(router=api_endpoint_router, prefix=settings.API_PREFIX)
 
     return app
@@ -30,11 +29,13 @@ def initialize_backend_application() -> fastapi.FastAPI:
 
 backend_app: fastapi.FastAPI = initialize_backend_application()
 
+
 @backend_app.on_event("startup")
 def remove_expired_tokens_task() -> None:
     with SessionLocal() as db:
         start_schedules(app_db=db)
-        
+
+
 if __name__ == "__main__":
     uvicorn.run(
         app="main:backend_app",

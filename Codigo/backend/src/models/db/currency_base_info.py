@@ -1,9 +1,11 @@
-from typing import List
-from sqlalchemy import ARRAY, Column, UUID, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
 import uuid
+from typing import List
+
+from sqlalchemy import ARRAY, Column, ForeignKey, Integer, String, UUID
+from sqlalchemy.orm import relationship
 
 from .base import Base
+
 
 class CurrencyBaseInfoModel(Base):
     __tablename__ = "currency_base_info"
@@ -20,11 +22,12 @@ class CurrencyBaseInfoModel(Base):
 
     # urls = relationship("Website", back_populates="owner")
 
+
 # class Website(Base):
 #     __tablename__ = "website"
 
 #     uuid = Column(UUID, primary_key=True)
 #     currency_uuid = Column(UUID, ForeignKey("currency_base_info.uuid"))
 #     website = Column(String(length=1000))
-    
+
 #     owner = relationship("CurrencyBaseInfoModel", back_populates="urls")

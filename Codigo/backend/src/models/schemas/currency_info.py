@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-        
+
+
 class CurrencyInfo(BaseModel):
     symbol: str
     cmc_id: int

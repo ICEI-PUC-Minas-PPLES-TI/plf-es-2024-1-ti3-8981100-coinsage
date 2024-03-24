@@ -6,10 +6,16 @@ from src.models.schemas import currency_info
 
 
 def get_crypto(db: Session, crypto_uuid: Uuid) -> currency_base_info.CurrencyBaseInfoModel | None:
-    return db.query(currency_base_info.CurrencyBaseInfoModel).filter(currency_base_info.CurrencyBaseInfoModel.uuid == crypto_uuid).first()
+    return (
+        db.query(currency_base_info.CurrencyBaseInfoModel)
+        .filter(currency_base_info.CurrencyBaseInfoModel.uuid == crypto_uuid)
+        .first()
+    )
+
 
 def get_cryptos(db: Session, skip: int = 0, limit: int = 100) -> list[currency_base_info.CurrencyBaseInfoModel]:
     return db.query(currency_base_info.CurrencyBaseInfoModel).offset(skip).limit(limit).all()
+
 
 def create_crypto(db: Session, crypto: currency_info.CurrencyInfo) -> currency_base_info.CurrencyBaseInfoModel:
     currency = currency_base_info.CurrencyBaseInfoModel(
@@ -20,12 +26,13 @@ def create_crypto(db: Session, crypto: currency_info.CurrencyInfo) -> currency_b
         name=crypto.name,
         description=crypto.description,
         technical_doc=crypto.technical_doc,
-        urls=crypto.urls
+        urls=crypto.urls,
     )
     db.add(currency)
     db.commit()
     db.refresh(currency)
     return currency
+
 
 def clear_table(db: Session) -> None:
     db.query(currency_base_info.CurrencyBaseInfoModel).delete()

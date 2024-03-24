@@ -40,9 +40,9 @@ class BackendBaseSettings(BaseSettings):
 
     LOGGING_LEVEL: int = logging.INFO
     LOGGERS: tuple[str, str] = ("uvicorn.asgi", "uvicorn.access")
-    
+
     CMC_API_KEY: str = decouple.config("CMC_API_KEY", cast=str)  # type: ignore
-    
+
     # ===== Schedules =====
     SCHEDULES: dict[str, dict[str, int]] = {
         "update_currencies_info": {
