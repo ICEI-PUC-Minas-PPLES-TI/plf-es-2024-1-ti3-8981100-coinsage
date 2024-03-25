@@ -1,9 +1,16 @@
 import fastapi
 import uvicorn
+from fastapi import Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
 
 from src.api.endpoints import router as api_endpoint_router
 from src.config.manager import settings
+from src.models.db.base import Base
+from src.repository.crud.user_repository import *
+from src.repository.database import engine
+
+Base.metadata.create_all(bind=engine)
 
 
 def initialize_backend_application() -> fastapi.FastAPI:

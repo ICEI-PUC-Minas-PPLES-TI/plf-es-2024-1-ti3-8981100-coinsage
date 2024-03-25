@@ -24,6 +24,12 @@ class BackendBaseSettings(BaseSettings):
     REDOC_URL: str = "/redoc"
     OPENAPI_PREFIX: str = ""
 
+    DATABASE_HOST: str = decouple.config("DATABASE_HOST", cast=str)  # type: ignore
+    DATABASE_PORT: int = decouple.config("DATABASE_PORT", cast=int)  # type: ignore
+    DATABASE_USER: str = decouple.config("DATABASE_USER", cast=str)  # type: ignore
+    DATABASE_PASSWORD: str = decouple.config("DATABASE_PASSWORD", cast=str)  # type: ignore
+    DATABASE_NAME: str = decouple.config("DATABASE_NAME", cast=str)  # type: ignore
+
     IS_ALLOWED_CREDENTIALS: bool = decouple.config("IS_ALLOWED_CREDENTIALS", default=True, cast=bool)  # type: ignore
     ALLOWED_ORIGINS: list[str] = [
         "http://localhost:3000",  # React default port

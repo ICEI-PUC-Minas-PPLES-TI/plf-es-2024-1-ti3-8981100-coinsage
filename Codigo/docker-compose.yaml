@@ -1,21 +1,35 @@
 version: '3.9'
 
 services:
-  backend_app:
-    container_name: coinsage_api
+  # backend_app:
+  #   container_name: coinsage_api
+  #   restart: always
+  #   build:
+  #     dockerfile: Dockerfile
+  #     context: ./backend/
+  #   environment:
+  #     - ENVIRONMENT=${ENVIRONMENT}
+  #     - DEBUG=${DEBUG}
+  #     - SERVER_HOST=${SERVER_HOST}
+  #     - SERVER_PORT=${SERVER_PORT}
+  #     - SERVER_WORKERS=${SERVER_WORKERS}
+  #   volumes:
+  #     - ./backend/:/usr/backend/
+  #   expose:
+  #     - 8000
+  #   ports:
+  #     - 8000:8000
+  postgres_coinsage_db:
+    container_name: coinsage_db
     restart: always
+    image: postgres:13
     build:
-      dockerfile: Dockerfile
       context: ./backend/
     environment:
-      - ENVIRONMENT=${ENVIRONMENT}
-      - DEBUG=${DEBUG}
-      - SERVER_HOST=${SERVER_HOST}
-      - SERVER_PORT=${SERVER_PORT}
-      - SERVER_WORKERS=${SERVER_WORKERS}
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
     volumes:
       - ./backend/:/usr/backend/
-    expose:
-      - 8000
     ports:
-      - 8000:8000
+      - 5432:5432
