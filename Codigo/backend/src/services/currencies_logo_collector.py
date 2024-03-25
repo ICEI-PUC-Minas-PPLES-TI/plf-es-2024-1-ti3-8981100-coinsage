@@ -77,7 +77,9 @@ class CurrenciesLogoCollector:
             # Return the created response object:
             return currency_info_response
 
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Crypto currencies info not found!")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Nenhuma criptomoeda encontrada no banco de dados!"
+        )
 
     def get_crypto(self, crypto_uuid: Uuid):
         return self.repository.get_crypto(self.session, crypto_uuid)

@@ -1,33 +1,17 @@
-import datetime
-
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 
-from src.api.dependencies.session import get_db
-from src.api.routes.currencies import read_cryptos
 from src.main import backend_app
-from src.models.schemas.currency_info import CurrencyInfoResponse, LastUpdate
+from src.models.schemas.currency_info import CurrencyInfoResponse
+
+client = TestClient(backend_app)
 
 
 @pytest.mark.asyncio
-async def test_return_currency_info_response_with_status_code_200(self, mocker):
-
-    # Arrange
-    db_mock = mocker.Mock()
-    collector_mock = mocker.Mock()
-    collector_mock.get_cryptos.return_value = CurrencyInfoResponse(
-        last_update=LastUpdate(time=datetime.datetime.now(), data=[]),
-        next_update=datetime.datetime.now() + datetime.timedelta(days=1),
-    )
-    mocker.patch("src.api.routes.currencies.CurrenciesLogoCollector", return_value=collector_mock)
-
-    backend_app.dependency_overrides[get_db] = db_mock
-    client = TestClient(backend_app)
-    # Act
+async def test_raise_http_exception_when_no_cryptocurrencies_and_collection_fails(mocker):
+    mocker.patch("src.repository.crud.currencies_info_schedule_repository.get_last_update", return_value=None)
     response = client.get("api/currency/")
 
-    # Assert
-    assert response.status_code == status.HTTP_200_OK
-    assert isinstance(response, CurrencyInfoResponse)
-    assert response.data == []
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json()["detail"] == "Nenhuma criptomoeda encontrada no banco de dados!"
