@@ -1,13 +1,13 @@
 import fastapi
 import uvicorn
+from fastapi import Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
 
 from src.api.endpoints import router as api_endpoint_router
 from src.config.manager import settings
 from src.models.db.base import Base
 from src.repository.database import engine, SessionLocal
-
-# from src.schedules.schedules import start_schedules, stop_schdeules
 from src.schedules.update_currencies_info import start_schedules, stop_schdeules
 
 Base.metadata.create_all(bind=engine)
