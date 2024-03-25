@@ -78,6 +78,7 @@ jobs:
       DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
       DATABASE_USER: ${{ secrets.DATABASE_USER }}
       DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+      CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -97,6 +98,10 @@ jobs:
       - name: Install Dependencies for Testing
         run: |
           pip install pytest pytest-asyncio pytest pytest-xdist
+      - name: Run Database for Unit Tests
+        run: |
+            cd ..
+            docker compose up -d
       - name: Test with Pytest-Cov
         run: |
           pytest --cov --cov-report xml tests/unit_tests
@@ -125,6 +130,7 @@ jobs:
       DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
       DATABASE_USER: ${{ secrets.DATABASE_USER }}
       DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+      CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
 
     runs-on: ${{ matrix.os }}
     needs: unit-tests
@@ -148,7 +154,7 @@ jobs:
       - name: Run Database for Integration Tests
         run: |
             cd ..
-            docker compose up
+            docker compose up -d
       - name: Test with Pytest-Cov
         run: |
           pytest --cov --cov-report xml tests/integration_tests
