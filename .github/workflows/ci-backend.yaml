@@ -92,6 +92,10 @@ jobs:
       - name: Install Dependencies for Testing
         run: |
           pip install pytest pytest-asyncio pytest pytest-xdist
+      - name: Run Database for Unit Tests
+        run: |
+            cd ..
+            docker compose up -d
       - name: Test with Pytest-Cov
         run: |
           pytest --cov --cov-report xml tests/unit_tests
