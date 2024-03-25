@@ -6,6 +6,7 @@ from src.api.endpoints import router as api_endpoint_router
 from src.config.manager import settings
 from src.models.db.base import Base
 from src.repository.database import engine, SessionLocal
+
 # from src.schedules.schedules import start_schedules, stop_schdeules
 from src.schedules.update_currencies_info import start_schedules, stop_schdeules
 
@@ -35,7 +36,8 @@ backend_app: fastapi.FastAPI = initialize_backend_application()
 def schedules() -> None:
     with SessionLocal() as db:
         start_schedules(app_db=db)
-        
+
+
 @backend_app.on_event("shutdown")
 def shutdown_event() -> None:
     stop_schdeules()

@@ -1,7 +1,9 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, DateTime
+
+from sqlalchemy import Column, DateTime, Integer
 
 from .base import Base
+
 
 class CurrenciesInfoScheduleModel(Base):
     __tablename__ = "currencies_info_schedule"

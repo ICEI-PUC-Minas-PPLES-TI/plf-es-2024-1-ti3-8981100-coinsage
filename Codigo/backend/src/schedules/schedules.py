@@ -11,7 +11,7 @@
 #     db = app_db
 #     scheduler.start()
 #     logger.info("Schedules started")
-    
+
 # def stop_schdeules():
 #     scheduler.shutdown()
 #     logger.info("Schedules stopped")

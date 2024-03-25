@@ -9,9 +9,10 @@ from sqlalchemy.orm import Session
 
 from src.models.db.currencies_info_schedule import CurrenciesInfoScheduleModel
 from src.models.schemas.currency_info import CurrencyInfo, CurrencyInfoResponse, LastUpdate
-from src.repository.crud import currency_info_repository, currencies_info_schedule_repository
+from src.repository.crud import currencies_info_schedule_repository, currency_info_repository
 from src.services.externals.binance_symbol_colletor import BinanceSymbolCollector
 from src.services.externals.cmc_symbol_colletor import CmcSymbolCollector
+
 
 class CurrenciesLogoCollector:
     def __init__(self, session: Session):
@@ -49,7 +50,7 @@ class CurrenciesLogoCollector:
                 logger.error(f"Error on [{symbol}]:\n{e}")
 
         logger.info(f"Parsing symbols took {(time.time() - start_time)/1000}ms")
-        
+
         self.session.add(CurrenciesInfoScheduleModel(next_scheduled_time=self.calculate_next_time()))
         self.session.commit()
 
@@ -59,23 +60,23 @@ class CurrenciesLogoCollector:
     def get_cryptos(self) -> CurrencyInfoResponse:
         cryptos = self.repository.get_cryptos(self.session)
         last_update_info = self.schedule_repository.get_last_update(self.session)
-        
+
         if last_update_info is not None:
             # Convert the cryptos list to CurrencyInfo
-            converted_cryptos = [CurrencyInfo(**crypto.__dict__)for crypto in cryptos]
+            converted_cryptos = [CurrencyInfo(**crypto.__dict__) for crypto in cryptos]
 
             # Create the response object using the correct attribute names:
             currency_info_response = CurrencyInfoResponse(
                 last_update=LastUpdate(
-                    time=getattr(last_update_info, 'last_update_time'),
+                    time=getattr(last_update_info, "last_update_time"),
                     data=converted_cryptos,
                 ),
-                next_update=getattr(last_update_info, 'next_scheduled_time')
+                next_update=getattr(last_update_info, "next_scheduled_time"),
             )
 
             # Return the created response object:
             return currency_info_response
-        
+
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Crypto currencies info not found!")
 
     def get_crypto(self, crypto_uuid: Uuid):
