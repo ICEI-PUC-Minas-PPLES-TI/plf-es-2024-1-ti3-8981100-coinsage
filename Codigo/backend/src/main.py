@@ -6,7 +6,8 @@ from src.api.endpoints import router as api_endpoint_router
 from src.config.manager import settings
 from src.models.db.base import Base
 from src.repository.database import engine, SessionLocal
-from src.schedules.update_currencies_info import start_schedules
+# from src.schedules.schedules import start_schedules, stop_schdeules
+from src.schedules.update_currencies_info import start_schedules, stop_schdeules
 
 Base.metadata.create_all(bind=engine)
 
@@ -31,9 +32,13 @@ backend_app: fastapi.FastAPI = initialize_backend_application()
 
 
 @backend_app.on_event("startup")
-def remove_expired_tokens_task() -> None:
+def schedules() -> None:
     with SessionLocal() as db:
         start_schedules(app_db=db)
+        
+@backend_app.on_event("shutdown")
+def shutdown_event() -> None:
+    stop_schdeules()
 
 
 if __name__ == "__main__":

@@ -46,7 +46,7 @@ class BackendBaseSettings(BaseSettings):
     # ===== Schedules =====
     SCHEDULES: dict[str, dict[str, int]] = {
         "update_currencies_info": {
-            "hour": 18,
+            "hour": 6,
             "minute": 0,
             "second": 0,
         },

@@ -1,6 +1,10 @@
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+import datetime
 from loguru import logger
 from sqlalchemy.orm import Session
+
+from src.models.db.currencies_info_schedule import CurrenciesInfoScheduleModel
+# from .schedules import scheduler, db
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from src.config.manager import settings
 from src.services.currencies_logo_collector import CurrenciesLogoCollector
@@ -9,13 +13,15 @@ scheduler = AsyncIOScheduler()
 
 db = None
 
-
 def start_schedules(app_db: Session):
     global db
     db = app_db
     scheduler.start()
     logger.info("Schedules started")
-
+    
+def stop_schdeules():
+    scheduler.shutdown()
+    logger.info("Schedules stopped")
 
 @scheduler.scheduled_job(
     "cron",

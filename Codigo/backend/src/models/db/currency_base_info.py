@@ -19,15 +19,3 @@ class CurrencyBaseInfoModel(Base):
     description = Column(String(length=5000))
     technical_doc: Column[List[str]] = Column(ARRAY(String(length=1000)), nullable=True)
     urls: Column[List[str]] = Column(ARRAY(String(length=1000)), nullable=True)
-
-    # urls = relationship("Website", back_populates="owner")
-
-
-# class Website(Base):
-#     __tablename__ = "website"
-
-#     uuid = Column(UUID, primary_key=True)
-#     currency_uuid = Column(UUID, ForeignKey("currency_base_info.uuid"))
-#     website = Column(String(length=1000))
-
-#     owner = relationship("CurrencyBaseInfoModel", back_populates="urls")
