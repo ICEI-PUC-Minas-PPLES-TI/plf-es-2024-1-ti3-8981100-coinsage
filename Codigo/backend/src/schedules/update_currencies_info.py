@@ -21,7 +21,7 @@ def start_schedules(app_db: Session):
     logger.info("Schedules started")
 
 
-def stop_schdeules():
+def stop_schedules():
     scheduler.shutdown()
     logger.info("Schedules stopped")
 

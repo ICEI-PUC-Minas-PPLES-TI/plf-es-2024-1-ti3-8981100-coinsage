@@ -8,7 +8,7 @@ from src.api.endpoints import router as api_endpoint_router
 from src.config.manager import settings
 from src.models.db.base import Base
 from src.repository.database import engine, SessionLocal
-from src.schedules.update_currencies_info import start_schedules, stop_schdeules
+from src.schedules.update_currencies_info import start_schedules, stop_schedules
 
 Base.metadata.create_all(bind=engine)
 
@@ -40,7 +40,7 @@ def schedules() -> None:
 
 @backend_app.on_event("shutdown")
 def shutdown_event() -> None:
-    stop_schdeules()
+    stop_schedules()
 
 
 if __name__ == "__main__":
