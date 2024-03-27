@@ -7,6 +7,7 @@ pytest==8.1.1
 pytest-asyncio==0.23.5.post1
 pytest-cov==4.1.0
 pytest-xdist==3.5.0
+pytest-mock==3.14.0
 python-decouple==3.8
 pydantic-settings==2.2.1
 asgi_lifespan
@@ -16,3 +17,7 @@ mypy==1.9.0
 colorama==0.4.6
 SQLAlchemy==2.0.28
 loguru==0.7.2
+binance-connector==3.6.0
+python-coinmarketcap==0.5
+psycopg2-binary==2.9.9
+fastapi_scheduler==0.0.15
