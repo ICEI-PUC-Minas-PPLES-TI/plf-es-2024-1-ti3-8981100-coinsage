@@ -1,7 +1,7 @@
 import uuid
 from typing import List
 
-from sqlalchemy import ARRAY, Column, ForeignKey, Integer, String, UUID
+from sqlalchemy import ARRAY, Column, Integer, String, UUID
 from sqlalchemy.orm import relationship
 
 from .base import Base
@@ -19,3 +19,5 @@ class CurrencyBaseInfoModel(Base):
     description = Column(String(length=5000))
     technical_doc: Column[List[str]] = Column(ARRAY(String(length=1000)), nullable=True)
     urls: Column[List[str]] = Column(ARRAY(String(length=1000)), nullable=True)
+
+    closing_prices = relationship("ClosingPriceModel", back_populates="currency")
