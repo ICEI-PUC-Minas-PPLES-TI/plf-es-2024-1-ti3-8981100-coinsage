@@ -1,5 +1,4 @@
 import uuid
-from datetime import datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, NUMERIC, UUID
 from sqlalchemy.orm import relationship
@@ -14,5 +13,3 @@ class ClosingPriceModel(Base):
     uuid_currency_info = Column(UUID(as_uuid=True), ForeignKey("currency_base_info.uuid"))
     closing_price = Column(NUMERIC(precision=15, scale=8), nullable=False)  # type: ignore
     week = Column(DateTime, nullable=False)
-
-    currency = relationship("CurrencyBaseInfoModel", back_populates="closing_prices")
