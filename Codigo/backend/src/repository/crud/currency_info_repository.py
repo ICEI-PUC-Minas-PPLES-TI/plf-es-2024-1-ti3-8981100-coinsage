@@ -13,8 +13,24 @@ def get_crypto(db: Session, crypto_uuid: Uuid) -> currency_base_info.CurrencyBas
     )
 
 
-def get_cryptos(db: Session, skip: int = 0, limit: int = 100) -> list[currency_base_info.CurrencyBaseInfoModel]:
+def get_currency_info_by_uuid(db: Session, uuid_value: Uuid) -> currency_base_info.CurrencyBaseInfoModel | None:
+    return (
+        db.query(currency_base_info.CurrencyBaseInfoModel)
+        .filter(currency_base_info.CurrencyBaseInfoModel.uuid == uuid_value)
+        .first()
+    )
+
+
+def get_cryptos(db: Session, skip: int = 0, limit: int = 10000) -> list[currency_base_info.CurrencyBaseInfoModel]:
     return db.query(currency_base_info.CurrencyBaseInfoModel).offset(skip).limit(limit).all()
+
+
+def get_currency_info_by_symbol(db: Session, symbol: str) -> currency_base_info.CurrencyBaseInfoModel | None:
+    return (
+        db.query(currency_base_info.CurrencyBaseInfoModel)
+        .filter(currency_base_info.CurrencyBaseInfoModel.symbol == symbol)
+        .first()
+    )
 
 
 def create_crypto(db: Session, crypto: currency_info.CurrencyInfo) -> currency_base_info.CurrencyBaseInfoModel:

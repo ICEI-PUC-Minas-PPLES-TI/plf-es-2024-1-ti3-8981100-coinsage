@@ -1,10 +1,7 @@
-from pydantic import BaseModel
+from ..base import BaseSchemaModel
 
 
-class BinanceSymbolsCollected(BaseModel):
+class BinanceSymbolsCollected(BaseSchemaModel):
     symbol: str
     base_asset: str
     quote_asset: str
-
-    class Config:
-        from_attributes = True

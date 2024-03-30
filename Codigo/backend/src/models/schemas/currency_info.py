@@ -1,10 +1,12 @@
 from datetime import datetime
 from typing import List
+from uuid import UUID
 
 from src.models.schemas.base import BaseSchemaModel
 
 
 class CurrencyInfo(BaseSchemaModel):
+    uuid: UUID
     symbol: str
     cmc_id: int
     cmc_slug: str
