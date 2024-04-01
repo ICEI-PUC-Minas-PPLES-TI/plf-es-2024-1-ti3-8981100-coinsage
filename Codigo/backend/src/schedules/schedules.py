@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from src.config.manager import settings
 
 # App schedules
-from .update_currencies_info import update_currencies_info
+from .update_currencies_info import check_update_currencies_info, update_currencies_info
 
 scheduler = AsyncIOScheduler()
 
@@ -15,6 +15,9 @@ db = None
 def start_schedules(app_db: Session):
     global db
     db = app_db
+    logger.info("Checking all schedules")
+    check_all_schedules()
+
     scheduler.start()
     logger.info("Schedules started")
 
@@ -22,6 +25,14 @@ def start_schedules(app_db: Session):
 def stop_schedules():
     scheduler.shutdown()
     logger.info("Schedules stopped")
+
+
+def check_all_schedules():
+    if db is None:
+        logger.critical("Database session is not available")
+        return
+
+    check_update_currencies_info(db=db, settings=settings.SCHEDULES["update_currencies_info"])
 
 
 # =======  All app schedules =======
@@ -33,7 +44,7 @@ def stop_schedules():
     id="update_currencies_info",
 )
 def schedule_update_currencies_info():
-    if db is not None:
-        update_currencies_info(db=db)
+    if db is None:
+        logger.critical("Database session is not available")
         return
-    logger.critical("Database session is not available")
+    update_currencies_info(db=db)
