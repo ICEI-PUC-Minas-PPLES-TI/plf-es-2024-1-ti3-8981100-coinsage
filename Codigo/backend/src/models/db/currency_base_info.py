@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Column, Integer, String, UUID, Text
+from sqlalchemy import Column, Integer, String, Text, UUID
 from sqlalchemy.orm import validates
 
 from .base import Base
@@ -18,11 +18,11 @@ class CurrencyBaseInfoModel(Base):
     description = Column(String(length=5000))
     _technical_doc = Column(Text, nullable=True)
     _urls = Column(Text, nullable=True)
-    
+
     @property
     def technical_doc(self):
         if self._technical_doc:
-            return self._technical_doc.split(',')
+            return self._technical_doc.split(",")
         else:
             return []
 
@@ -32,15 +32,15 @@ class CurrencyBaseInfoModel(Base):
             for doc in value:
                 if not isinstance(doc, str) or len(doc) > 1000:
                     raise ValueError("Each element in technical_doc must be a string of at max 1000 chars")
-            
-            self._technical_doc = ','.join(value) # type: ignore
+
+            self._technical_doc = ",".join(value)  # type: ignore
         else:
             raise ValueError("technical_doc must be a list of strings")
 
     @property
     def urls(self):
         if self._urls:
-            return self._urls.split(',')
+            return self._urls.split(",")
         else:
             return []
 
@@ -50,12 +50,12 @@ class CurrencyBaseInfoModel(Base):
             for doc in value:
                 if not isinstance(doc, str) or len(doc) > 1000:
                     raise ValueError("Each element in technical_doc must be a string of at max 1000 chars")
-                
-            self._urls = ','.join(value) # type: ignore
+
+            self._urls = ",".join(value)  # type: ignore
         else:
             raise ValueError("urls must be a list of strings")
 
-    @validates('technical_doc', 'urls')
+    @validates("technical_doc", "urls")
     def validate_list(self, key, value):
         if not isinstance(value, list):
             raise ValueError(f"{key} must be a list of strings")
