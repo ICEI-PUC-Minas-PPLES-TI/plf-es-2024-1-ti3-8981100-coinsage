@@ -33,4 +33,7 @@ def stop_schedules():
     id="update_currencies_info",
 )
 def schedule_update_currencies_info():
-    update_currencies_info(db=db)
+    if db is not None:
+        update_currencies_info(db=db)
+        return
+    logger.critical("Database session is not available")
