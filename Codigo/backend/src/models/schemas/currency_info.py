@@ -6,7 +6,6 @@ from src.models.schemas.base import BaseSchemaModel
 
 
 class CurrencyInfo(BaseSchemaModel):
-    uuid: UUID
     symbol: str
     cmc_id: int
     cmc_slug: str

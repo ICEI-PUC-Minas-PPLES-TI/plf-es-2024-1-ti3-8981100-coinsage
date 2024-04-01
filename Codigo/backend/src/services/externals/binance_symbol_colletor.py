@@ -14,7 +14,7 @@ class BinanceSymbolCollector:
     def _collect_from_binance(self):
         star_time = time.time()
         symbols = Spot().exchange_info()["symbols"]
-        logger.info(f"Collecting symbols {len(symbols)} from Binance took {(time.time() - star_time)}h")
+        logger.info(f"Collecting symbols {len(symbols)} from Binance took {(time.time() - star_time)}ms")
         return symbols
 
     def _parse_symbols(self, symbols) -> list[BinanceSymbolsCollected]:

@@ -6,11 +6,8 @@ from sqlalchemy.orm import Session
 
 from src.api.endpoints import router as api_endpoint_router
 from src.config.manager import settings
-from src.models.db.base import Base
-from src.repository.database import engine, SessionLocal
+from src.repository.database import SessionLocal
 from src.schedules.update_currencies_info import start_schedules, stop_schedules
-
-Base.metadata.create_all(bind=engine)
 
 
 def initialize_backend_application() -> fastapi.FastAPI:
