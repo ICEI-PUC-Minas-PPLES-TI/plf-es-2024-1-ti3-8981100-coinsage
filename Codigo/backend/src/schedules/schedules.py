@@ -1,17 +1,36 @@
-# from apscheduler.schedulers.asyncio import AsyncIOScheduler
-# from sqlalchemy.orm import Session
-# from loguru import logger
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from loguru import logger
+from sqlalchemy.orm import Session
 
-# scheduler = AsyncIOScheduler()
+from src.config.manager import settings
 
-# db = None
+# App schedules
+from .update_currencies_info import update_currencies_info
 
-# def start_schedules(app_db: Session):
-#     global db
-#     db = app_db
-#     scheduler.start()
-#     logger.info("Schedules started")
+scheduler = AsyncIOScheduler()
 
-# def stop_schdeules():
-#     scheduler.shutdown()
-#     logger.info("Schedules stopped")
+db = None
+
+
+def start_schedules(app_db: Session):
+    global db
+    db = app_db
+    scheduler.start()
+    logger.info("Schedules started")
+
+
+def stop_schedules():
+    scheduler.shutdown()
+    logger.info("Schedules stopped")
+
+
+# =======  All app schedules =======
+@scheduler.scheduled_job(
+    "cron",
+    hour=settings.SCHEDULES["update_currencies_info"]["hour"],
+    minute=settings.SCHEDULES["update_currencies_info"]["minute"],
+    second=settings.SCHEDULES["update_currencies_info"]["second"],
+    id="update_currencies_info",
+)
+def schedule_update_currencies_info():
+    update_currencies_info(db=db)

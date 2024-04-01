@@ -49,7 +49,7 @@ class CurrenciesLogoCollector:
             except Exception as e:
                 logger.error(f"Error on [{symbol}]:\n{e}")
 
-        logger.info(f"Parsing symbols took {(time.time() - start_time)/1000}ms")
+        logger.info(f"Parsing symbols took {(time.time() - start_time)/1000}s")
 
         self.session.add(CurrenciesInfoScheduleModel(next_scheduled_time=self.calculate_next_time()))
         self.session.commit()
