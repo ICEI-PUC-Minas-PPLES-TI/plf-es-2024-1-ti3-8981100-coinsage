@@ -7,6 +7,7 @@ from loguru import logger
 from sqlalchemy import Uuid
 from sqlalchemy.orm import Session
 
+from src.config.manager import settings
 from src.models.db.currencies_info_schedule import CurrenciesInfoScheduleModel
 from src.models.schemas.currency_info import CurrencyInfo, CurrencyInfoResponse, LastUpdate
 from src.repository.crud import currencies_info_schedule_repository, currency_info_repository
@@ -49,13 +50,20 @@ class CurrenciesLogoCollector:
             except Exception as e:
                 logger.error(f"Error on [{symbol}]:\n{e}")
 
-        logger.info(f"Parsing symbols took {(time.time() - start_time)/1000}ms")
+        logger.info(f"Parsing symbols took {(time.time() - start_time)/1000}s")
 
-        self.session.add(CurrenciesInfoScheduleModel(next_scheduled_time=self.calculate_next_time()))
+        self.session.add(CurrenciesInfoScheduleModel(next_scheduled_time=self.next_time()))
         self.session.commit()
 
-    def calculate_next_time(self) -> datetime.datetime:
-        return datetime.datetime.now() + datetime.timedelta(days=1)
+    def next_time(self) -> datetime.datetime:
+        next_time: datetime.datetime = datetime.datetime.now().replace(
+            hour=settings.SCHEDULES["update_currencies_info"]["hour"],
+            minute=settings.SCHEDULES["update_currencies_info"]["minute"],
+            second=settings.SCHEDULES["update_currencies_info"]["second"],
+        )
+        next_time += datetime.timedelta(days=1)
+        logger.info(f"Next update time set to {next_time}")
+        return next_time
 
     def get_cryptos(self) -> CurrencyInfoResponse:
         cryptos = self.repository.get_cryptos(self.session)
