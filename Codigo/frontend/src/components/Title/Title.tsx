@@ -1,6 +1,6 @@
 import styles from './Title.module.css'
 
-export function Title() {
+const Title: React.FC = () => {
   return(
     <div>
       <h1 className={styles.title}>Balanceamento inicial</h1>
@@ -8,3 +8,5 @@ export function Title() {
     </div>
   );
 }
+
+export default Title;

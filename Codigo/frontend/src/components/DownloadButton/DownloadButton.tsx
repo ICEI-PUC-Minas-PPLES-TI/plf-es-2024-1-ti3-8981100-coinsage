@@ -1,8 +1,11 @@
+import { Button } from '@mui/material';
 import styles from './DownloadButton.module.css'
 
-
-export function DownloadButton() {
+const DownloadButton: React.FC = () => {
   return(
-    <button className={styles.downloadButton}>Download</button>
+    <Button variant="outlined">DOWNLOAD</Button>
+
   );
 }
+
+export default DownloadButton;
