@@ -5,36 +5,36 @@ from src.models.db import analysis
 from src.models.schemas import analysis_info
 
 
-def get_crypto(db: Session, crypto_uuid: Uuid) -> analysis.AnalysisBaseInfoModel | None:
+def get_crypto(db: Session, crypto_uuid: Uuid) -> analysis.Analysis | None:
     return (
-        db.query(analysis.AnalysisBaseInfoModel)
-        .filter(analysis.AnalysisBaseInfoModel.uuid == crypto_uuid)
+        db.query(analysis.Analysis)
+        .filter(analysis.Analysis.uuid == crypto_uuid)
         .first()
     )
 
 
-def get_analysis_info_by_uuid(db: Session, uuid_value: Uuid) -> analysis.AnalysisBaseInfoModel | None:
+def get_analysis_info_by_uuid(db: Session, uuid_value: Uuid) -> analysis.Analysis | None:
     return (
-        db.query(analysis.AnalysisBaseInfoModel)
-        .filter(analysis.AnalysisBaseInfoModel.uuid == uuid_value)
+        db.query(analysis.Analysis)
+        .filter(analysis.Analysis.uuid == uuid_value)
         .first()
     )
 
 
-def get_cryptos(db: Session, skip: int = 0, limit: int = 10000) -> list[analysis.AnalysisBaseInfoModel]:
-    return db.query(analysis.AnalysisBaseInfoModel).offset(skip).limit(limit).all()
+def get_cryptos(db: Session, skip: int = 0, limit: int = 10000) -> list[analysis.Analysis]:
+    return db.query(analysis.Analysis).offset(skip).limit(limit).all()
 
 
-def get_analysis_info_by_symbol(db: Session, symbol: str) -> analysis.AnalysisBaseInfoModel | None:
+def get_analysis_info_by_symbol(db: Session, symbol: str) -> analysis.Analysis | None:
     return (
-        db.query(analysis.AnalysisBaseInfoModel)
-        .filter(analysis.AnalysisBaseInfoModel.symbol == symbol)
+        db.query(analysis.Analysis)
+        .filter(analysis.Analysis.symbol == symbol)
         .first()
     )
 
 
-def create_crypto(db: Session, crypto: analysis_info.AnalysisInfo) -> analysis.AnalysisBaseInfoModel:
-    currency = analysis.AnalysisBaseInfoModel(
+def create_crypto(db: Session, crypto: analysis_info.AnalysisInfo) -> analysis.Analysis:
+    currency = analysis.Analysis(
         symbol=crypto.symbol,
         cmc_id=crypto.cmc_id,
         cmc_slug=crypto.cmc_slug,
@@ -51,4 +51,4 @@ def create_crypto(db: Session, crypto: analysis_info.AnalysisInfo) -> analysis.A
 
 
 def clear_table(db: Session) -> None:
-    db.query(analysis.AnalysisBaseInfoModel).delete()
+    db.query(analysis.Analysis).delete()

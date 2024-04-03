@@ -7,7 +7,7 @@ from sqlalchemy import ARRAY, Column, DateTime, UUID, Integer, String
 from .base import Base
 
 
-class AnalysisBaseInfoModel(Base):
+class Analysis(Base):
     __tablename__ = "analysis_info"
 
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

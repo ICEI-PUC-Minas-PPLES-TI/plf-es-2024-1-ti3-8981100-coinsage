@@ -8,7 +8,7 @@ from sqlalchemy import Uuid
 from sqlalchemy.orm import Session
 
 from src.models.db.analysis_info_schedule import AnalysisInfoScheduleModel
-from src.models.schemas.currency_info import CurrencyInfo, CurrencyInfoResponse, LastUpdate
+from src.models.schemas.currency_info import CurrencyInfo
 from src.repository.crud import analysis_info_schedule_repository, analysis_info_repository
 from src.services.externals.binance_symbol_colletor import BinanceSymbolCollector
 from src.services.externals.cmc_symbol_colletor import CmcSymbolCollector
