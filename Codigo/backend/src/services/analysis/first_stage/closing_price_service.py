@@ -7,14 +7,16 @@ from sqlalchemy.orm import Session
 
 from src.models.db.first_stage_analysis import FirstStageAnalysisModel
 from src.models.schemas.analysis.closing_price_entity import ClosingPriceResponse
-from src.repository.crud import closing_price_repository, currency_info_repository
+from src.models.schemas.analysis.first_stage_analysis import FirstStageAnalysisResponse
+from src.repository.crud import currency_info_repository, first_stage_repository
 from src.services.externals.binance_closing_price_colletor import BinanceClosingPriceColletor
+from src.utilities.runtime import show_runtime
 
 
 class ClosingPriceService:
     def __init__(self, session: Session):
         self.session = session
-        self.repository = closing_price_repository
+        self.repository = first_stage_repository
         self.symbols_repository = currency_info_repository
         self.binance_closing_price_colletor = BinanceClosingPriceColletor()
 
@@ -67,7 +69,21 @@ class ClosingPriceService:
         logger.info(f"Getting closing prices from DB took {datetime.now() - start_time}h")
         return closing_prices_responses
 
-    def get_closing_price_by_symbol(self, symbol_str: str):
+    @show_runtime
+    def get_all_by_analysis_uuid(self, uuid):
+        analysis = self.repository.get_by_analysis_uuid(self.session, uuid)
+        responses = [
+            FirstStageAnalysisResponse(
+                currency=self.symbols_repository.get_currency_info_by_uuid(self.session, anylise.uuid_currency),
+                week_incerae_percentage=anylise.week_incerae_percentage,
+                valorization_date=anylise.today,
+                current_price=anylise.closing_price,
+            )
+            for anylise in analysis
+        ]
+        return responses
+
+    def get_closing_price_by_symbol(self, symbol_str: str) -> list[FirstStageAnalysisModel]:
         symbol = self.symbols_repository.get_currency_info_by_symbol(self.session, symbol_str)
         if symbol is None:
             raise HTTPException(status_code=404, detail="Criptomoeda não encontrada")

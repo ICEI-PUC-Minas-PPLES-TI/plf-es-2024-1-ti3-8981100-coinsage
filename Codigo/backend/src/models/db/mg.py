@@ -1,5 +1,6 @@
 # main models
 from src.models.db.analysis import Analysis
+from src.models.db.analysis_info_schedule import AnalysisInfoScheduleModel
 from src.models.db.base import Base
 from src.models.db.currencies_info_schedule import CurrenciesInfoScheduleModel
 from src.models.db.currency_base_info import CurrencyBaseInfoModel

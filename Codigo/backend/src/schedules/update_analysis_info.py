@@ -1,16 +1,17 @@
-import datetime
+from datetime import datetime
 
-from src.config.manager import settings
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from loguru import logger
 from sqlalchemy.orm import Session
 
-from src.services.analysis_collector import AnalysisCollector
+from src.config.manager import settings
 from src.models.db.analysis_info_schedule import AnalysisInfoScheduleModel
+from src.services.analysis_collector import AnalysisCollector
 
 scheduler = AsyncIOScheduler()
 
 db = None
+
 
 @scheduler.scheduled_job(
     "cron",
@@ -19,18 +20,16 @@ db = None
     second=settings.SCHEDULES["update_currencies_info"]["second"],
     id="update_analysis_info",
 )
-
 def update_analysis_info():
     print("Puxe tudo aqui")
     logger.info("Updating analysis info")
     if db is not None:
         func_session: Session = db
-        #! analysis_currency_stage_one | analysis_currency_stage_two | analysis_currency_stage_three | analysis_currency_stage_four    --> Utilizando a currency_base_info        
-        AnalysisCollector(session=func_session).collect_symbols_info()
+        AnalysisCollector(session=func_session).start_analysis()
     else:
         logger.critical("Database session is not available")
-        
-              
+
+
 def check_update_analysis_info(db: Session, settings: dict) -> None:
     next_update_time = (
         db.query(AnalysisInfoScheduleModel).order_by(AnalysisInfoScheduleModel.next_scheduled_time.desc()).first()

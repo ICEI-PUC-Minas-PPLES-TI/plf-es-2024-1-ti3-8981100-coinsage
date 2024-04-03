@@ -8,7 +8,7 @@ from .base import Base
 class FirstStageAnalysisModel(Base):
     __tablename__ = "analysis_currency_stage_one"
 
-    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)  # type: ignore
     uuid_analysis = Column(UUID(as_uuid=True), ForeignKey("analysis.uuid"))
     uuid_currency = Column(UUID(as_uuid=True), ForeignKey("currency_base_info.uuid"))
     ranking = Column(Integer)  # type: ignore

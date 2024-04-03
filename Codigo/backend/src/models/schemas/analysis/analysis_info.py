@@ -2,23 +2,17 @@ from datetime import datetime
 from typing import List
 from uuid import UUID
 
+from src.models.schemas.analysis.first_stage_analysis import FirstStageAnalysisResponse
 from src.models.schemas.base import BaseSchemaModel
 
 
 class AnalysisInfo(BaseSchemaModel):
-    symbol: str
-    cmc_id: int
-    cmc_slug: str
-    urls: list[str]
-    technical_doc: list[str]
-    logo: str
-    name: str
-    description: str
+    firstStageAnalysis: List[FirstStageAnalysisResponse]
 
 
 class LastUpdate(BaseSchemaModel):
     time: datetime
-    data: List[AnalysisInfo]
+    data: AnalysisInfo
 
 
 class AnalysisInfoResponse(BaseSchemaModel):
