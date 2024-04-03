@@ -1,0 +1,12 @@
+.headerFixed {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 9999;
+}
+
+.content {
+  padding: 16px;
+  margin-top: 60px;
+  /* height: 1500px; Used in this example to enable scrolling */
+}

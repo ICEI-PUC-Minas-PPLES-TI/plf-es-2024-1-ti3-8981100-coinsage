@@ -1,0 +1,33 @@
+{
+  "last_update":{
+      "time":"2024-03-24T20:53:15.124559Z",
+      "data":
+      [
+          {
+              "symbol": "BTC",
+              "cmc_id": 1,
+              "cmc_slug": "bitcoin",
+              "urls": {
+                  "website": "https://bitcoin.org/",
+                  "technical_doc": "https://bitcoin.org/bitcoin.pdf"
+              },
+              "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+              "name": "Bitcoin",
+              "description": "Bitcoin (BTC) is a cryptocurrency launched in 2010. Users are able to generate BTC through the process of mining. Bitcoin has a current supply of 19,657,950. The last known price of Bitcoin is 67,842.47525117 USD and is down -0.45 over the last 24 hours. It is currently trading on 10930 active market(s) with $49,335,571,661.13 traded over the last 24 hours. More information can be found at https://bitcoin.org/."
+          },
+          {
+              "symbol": "ETH",
+              "cmc_id": 1027,
+              "cmc_slug": "ethereum",
+              "urls": {
+                  "website": "https://www.ethereum.org/",
+                  "technical_doc": "https://github.com/ethereum/wiki/wiki/White-Paper"
+              },
+              "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+              "name": "Ethereum",
+              "description": "Ethereum (ETH) is a cryptocurrency . Ethereum has a current supply of 120,078,892.26055382. The last known price of Ethereum is 3,537.34318332 USD and is down -2.63 over the last 24 hours. It is currently trading on 8594 active market(s) with $21,181,663,066.33 traded over the last 24 hours. More information can be found at https://www.ethereum.org/."
+          }
+          ]
+  },
+  "next_next_update": "2024-03-20T17:14Z"
+}
