@@ -1,0 +1,10 @@
+.title {
+  background:  #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.25rem 0;
+  height: 80px;
+  fontStyle: 'italic';
+  color: #121212;
+}
