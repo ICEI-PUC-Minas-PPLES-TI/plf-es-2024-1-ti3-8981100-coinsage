@@ -9,8 +9,7 @@ from src.services.currencies_logo_collector import CurrenciesLogoCollector
 
 def update_currencies_info(db: Session) -> None:
     logger.info("Updating currencies info")
-    func_session: Session = db
-    CurrenciesLogoCollector(session=func_session).collect_symbols_info()
+    CurrenciesLogoCollector(session=db).collect_symbols_info()
 
 
 def check_update_currencies_info(db: Session, settings: dict) -> None:

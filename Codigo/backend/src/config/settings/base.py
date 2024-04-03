@@ -50,6 +50,11 @@ class BackendBaseSettings(BaseSettings):
             "minute": 0,
             "second": 0,
         },
+        "update_all_analysis": {
+            "hour": 8,
+            "minute": 0,
+            "second": 0,
+        },
     }
 
     class Config(pydantic.BaseConfig):
