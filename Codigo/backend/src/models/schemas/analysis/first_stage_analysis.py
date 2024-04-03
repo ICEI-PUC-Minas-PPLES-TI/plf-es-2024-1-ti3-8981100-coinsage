@@ -8,6 +8,6 @@ from src.models.schemas.currency_info import CurrencyInfo
 
 class FirstStageAnalysisResponse(BaseSchemaModel):
     currency: CurrencyInfo
-    week_incerae_percentage: float
-    valorization_date: datetime
-    current_price: float
+    week_increase_percentage: float | None
+    valorization_date: datetime | None
+    current_price: float | None

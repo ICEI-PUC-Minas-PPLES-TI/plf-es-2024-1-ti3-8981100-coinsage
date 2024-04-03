@@ -11,7 +11,7 @@ router = APIRouter(prefix="/edwin_method", tags=["edwin_method"])
 @router.get(
     path="/",
     name="edwin_method:read-last-analysis",
-    response_model=str,
+    response_model=AnalysisInfoResponse,
     description="Coletar dados da última análise.",
     status_code=status.HTTP_200_OK,
 )

@@ -45,27 +45,36 @@ class AnalysisCollector:
     @show_runtime
     def start_analysis(self):
         new_analysis: Analysis = self._new_analysis()
-        self.session.add(AnalysisInfoScheduleModel(next_scheduled_time=self.calculate_next_time()))
-        self.session.commit()
 
         cryptos_str: List[str] = [crypto.symbol for crypto in self.symbols_service.get_cryptos().last_update.data]
         self.closing_price_service.collect(analysis_indentifier=new_analysis.uuid)
-        self.week_increse_service.calculate_all_week_percentage_valorization(cryptos_str)
+        self.week_increse_service.calculate_all_week_percentage_valorization(cryptos_str, new_analysis.uuid)
+
+        self.session.add(AnalysisInfoScheduleModel(next_scheduled_time=self.calculate_next_time()))
+        self.session.commit()
 
     def calculate_next_time(self) -> datetime.datetime:
         return datetime.datetime.now() + datetime.timedelta(days=1)
 
-    def get_last_analysis(self) -> AnalysisInfoResponse:
+    def get_last_analysis(self):
         last_analysis: Analysis | None = self.repository.get_last(self.session)
         schedule: AnalysisInfoScheduleModel | None = self.schedule_repository.get_last_update(self.session)
 
         if last_analysis and schedule:
-            all_first_stage: List[FirstStageAnalysisResponse] = self.repository.get_analysis_info_by_uuid(
-                self.session, last_analysis.uuid
+            all_first_stage: List[FirstStageAnalysisResponse] = self.closing_price_service.get_all_by_analysis_uuid(
+                last_analysis.uuid
             )
-            return AnalysisInfoResponse(
-                next_update=schedule.next_scheduled_time,
-                last_update=LastUpdate(time=last_analysis.date, data=AnalysisInfo(firstStageAnalysis=all_first_stage)),
-            )
+
+            try:
+                analysis = AnalysisInfo(firstStageAnalysis=all_first_stage)
+                return AnalysisInfoResponse(
+                    next_update=schedule.next_scheduled_time,
+                    last_update=LastUpdate(time=last_analysis.date, data=analysis),
+                )
+            except Exception as e:
+                logger.error(f"Error on get_last_analysis: {e}")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error on get_last_analysis"
+                )
 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No analysis found")

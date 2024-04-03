@@ -16,6 +16,7 @@ class FirstStageAnalysisModel(Base):
     week_increase_percentage = Column(NUMERIC(precision=15, scale=8))  # type: ignore
     increase_date = Column(DateTime)
     closing_price = Column(NUMERIC(precision=15, scale=8))  # type: ignore
+    last_week_closing_price = Column(NUMERIC(precision=15, scale=8))  # type: ignore
     open_price = Column(NUMERIC(precision=15, scale=8))  # type: ignore
     ema8 = Column(NUMERIC(precision=15, scale=8))  # type: ignore
     ema8_greater_open = Column(Boolean)  # type: ignore

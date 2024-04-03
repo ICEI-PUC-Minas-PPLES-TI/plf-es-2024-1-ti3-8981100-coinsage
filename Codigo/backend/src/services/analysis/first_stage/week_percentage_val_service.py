@@ -20,39 +20,46 @@ class WeekPercentageValorizationService:
         self.closing_price_service = closing_price_service
         self.repository = first_stage_repository
 
-    def _calculate_week_percentage_valorization(self, symbol: str) -> Decimal:
-        last_weeks_closing_prices: list[FirstStageAnalysisModel] = (
-            self.closing_price_service.get_closing_price_by_symbol(symbol)
-        )
+    def _calculate_week_percentage_valorization(self, symbol: str, analysis_uuid) -> float:
+        closes: FirstStageAnalysisModel = self.closing_price_service.get_closing_price_by_symbol(symbol, analysis_uuid)
 
-        if last_weeks_closing_prices.__len__() < 2:
-            logger.warning(f"Closing prices not found for symbol {symbol}")
-            raise ValueError(f"Closing prices not found for symbol {symbol}")
-
-        current_week = last_weeks_closing_prices[1]
-        last_week = last_weeks_closing_prices[0]
-        percentage_diff = (current_week.closing_price - last_week.closing_price) / last_week.closing_price * 100
-        return Decimal(float(percentage_diff))
+        try:
+            percentage_diff = (
+                (closes.closing_price - closes.last_week_closing_price) / closes.last_week_closing_price * 100
+            )
+            logger.debug(
+                f"Symbol: {symbol}, Current Week: {closes.closing_price}, Last Week: {closes.last_week_closing_price}"
+            )
+            logger.debug(f"Percentage Diff: {percentage_diff}")
+            return float(percentage_diff)
+        except TypeError as e:
+            logger.error(f"Error on [{symbol}]:\n{e}")
+            return 0.0
 
     @show_runtime
-    def calculate_all_week_percentage_valorization(self, symbols: list[str]) -> list[FirstStageAnalysisModel]:
+    def calculate_all_week_percentage_valorization(
+        self, symbols: list[str], analysis_uuid
+    ) -> list[FirstStageAnalysisModel]:
         all_diffs = []
 
         with ThreadPoolExecutor() as executor:
-            futures = [executor.submit(self._calculate_week_percentage_valorization, symbol) for symbol in symbols]
+            futures = [
+                executor.submit(self._calculate_week_percentage_valorization, symbol, analysis_uuid)
+                for symbol in symbols
+            ]
 
             for future, symbol in zip(futures, symbols):
                 collected = future.result()
                 all_diffs.append({symbol: collected})
 
         # update first stage model with week percentage valorization
-        self.update_last(all_diffs)
+        self.update_last(all_diffs, analysis_uuid)
 
         return self.repository.get_all(self.session)
 
     @show_runtime
-    def update_last(self, increases):
+    def update_last(self, increases, analysis_uuid):
         for increase in increases:
             symbol = list(increase.keys())[0]
             week_percentage = increase[symbol]
-            self.repository.update_last_week_percentage(self.session, symbol, week_percentage)
+            self.repository.update_last_week_percentage(self.session, symbol, week_percentage, analysis_uuid)

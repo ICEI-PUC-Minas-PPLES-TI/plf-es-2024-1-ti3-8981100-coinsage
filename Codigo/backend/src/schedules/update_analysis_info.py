@@ -13,21 +13,9 @@ scheduler = AsyncIOScheduler()
 db = None
 
 
-@scheduler.scheduled_job(
-    "cron",
-    hour=settings.SCHEDULES["update_currencies_info"]["hour"],
-    minute=settings.SCHEDULES["update_currencies_info"]["minute"],
-    second=settings.SCHEDULES["update_currencies_info"]["second"],
-    id="update_analysis_info",
-)
-def update_analysis_info():
-    print("Puxe tudo aqui")
+def update_analysis_info(db: Session) -> None:
     logger.info("Updating analysis info")
-    if db is not None:
-        func_session: Session = db
-        AnalysisCollector(session=func_session).start_analysis()
-    else:
-        logger.critical("Database session is not available")
+    AnalysisCollector(session=db).start_analysis()
 
 
 def check_update_analysis_info(db: Session, settings: dict) -> None:
@@ -39,7 +27,7 @@ def check_update_analysis_info(db: Session, settings: dict) -> None:
 
     if next_update_time is not None:
         if next_update_time.last_update_time.date() == now.date():
-            logger.info("Currencies info already updated today")
+            logger.info("Analysis info already updated today")
             return
 
         logger.info("Schedule is late. Updating now")
