@@ -12,8 +12,9 @@ class CurrencyInfo(BaseSchemaModel):
     logo: str
     name: str
     description: str
-    technical_doc: list[str]
-    urls: list[str]
+    current_price: float
+    _technical_doc: list[str]
+    _urls: list[str]
 
 
 class LastUpdate(BaseSchemaModel):

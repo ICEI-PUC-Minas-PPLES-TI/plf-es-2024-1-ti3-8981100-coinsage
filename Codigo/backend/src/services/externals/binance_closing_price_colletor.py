@@ -48,3 +48,26 @@ class BinanceClosingPriceColletor:
 
         logger.info(f"Collecting {len(coins)} cypto closing price from DB took {(time.time() - start_time)}h")
         return data
+
+    def get_price_at_timestamp(self, symbol: str, timestamp: int) -> float | None:
+        """
+        Retrieves the closing price of a cryptocurrency at a specific timestamp.
+
+        Args:
+            symbol (str): The symbol of the cryptocurrency pair.
+            interval (str): The interval of the kline data.
+            timestamp (int): The timestamp for which the closing price is to be retrieved.
+
+        Returns:
+            float or None: The closing price of the cryptocurrency at the specified timestamp,
+            or None if the price could not be retrieved.
+
+        Note:
+            The timestamp should be in milliseconds since the Unix epoch."""
+        try:
+            raw_data = Spot().klines(symbol=symbol, interval="1m", startTime=timestamp, endTime=timestamp, limit=1)
+            if raw_data:
+                return float(raw_data[0][4])
+        except Exception as e:
+            logger.error(f"Error fetching price for {symbol} at timestamp {timestamp}: {e}")
+        return None

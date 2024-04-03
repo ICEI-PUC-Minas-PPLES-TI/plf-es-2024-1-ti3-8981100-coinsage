@@ -34,3 +34,22 @@ def save_all(db: Session, closing_prices: list[FirstStageAnalysisModel]) -> list
     for closing_price in closing_prices:
         db.refresh(closing_price)
     return closing_prices
+
+
+def update_current_price(db: Session, symbol: str, current_price: float):
+    if current_price is None:
+        raise ValueError(f"Failed to get current price for symbol {symbol}")
+
+    item = (
+        db.query(FirstStageAnalysisModel)
+        .join(CurrencyBaseInfoModel, FirstStageAnalysisModel.uuid_currency == CurrencyBaseInfoModel.uuid)
+        .filter(CurrencyBaseInfoModel.symbol == symbol)
+        .order_by(FirstStageAnalysisModel.today.desc())
+        .first()
+    )
+
+    if item is None:
+        raise ValueError(f"Item not found for symbol {symbol}")
+
+    item.current_price = current_price
+    db.commit()
