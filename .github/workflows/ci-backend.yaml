@@ -52,7 +52,7 @@ jobs:
           flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
       - name: Lint with MyPy
         run: |
-          mypy . --pretty
+          mypy . --pretty --config-file pyproject.toml
 
   # tests:
   #   name: 'Tests 🧪'
