@@ -68,8 +68,8 @@ class AnalysisCollector:
             try:
                 analysis = AnalysisInfo(firstStageAnalysis=all_first_stage)
                 return AnalysisInfoResponse(
-                    next_update=schedule.next_scheduled_time,
-                    last_update=LastUpdate(time=last_analysis.date, data=analysis),
+                    next_update=schedule.next_scheduled_time,  # type: ignore
+                    last_update=LastUpdate(time=last_analysis.date, data=analysis),  # type: ignore
                 )
             except Exception as e:
                 logger.error(f"Error on get_last_analysis: {e}")

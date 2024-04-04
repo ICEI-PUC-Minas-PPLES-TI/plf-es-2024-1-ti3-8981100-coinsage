@@ -20,7 +20,7 @@ class CurrencyBaseInfoModel(Base):
     _urls = Column(Text, nullable=True)
 
     @property
-    def technical_doc(self):
+    def technical_doc(self) -> list[str]:
         if self._technical_doc:
             return self._technical_doc.split(",")
         else:
@@ -38,7 +38,7 @@ class CurrencyBaseInfoModel(Base):
             raise ValueError("technical_doc must be a list of strings")
 
     @property
-    def urls(self):
+    def urls(self) -> list[str]:
         if self._urls:
             return self._urls.split(",")
         else:
