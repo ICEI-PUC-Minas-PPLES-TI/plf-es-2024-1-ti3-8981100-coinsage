@@ -8,6 +8,7 @@ from src.config.manager import settings
 from src.models.db.analysis_info_schedule import AnalysisInfoScheduleModel
 from src.services.analysis.analysis_collector import AnalysisCollector
 
+
 def update_analysis_info(db: Session) -> None:
     logger.info("Updating analysis info")
     AnalysisCollector(session=db).start_analysis()

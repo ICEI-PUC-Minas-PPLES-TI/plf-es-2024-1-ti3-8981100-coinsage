@@ -26,14 +26,14 @@ class ClosingPriceService:
 
     def extract(self, analysis_indentifier: Uuid, closing_prices):
         closing_prices_models: list[FirstStageAnalysisModel] = []
-        
+
         for closing_price in closing_prices:
             symbol = self.symbols_repository.get_currency_info_by_symbol(self.session, closing_price["symbol"])
-            
+
             if symbol is None:
                 logger.warning(f"Symbol {closing_price['symbol']} not found in DB")
                 continue
-            
+
             if len(closing_price["data"]) != 7:
                 logger.warning(f"Symbol {closing_price['symbol']} has not enough data")
                 logger.critical(f"Closing prices: {closing_price}")
@@ -57,12 +57,11 @@ class ClosingPriceService:
             closing_prices_models.append(current_week)
 
         self.repository.save_all(self.session, closing_prices_models)
-    
+
     @show_runtime
     def collect(self, analysis_indentifier: Uuid):
         closing_prices = self._collect_binance_closing_prices()
         self.extract(analysis_indentifier, closing_prices)
-        
 
     def get_all_closing_prices(self):
         start_time = datetime.now()
