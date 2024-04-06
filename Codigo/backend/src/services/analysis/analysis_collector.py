@@ -32,9 +32,6 @@ class AnalysisCollector:
             session=session, closing_price_service=self.closing_price_service
         )
 
-    def _clear_table(self):
-        self.repository.clear_table(self.session)
-
     def _new_analysis(self) -> Analysis:
         analysis: Analysis = Analysis()
         self.session.add(analysis)
@@ -47,6 +44,7 @@ class AnalysisCollector:
         new_analysis: Analysis = self._new_analysis()
 
         cryptos_str: List[str] = [crypto.symbol for crypto in self.symbols_service.get_cryptos().last_update.data]
+        
         self.closing_price_service.collect(analysis_indentifier=new_analysis.uuid)
         self.week_increse_service.calculate_all_week_percentage_valorization(cryptos_str, new_analysis.uuid)
 
@@ -74,7 +72,7 @@ class AnalysisCollector:
             except Exception as e:
                 logger.error(f"Error on get_last_analysis: {e}")
                 raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error on get_last_analysis"
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error on getting last analysis"
                 )
 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No analysis found")

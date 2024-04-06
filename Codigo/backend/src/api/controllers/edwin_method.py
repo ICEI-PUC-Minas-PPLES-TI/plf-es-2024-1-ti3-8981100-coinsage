@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from src.api.dependencies.session import get_db
 from src.models.schemas.analysis.analysis_info import AnalysisInfoResponse
-from src.services.analysis_collector import AnalysisCollector
+from src.services.analysis.analysis_collector import AnalysisCollector
 
 router = APIRouter(prefix="/edwin_method", tags=["edwin_method"])
 

@@ -66,12 +66,12 @@ class CurrenciesLogoCollector:
             # Convert the cryptos list to CurrencyInfo
             converted_cryptos = [
                 CurrencyInfo(
-                    cmc_id=crypto.cmc_id.python_type,
-                    cmc_slug=crypto.cmc_slug.python_type,
-                    description=crypto.description.python_type,
-                    logo=crypto.logo.python_type,
-                    name=crypto.name.python_type,
-                    symbol=crypto.symbol.python_type,
+                    cmc_id=crypto.cmc_id,
+                    cmc_slug=crypto.cmc_slug,
+                    description=crypto.description,
+                    logo=crypto.logo,
+                    name=crypto.name,
+                    symbol=crypto.symbol,
                     technical_doc=crypto.technical_doc,
                     urls=crypto.urls,
                 )
