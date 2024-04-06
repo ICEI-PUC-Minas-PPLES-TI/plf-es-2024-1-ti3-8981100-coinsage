@@ -1,3 +1,4 @@
+import json
 from concurrent.futures import ThreadPoolExecutor
 from decimal import Decimal
 from typing import Annotated
@@ -22,15 +23,13 @@ class WeekPercentageValorizationService:
 
     def _calculate_week_percentage_valorization(self, symbol: str, analysis_uuid) -> float:
         closes: FirstStageAnalysisModel = self.closing_price_service.get_closing_price_by_symbol(symbol, analysis_uuid)
-
         try:
             percentage_diff = (
-                (closes.closing_price - closes.last_week_closing_price) / closes.last_week_closing_price * 100
-            )
+                (closes.closing_price - closes.last_week_closing_price) / closes.last_week_closing_price
+            ) * 100
             logger.debug(
-                f"Symbol: {symbol}, Current Week: {closes.closing_price}, Last Week: {closes.last_week_closing_price}"
+                f"Symbol: {symbol}, Current Week: {closes.closing_price}, Last Week: {closes.last_week_closing_price}, Percentage Diff: {percentage_diff}"
             )
-            logger.debug(f"Percentage Diff: {percentage_diff}")
             return float(percentage_diff)
         except TypeError as e:
             logger.error(f"Error on [{symbol}]:\n{e}")
