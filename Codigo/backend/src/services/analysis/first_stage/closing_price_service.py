@@ -22,8 +22,8 @@ class ClosingPriceService:
         symbols_str = [symbol.symbol for symbol in self.symbols_repository.get_cryptos(self.session)]
         return self.binance_closing_price_colletor.collect(symbols=symbols_str, interval=interval, limit=limit)
 
-    def collect_current_price_at_timestamp(self, symbol: str, timestamp: float):
-        current_price = self.binance_closing_price_colletor.get_price_at_timestamp(symbol=symbol, timestamp=timestamp)
+    def collect_current_price_at_timestamp(self, symbol: str, time_to_collect_price: datetime):
+        current_price = self.binance_closing_price_colletor.get_price_at_timestamp(symbol=symbol, timestamp=time_to_collect_price.timestamp)
         self.repository.update_current_price(self.session, symbol=symbol, current_price=current_price)
 
     def collect(self, analysis_indentifier: Uuid):

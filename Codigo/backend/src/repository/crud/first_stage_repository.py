@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-
+from fastapi.encoders import jsonable_encoder
 from src.models.db.currency_base_info import CurrencyBaseInfoModel
 from src.models.db.first_stage_analysis import FirstStageAnalysisModel
 
@@ -36,7 +36,21 @@ def save_all(db: Session, closing_prices: list[FirstStageAnalysisModel]) -> list
     return closing_prices
 
 
-def update_current_price(db: Session, symbol: str, current_price: float):
+def update_current_price(db: Session, symbol: str, current_price: float) -> FirstStageAnalysisModel:
+    """
+    Update the current price of a currency symbol in the database.
+
+    Args:
+        db (Session): SQLAlchemy database session.
+        symbol (str): The symbol of the currency.
+        current_price (float): The current price to be updated.
+
+    Raises:
+        ValueError: If the current_price is None or if no item is found for the given symbol.
+
+    Returns:
+        FirstStageAnalysisModel
+    """
     if current_price is None:
         raise ValueError(f"Failed to get current price for symbol {symbol}")
 
@@ -51,5 +65,8 @@ def update_current_price(db: Session, symbol: str, current_price: float):
     if item is None:
         raise ValueError(f"Item not found for symbol {symbol}")
 
+    update_current_price_encoded = jsonable_encoder(item)
+
     item.current_price = current_price
     db.commit()
+    return update_current_price_encoded

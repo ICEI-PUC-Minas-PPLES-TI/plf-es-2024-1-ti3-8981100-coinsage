@@ -1,5 +1,6 @@
 import threading
 import time
+from datetime import datetime
 
 from binance.spot import Spot
 from loguru import logger
@@ -49,7 +50,7 @@ class BinanceClosingPriceColletor:
         logger.info(f"Collecting {len(coins)} cypto closing price from DB took {(time.time() - start_time)}h")
         return data
 
-    def get_price_at_timestamp(self, symbol: str, timestamp: int) -> float | None:
+    def get_price_at_timestamp(self, symbol: str, timestamp: int | str) -> float | None:
         """
         Retrieves the closing price of a cryptocurrency at a specific timestamp.
 

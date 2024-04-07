@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, NUMERIC, UUID
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, NUMERIC, UUID, Float
 
 from .base import Base
 
@@ -28,3 +28,4 @@ class FirstStageAnalysisModel(Base):
     ema_aligned = Column(Boolean)  # type: ignore
     buying_signal = Column(Boolean)  # type: ignore
     today = Column(DateTime)
+    current_price = Column(Float) # type: ignore

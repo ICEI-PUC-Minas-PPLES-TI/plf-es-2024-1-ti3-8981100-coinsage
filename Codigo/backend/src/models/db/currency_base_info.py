@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Column, Integer, String, Text, UUID, Float
+from sqlalchemy import Column, Integer, String, Text, UUID
 from sqlalchemy.orm import validates
 
 from .base import Base
@@ -16,7 +16,6 @@ class CurrencyBaseInfoModel(Base):
     logo = Column(String(length=1000))
     name = Column(String(length=100))
     description = Column(String(length=5000))
-    current_price = Column(Float)
     _technical_doc = Column(Text, nullable=True)
     _urls = Column(Text, nullable=True)
 
