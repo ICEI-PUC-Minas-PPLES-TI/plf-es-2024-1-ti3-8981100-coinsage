@@ -1,0 +1,77 @@
+@startuml
+title Coinsage - Sprint 2
+
+left to right direction
+actor "Investidor" as investor
+actor "Temporizador" as schedule
+actor "Binance API" as binance
+actor "CoinMarketCap API" as cmc
+
+rectangle "Legenda"{
+    skinparam minClassWidth 10
+    skinparam nodesep 1
+    skinparam ranksep 1
+
+    rectangle "Sprint 1" #LightBlue
+    rectangle "Sprint 2" #LightGreen
+    ' rectangle "Sprint 3" #LightCoral
+    ' rectangle "Sprint 4" #LightYellow
+}
+
+rectangle "Coinsage"{
+    skinparam nodesep 20
+
+    ' Schedules use cases
+    usecase "Iniciar Análise" as sch_analysis #LightBlue
+    usecase "Coletar Informações das moedas" as sch_cripto_info #LightBlue
+    usecase "Coletar variação semanal" as collect_cripto_week_incresse #LightBlue
+    usecase "Coletar preço atual" as collect_cripto_current_price #LightGreen /' Should be sprint 1 but not ended '/
+
+    usecase "Coletar Setores" as sch_sectors #LightGreen
+    usecase "Coletar preços de abertura e fechamento" as collect_cripto_open_close #LightGreen
+    usecase "Calcular relações de ema8" as collect_ema8_relations #LightGreen
+    usecase "Calcular relações de volume" as collect_volume_relations #LightGreen
+
+    ' Report use cases
+    usecase "Vizualizar logo e nome das moedas" as view_cripto_info #LightBlue
+    usecase "Vizualizar porcentagem de variação semanal" as view_cripto_week_incresse #LightBlue
+    usecase "Vizualizar preço atual" as view_cripto_current_price #LightGreen /' Should be sprint 1 but not ended '/
+
+    usecase "Visualizar Setores" as view_sectors #LightGreen
+    usecase "Visualizar preço de abertura e fechamento" as view_cripto_open_close #LightGreen
+    usecase "Visualizar relações de ema8" as view_ema8_relations #LightGreen
+    usecase "Visualizar relações de volume" as view_volume_relations #LightGreen
+}
+
+' Schedules use cases
+schedule -- sch_analysis
+schedule -- sch_sectors
+schedule -- sch_cripto_info
+
+' APIS use cases
+sch_sectors -- cmc
+sch_cripto_info -- binance
+sch_cripto_info -- cmc
+collect_cripto_week_incresse -- binance
+collect_cripto_current_price -- binance
+collect_cripto_open_close -- binance
+collect_ema8_relations -- binance
+collect_volume_relations -- binance
+
+' Investor use cases
+investor -- view_sectors
+investor -- view_cripto_info
+investor -- view_cripto_week_incresse
+investor -- view_cripto_current_price
+investor -- view_cripto_open_close
+investor -- view_ema8_relations
+investor -- view_volume_relations
+
+' Use cases relations
+sch_analysis --> collect_cripto_week_incresse  : <<include>>
+sch_analysis --> collect_cripto_current_price  : <<include>>
+sch_analysis --> collect_cripto_open_close  : <<include>>
+sch_analysis --> collect_ema8_relations  : <<include>>
+sch_analysis --> collect_volume_relations  : <<include>>
+
+@enduml
