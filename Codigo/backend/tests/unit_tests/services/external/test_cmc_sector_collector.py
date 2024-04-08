@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from coinmarketcapapi import CoinMarketCapAPIError
 
@@ -62,6 +64,7 @@ def test_cmc_api_rate_limit(mocker):
 
 # @pytest.mark.skip
 def test_should_not_raise_rate_limit_request_error():
+    time.sleep(60)  # Sleep for 1 minute to avoid rate limit
     collector = CmcSectorsCollector()
     symbols_list = ["BTC"] * 70
     sectors = collector(symbols_list)
