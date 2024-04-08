@@ -1,10 +1,7 @@
-import time
-
 import pytest
 from coinmarketcapapi import CoinMarketCapAPIError
 
 from src.services.externals.cmc_sectors_collector import CmcSectorsCollector
-from tests.db.db_fixture import test_session
 
 
 # @pytest.mark.skip
