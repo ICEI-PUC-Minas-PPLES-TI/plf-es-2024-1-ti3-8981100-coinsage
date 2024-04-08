@@ -73,6 +73,12 @@ jobs:
       SERVER_PORT: ${{ secrets.SERVER_PORT }}
       SERVER_WORKERS: ${{ secrets.SERVER_WORKERS }}
       IS_ALLOWED_CREDENTIALS: ${{ secrets.IS_ALLOWED_CREDENTIALS }}
+      CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
+      DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+      DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+      DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+      DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+      DATABASE_USER: ${{ secrets.DATABASE_USER }}
 
     runs-on: ${{ matrix.os }}
     steps:
