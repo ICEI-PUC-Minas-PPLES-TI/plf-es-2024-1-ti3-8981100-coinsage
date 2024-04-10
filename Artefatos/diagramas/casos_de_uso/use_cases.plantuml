@@ -31,6 +31,7 @@ rectangle "Coinsage"{
     usecase "Coletar preços de abertura e fechamento" as collect_cripto_open_close #LightGreen
     usecase "Calcular relações de ema8" as collect_ema8_relations #LightGreen
     usecase "Calcular relações de volume" as collect_volume_relations #LightGreen
+    usecase "Coletar data do aumento expressivo" as collect_expressive_volume_date #LightGreen
 
     ' Report use cases
     usecase "Vizualizar logo e nome das moedas" as view_cripto_info #LightBlue
@@ -41,6 +42,7 @@ rectangle "Coinsage"{
     usecase "Visualizar preço de abertura e fechamento" as view_cripto_open_close #LightGreen
     usecase "Visualizar relações de ema8" as view_ema8_relations #LightGreen
     usecase "Visualizar relações de volume" as view_volume_relations #LightGreen
+    usecase "Visualizar aumento do volume expressivo" as view_expressive_volume_increase #LightGreen
 }
 
 ' Schedules use cases
@@ -57,6 +59,7 @@ collect_cripto_current_price -- binance
 collect_cripto_open_close -- binance
 collect_ema8_relations -- binance
 collect_volume_relations -- binance
+collect_expressive_volume_date -- binance
 
 ' Investor use cases
 investor -- view_sectors
@@ -66,6 +69,7 @@ investor -- view_cripto_current_price
 investor -- view_cripto_open_close
 investor -- view_ema8_relations
 investor -- view_volume_relations
+investor -- view_expressive_volume_increase
 
 ' Use cases relations
 sch_analysis --> collect_cripto_week_incresse  : <<include>>
@@ -73,5 +77,6 @@ sch_analysis --> collect_cripto_current_price  : <<include>>
 sch_analysis --> collect_cripto_open_close  : <<include>>
 sch_analysis --> collect_ema8_relations  : <<include>>
 sch_analysis --> collect_volume_relations  : <<include>>
+sch_analysis --> collect_expressive_volume_date : <<include>>
 
 @enduml
