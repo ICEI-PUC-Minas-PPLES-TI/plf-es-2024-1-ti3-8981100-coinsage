@@ -46,6 +46,7 @@ const Balanceamento: React.FC = () => {
   return (
     <div className={styles.content}>
       <Title />
+      <DownloadButton/>
       <div className={styles.datagrid}>
         <DataGrid
           rows={rows}
