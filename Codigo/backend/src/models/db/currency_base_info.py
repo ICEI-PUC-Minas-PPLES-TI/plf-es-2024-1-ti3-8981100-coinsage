@@ -1,6 +1,7 @@
+import datetime
 import uuid
 
-from sqlalchemy import Column, Integer, String, Text, UUID
+from sqlalchemy import Column, DateTime, Integer, String, Text, UUID
 from sqlalchemy.orm import validates
 
 from .base import Base
@@ -18,6 +19,8 @@ class CurrencyBaseInfoModel(Base):
     description = Column(String(length=5000))
     _technical_doc = Column(Text, nullable=True)
     _urls = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.now())
+    last_updated = Column(DateTime, default=datetime.datetime.now())
 
     @property
     def technical_doc(self) -> list[str]:
