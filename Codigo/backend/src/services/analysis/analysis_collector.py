@@ -32,9 +32,6 @@ class AnalysisCollector:
             session=session, closing_price_service=self.closing_price_service
         )
 
-    def _clear_table(self):
-        self.repository.clear_table(self.session)
-
     def _new_analysis(self) -> Analysis:
         analysis: Analysis = Analysis()
         self.session.add(analysis)
@@ -44,18 +41,25 @@ class AnalysisCollector:
 
     @show_runtime
     def start_analysis(self):
-        new_analysis: Analysis = self._new_analysis()
+        logger.info(f"Starting analysis at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        try:
+            new_analysis: Analysis = self._new_analysis()
 
-        cryptos_str: List[str] = [crypto.symbol for crypto in self.symbols_service.get_cryptos().last_update.data]
-        self.closing_price_service.collect(analysis_indentifier=new_analysis.uuid)
-        self.week_increse_service.calculate_all_week_percentage_valorization(cryptos_str, new_analysis.uuid)
+            cryptos_str: List[str] = [crypto.symbol for crypto in self.symbols_service.get_cryptos().last_update.data]
 
-        self.session.add(AnalysisInfoScheduleModel(next_scheduled_time=self.calculate_next_time()))
-        self.session.commit()
+            self.closing_price_service.collect(analysis_indentifier=new_analysis.uuid)
+            self.week_increse_service.calculate_all_week_percentage_valorization(cryptos_str, new_analysis.uuid)
+
+            self.session.add(AnalysisInfoScheduleModel(next_scheduled_time=self.calculate_next_time()))
+            self.session.commit()
+        except Exception as err:
+            logger.error(f"Error on start_analysis: {err}")
+            self.session.rollback()
 
     def calculate_next_time(self) -> datetime.datetime:
         return datetime.datetime.now() + datetime.timedelta(days=1)
 
+    @show_runtime
     def get_last_analysis(self):
         last_analysis: Analysis | None = self.repository.get_last(self.session)
         schedule: AnalysisInfoScheduleModel | None = self.schedule_repository.get_last_update(self.session)
@@ -74,7 +78,7 @@ class AnalysisCollector:
             except Exception as e:
                 logger.error(f"Error on get_last_analysis: {e}")
                 raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error on get_last_analysis"
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error on getting last analysis"
                 )
 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No analysis found")
