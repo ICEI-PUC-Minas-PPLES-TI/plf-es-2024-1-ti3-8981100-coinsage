@@ -27,9 +27,9 @@ class WeekPercentageValorizationService:
             percentage_diff = (
                 (closes.closing_price - closes.last_week_closing_price) / closes.last_week_closing_price
             ) * 100
-            logger.debug(
-                f"Symbol: {symbol}, Current Week: {closes.closing_price}, Last Week: {closes.last_week_closing_price}, Percentage Diff: {percentage_diff}"
-            )
+            # logger.debug(
+            #     f"Symbol: {symbol}, Current Week: {closes.closing_price}, Last Week: {closes.last_week_closing_price}, Percentage Diff: {percentage_diff}"
+            # )
             return float(percentage_diff)
         except TypeError as e:
             logger.error(f"Error on [{symbol}]:\n{e}")

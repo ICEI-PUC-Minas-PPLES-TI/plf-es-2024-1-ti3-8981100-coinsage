@@ -62,7 +62,7 @@ def test_cmc_api_rate_limit(mocker):
         assert "You've exceeded your API Key's" in str(e)
 
 
-# @pytest.mark.skip
+@pytest.mark.skip(reason="This test takes to long, should be run manually")
 def test_should_not_raise_rate_limit_request_error():
     time.sleep(60)  # Sleep for 1 minute to avoid rate limit
     collector = CmcSectorsCollector()

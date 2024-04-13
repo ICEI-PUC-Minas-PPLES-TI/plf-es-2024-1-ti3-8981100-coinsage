@@ -22,7 +22,7 @@ class CmcSectorsCollector:
     @show_runtime
     def _collect(self, symbols_list: List[str]):
         for symbol in symbols_list:
-            logger.debug(f"Collecting sector for {symbol}")  # TODO: Remove this line
+            # logger.debug(f"Collecting sector for {symbol}")  # TODO: Remove this line
             try:
                 data = self.api.cryptocurrency_categories(symbol=symbol, limit=1000).data
                 time.sleep(self.INTERVAL_CALL)
@@ -47,7 +47,7 @@ class CmcSectorsCollector:
         for s in self.sectors:
             if s["name"] == sector["name"]:
                 s["symbols"].append(symbol)
-                logger.debug(f"Appended {symbol} to {sector['name']} in {datetime.now() - apend_time} seconds")
+                # logger.debug(f"Appended {symbol} to {sector['name']} in {datetime.now() - apend_time} seconds")
                 return
 
         self.sectors.append(

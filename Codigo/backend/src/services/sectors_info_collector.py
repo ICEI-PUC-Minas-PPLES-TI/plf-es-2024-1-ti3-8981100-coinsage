@@ -56,7 +56,9 @@ class SectorsCollector:
             # Sector already exists, just update the number of coins
             elif sector_db is not None:
                 logger.info(f"Updating sector: {sector['name']}")
-                sector_db.num_tokens = sector["num_tokens"]
+                # logger.debug(f"Number of coins? {sector_db.coins_quantity} -> {sector['num_tokens']}")
+                sector_db.coins_quantity = sector["num_tokens"]
+                sector_db.active = True  # type: ignore
                 self.repository.update(db_session, sector_db)
                 self.add_coins_to_sector(db_session, sector_db, sector["symbols"])
                 continue
