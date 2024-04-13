@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from src.api.dependencies.session import get_db
 from src.models.schemas.analysis.analysis_info import AnalysisInfoResponse
 from src.services.analysis.analysis_collector import AnalysisCollector
+from src.services.sectors_info_collector import SectorsCollector
 
 router = APIRouter(prefix="/edwin_method", tags=["edwin_method"])
 
@@ -16,5 +17,6 @@ router = APIRouter(prefix="/edwin_method", tags=["edwin_method"])
     status_code=status.HTTP_200_OK,
 )
 async def get_accounts(db: Session = Depends(get_db)) -> AnalysisInfoResponse:
+    SectorsCollector().collect(db)
     analysis = AnalysisCollector(session=db).get_last_analysis()
     return analysis

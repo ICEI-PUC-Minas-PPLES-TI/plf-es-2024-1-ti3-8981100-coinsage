@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy import Uuid
 from sqlalchemy.orm import Session
@@ -9,6 +9,12 @@ from src.models.db.setor import Setor
 
 def get_sector_by_cmc_id(db: Session, cmc_id: int) -> Optional[Setor]:
     return db.query(Setor).filter(Setor.cmc_id == cmc_id).first()
+
+
+def get_by_symbol_uuid(db: Session, currency_uuid: Uuid) -> List[Setor]:
+    return (
+        db.query(Setor).join(SetorCurrencyBaseInfo).filter(SetorCurrencyBaseInfo.uuid_currency == currency_uuid).all()
+    )
 
 
 def deactivate_sector(db: Session, sector: Setor) -> Setor:

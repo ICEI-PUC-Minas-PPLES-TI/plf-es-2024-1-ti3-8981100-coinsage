@@ -12,5 +12,5 @@ class Setor(Base):
     name = Column(String(length=500))
     title = Column(String(length=500))
     coins_quantity = Column(Integer)
-    cmc_id = Column(Integer)
+    cmc_id = Column(String(length=200))
     active = Column(Boolean, default=True)

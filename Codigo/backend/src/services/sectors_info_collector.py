@@ -1,4 +1,6 @@
+from datetime import datetime
 from typing import List
+from uuid import UUID
 
 from loguru import logger
 from sqlalchemy.orm import Session
@@ -23,6 +25,8 @@ class SectorsCollector:
 
     @show_runtime
     def collect(self, db_session: Session):
+        logger.info(f"Starting sectors collection at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
         cryptos = self.symbols_repository.get_cryptos(db_session)
         raw_sector_info = self.external_collector([crypto.symbol for crypto in cryptos])  # type: ignore
         for sector in raw_sector_info:
@@ -84,3 +88,8 @@ class SectorsCollector:
                 symbols.remove(coin.symbol)  # type: ignore
 
         return symbols
+
+    def get_by_symbol_uuid(self, db_session: Session, symbol_uuid: UUID) -> List[Setor]:
+        sector_list = self.repository.get_by_symbol_uuid(db_session, symbol_uuid)  # type: ignore
+        sector_list.sort(key=lambda x: x.coins_quantity, reverse=True)  # type: ignore
+        return sector_list

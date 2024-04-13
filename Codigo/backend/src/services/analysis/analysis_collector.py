@@ -41,6 +41,7 @@ class AnalysisCollector:
 
     @show_runtime
     def start_analysis(self):
+        logger.info(f"Starting analysis at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         new_analysis: Analysis = self._new_analysis()
 
         cryptos_str: List[str] = [crypto.symbol for crypto in self.symbols_service.get_cryptos().last_update.data]

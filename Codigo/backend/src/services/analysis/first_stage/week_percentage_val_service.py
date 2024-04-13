@@ -1,5 +1,6 @@
 import json
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from decimal import Decimal
 from typing import Annotated
 
@@ -40,6 +41,10 @@ class WeekPercentageValorizationService:
         self, symbols: list[str], analysis_uuid
     ) -> list[FirstStageAnalysisModel]:
         all_diffs = []
+
+        logger.info(
+            f"Starting week percentage valorization calculation for {len(symbols)} symbols at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        )
 
         with ThreadPoolExecutor() as executor:
             futures = [

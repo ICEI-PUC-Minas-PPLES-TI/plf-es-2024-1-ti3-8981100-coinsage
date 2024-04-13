@@ -26,9 +26,15 @@ class CmcSectorsCollector:
             try:
                 data = self.api.cryptocurrency_categories(symbol=symbol, limit=1000).data
                 time.sleep(self.INTERVAL_CALL)
+
+                if isinstance(data, dict):
+                    self.add_sector(data, symbol)
+                    continue
+
                 if not data:
                     logger.error(f"No sector found for {symbol}")
                     continue
+
                 for sector in data:
                     self.add_sector(sector, symbol)
             except Exception as e:
