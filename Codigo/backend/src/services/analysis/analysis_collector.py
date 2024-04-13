@@ -15,7 +15,7 @@ from src.models.schemas.currency_info import CurrencyInfo, CurrencyInfoResponse
 from src.repository.crud import analysis_info_repository, analysis_info_schedule_repository
 from src.services.analysis.first_stage.closing_price_service import ClosingPriceService
 from src.services.analysis.first_stage.week_percentage_val_service import WeekPercentageValorizationService
-from src.services.currencies_logo_collector import CurrenciesLogoCollector
+from src.services.currencies_info_collector import CurrenciesLogoCollector
 from src.utilities.runtime import show_runtime
 
 

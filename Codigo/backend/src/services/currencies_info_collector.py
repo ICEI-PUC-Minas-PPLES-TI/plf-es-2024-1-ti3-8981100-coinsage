@@ -26,14 +26,24 @@ class CurrenciesLogoCollector:
         self.repository.clear_table(self.session)
 
     def collect_symbols_info(self):
-        self._clear_table()
         self.cmc_symbols = CmcSymbolCollector(BinanceSymbolCollector().get_base_assets_as_str()).get_symbols()
+        self.cmc_symbols.pop("EUR")
+
         start_time = time.time()
         for symbol in self.cmc_symbols:
             try:
                 coin = self.cmc_symbols[symbol][0]
-                if coin["symbol"] == "EUR":
+                symbol = self.repository.get_currency_info_by_symbol(self.session, coin["symbol"])
+
+                if symbol is not None:
+                    symbol.urls = coin["urls"]["website"]
+                    symbol.technical_doc = coin["urls"]["technical_doc"]
+                    symbol.logo = coin["logo"]
+                    symbol.name = coin["name"]
+                    symbol.description = coin["description"]
+                    self.session.commit()
                     continue
+
                 self.repository.create_crypto(
                     self.session,
                     CurrencyInfo(
@@ -47,6 +57,7 @@ class CurrenciesLogoCollector:
                         description=coin["description"],
                     ),
                 )
+
             except Exception as e:
                 logger.error(f"Error on [{symbol}]:\n{e}")
 

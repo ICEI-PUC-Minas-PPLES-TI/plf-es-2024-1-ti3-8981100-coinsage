@@ -4,7 +4,7 @@ from loguru import logger
 from sqlalchemy.orm import Session
 
 from src.models.db.currencies_info_schedule import CurrenciesInfoScheduleModel
-from src.services.currencies_logo_collector import CurrenciesLogoCollector
+from src.services.currencies_info_collector import CurrenciesLogoCollector
 
 
 def update_currencies_info(db: Session) -> None:
