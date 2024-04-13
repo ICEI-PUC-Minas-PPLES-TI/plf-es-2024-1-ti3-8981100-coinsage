@@ -54,48 +54,50 @@ jobs:
         run: |
           mypy . --pretty --config-file pyproject.toml
 
-  # tests:
-  #   name: 'Tests 🧪'
-  #   strategy:
-  #     matrix:
-  #       os:
-  #         - ubuntu-latest
-  #       python-version:
-  #         - "3.11"
-  #   defaults:
-  #     run:
-  #       working-directory: Codigo/backend/
+  tests:
+    name: 'Tests 🧪'
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+        python-version:
+          - "3.11"
+    defaults:
+      run:
+        working-directory: Codigo/backend/
 
-  #   env:
-  #     ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
-  #     DEBUG: ${{ secrets.DEBUG }}
-  #     SERVER_HOST: ${{ secrets.SERVER_HOST }}
-  #     SERVER_PORT: ${{ secrets.SERVER_PORT }}
-  #     SERVER_WORKERS: ${{ secrets.SERVER_WORKERS }}
-  #     IS_ALLOWED_CREDENTIALS: ${{ secrets.IS_ALLOWED_CREDENTIALS }}
+    env:
+      ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
+      DEBUG: ${{ secrets.DEBUG }}
+      SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      SERVER_PORT: ${{ secrets.SERVER_PORT }}
+      SERVER_WORKERS: ${{ secrets.SERVER_WORKERS }}
+      IS_ALLOWED_CREDENTIALS: ${{ secrets.IS_ALLOWED_CREDENTIALS }}
+      CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
+      DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+      DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+      DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+      DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+      DATABASE_USER: ${{ secrets.DATABASE_USER }}
 
-  #   runs-on: ${{ matrix.os }}
-  #   steps:
-  #     - name: Check repository
-  #       uses: actions/checkout@v3
-  #     - name: Set up Python ${{ matrix.python-version }}
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: ${{ matrix.python-version }}
-  #         cache: 'pip'
-  #     - name: Display Python version
-  #       run: python -c "import sys; print(sys.version)"
-  #     - name: Install dependencies
-  #       run:  |
-  #         python -m pip install --upgrade pip
-  #         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-  #     - name: Install Dependencies for Testing
-  #       run: |
-  #         pip install pytest pytest-asyncio pytest pytest-xdist
-  #     - name: Run Database for Unit Tests
-  #       run: |
-  #           cd ..
-  #           docker compose up -d
-  #     - name: Test with Pytest-Cov
-  #       run: |
-  #         pytest --cov --cov-report xml tests/
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check repository
+        uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+      - name: Install dependencies
+        run:  |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Install Dependencies for Testing
+        run: |
+          pip install pytest pytest-asyncio pytest pytest-xdist
+      - name: Test with Pytest-Cov
+        run: |
+          pytest
