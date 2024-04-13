@@ -39,10 +39,10 @@ class BinanceClosingPriceColletor:
         for coin in coins:
             symbol = coin + self.DEFAULT_QUOTE_ASSET
             try:
-                raw_data = Spot().klines(symbol=symbol, interval=interval, limit=limit)
+                raw_data = Spot().klines(symbol=symbol, interval=interval, limit=limit, timeZone="-03:00")
             except:
                 time.sleep(0.1)
-                raw_data = Spot().klines(symbol=symbol, interval=interval, limit=limit)
+                raw_data = Spot().klines(symbol=symbol, interval=interval, limit=limit, timeZone="-03:00")
             data.append({"symbol": coin, "data": raw_data})
 
         return data

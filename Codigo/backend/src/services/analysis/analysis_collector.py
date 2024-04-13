@@ -42,19 +42,24 @@ class AnalysisCollector:
     @show_runtime
     def start_analysis(self):
         logger.info(f"Starting analysis at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        new_analysis: Analysis = self._new_analysis()
+        try:
+            new_analysis: Analysis = self._new_analysis()
 
-        cryptos_str: List[str] = [crypto.symbol for crypto in self.symbols_service.get_cryptos().last_update.data]
+            cryptos_str: List[str] = [crypto.symbol for crypto in self.symbols_service.get_cryptos().last_update.data]
 
-        self.closing_price_service.collect(analysis_indentifier=new_analysis.uuid)
-        self.week_increse_service.calculate_all_week_percentage_valorization(cryptos_str, new_analysis.uuid)
+            self.closing_price_service.collect(analysis_indentifier=new_analysis.uuid)
+            self.week_increse_service.calculate_all_week_percentage_valorization(cryptos_str, new_analysis.uuid)
 
-        self.session.add(AnalysisInfoScheduleModel(next_scheduled_time=self.calculate_next_time()))
-        self.session.commit()
+            self.session.add(AnalysisInfoScheduleModel(next_scheduled_time=self.calculate_next_time()))
+            self.session.commit()
+        except Exception as err:
+            logger.error(f"Error on start_analysis: {err}")
+            self.session.rollback()
 
     def calculate_next_time(self) -> datetime.datetime:
         return datetime.datetime.now() + datetime.timedelta(days=1)
 
+    @show_runtime
     def get_last_analysis(self):
         last_analysis: Analysis | None = self.repository.get_last(self.session)
         schedule: AnalysisInfoScheduleModel | None = self.schedule_repository.get_last_update(self.session)

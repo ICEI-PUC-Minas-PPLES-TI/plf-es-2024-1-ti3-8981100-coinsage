@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from src.models.db import currency_base_info
 from src.models.db.rel_setor_currency_base_info import SetorCurrencyBaseInfo
 from src.models.schemas import currency_info
+from src.utilities.runtime import show_runtime
 
 
 def get_crypto(db: Session, crypto_uuid: Uuid) -> currency_base_info.CurrencyBaseInfoModel | None:

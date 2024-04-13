@@ -84,7 +84,7 @@ class ClosingPriceService:
         return closing_prices_responses
 
     @show_runtime
-    def get_all_by_analysis_uuid(self, uuid):
+    def get_all_by_analysis_uuid(self, uuid: UUID):
         analysis = self.repository.get_by_analysis_uuid(self.session, uuid)
         responses = [
             FirstStageAnalysisResponse(

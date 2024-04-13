@@ -17,6 +17,4 @@ router = APIRouter(prefix="/edwin_method", tags=["edwin_method"])
     status_code=status.HTTP_200_OK,
 )
 async def get_accounts(db: Session = Depends(get_db)) -> AnalysisInfoResponse:
-    SectorsCollector().collect(db)
-    analysis = AnalysisCollector(session=db).get_last_analysis()
-    return analysis
+    return AnalysisCollector(session=db).get_last_analysis()
