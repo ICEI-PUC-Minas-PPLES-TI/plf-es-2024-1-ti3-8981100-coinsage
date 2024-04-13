@@ -6,11 +6,7 @@ from sqlalchemy.orm import Session
 
 from src.config.manager import settings
 from src.models.db.analysis_info_schedule import AnalysisInfoScheduleModel
-from src.services.analysis_collector import AnalysisCollector
-
-scheduler = AsyncIOScheduler()
-
-db = None
+from src.services.analysis.analysis_collector import AnalysisCollector
 
 
 def update_analysis_info(db: Session) -> None:

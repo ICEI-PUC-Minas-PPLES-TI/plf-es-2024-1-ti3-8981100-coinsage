@@ -17,7 +17,7 @@ config = context.config
 base_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(base_dir)
 from src.config.manager import settings
-from src.models.db.mg import Base
+from src.models.db.mg import *
 
 target_metadata = Base.metadata
 

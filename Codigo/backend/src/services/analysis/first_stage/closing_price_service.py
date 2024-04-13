@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import UUID
 
 from fastapi import HTTPException
 from loguru import logger
@@ -7,9 +8,10 @@ from sqlalchemy.orm import Session
 
 from src.models.db.first_stage_analysis import FirstStageAnalysisModel
 from src.models.schemas.analysis.closing_price_entity import ClosingPriceResponse
-from src.models.schemas.analysis.first_stage_analysis import FirstStageAnalysisResponse
+from src.models.schemas.analysis.first_stage_analysis import AnalysisCurrencyInfo, FirstStageAnalysisResponse
 from src.repository.crud import currency_info_repository, first_stage_repository
 from src.services.externals.binance_closing_price_colletor import BinanceClosingPriceColletor
+from src.services.sectors_info_collector import SectorsCollector
 from src.utilities.runtime import show_runtime
 
 
@@ -18,21 +20,23 @@ class ClosingPriceService:
         self.session = session
         self.repository = first_stage_repository
         self.symbols_repository = currency_info_repository
+        self.sectors_service = SectorsCollector()
         self.binance_closing_price_colletor = BinanceClosingPriceColletor()
 
     def _collect_binance_closing_prices(self, interval="1d", limit=7):
         symbols_str = [symbol.symbol for symbol in self.symbols_repository.get_cryptos(self.session)]
         return self.binance_closing_price_colletor.collect(symbols=symbols_str, interval=interval, limit=limit)
 
-    @show_runtime
-    def collect(self, analysis_indentifier: Uuid):
-        closing_prices = self._collect_binance_closing_prices()
+    def extract(self, analysis_indentifier: Uuid, closing_prices):
         closing_prices_models: list[FirstStageAnalysisModel] = []
+
         for closing_price in closing_prices:
             symbol = self.symbols_repository.get_currency_info_by_symbol(self.session, closing_price["symbol"])
+
             if symbol is None:
                 logger.warning(f"Symbol {closing_price['symbol']} not found in DB")
                 continue
+
             if len(closing_price["data"]) != 7:
                 logger.warning(f"Symbol {closing_price['symbol']} has not enough data")
                 logger.critical(f"Closing prices: {closing_price}")
@@ -57,6 +61,12 @@ class ClosingPriceService:
 
         self.repository.save_all(self.session, closing_prices_models)
 
+    @show_runtime
+    def collect(self, analysis_indentifier: Uuid):
+        logger.info(f"Starting collecting closing prices at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        closing_prices = self._collect_binance_closing_prices()
+        self.extract(analysis_indentifier, closing_prices)
+
     def get_all_closing_prices(self):
         start_time = datetime.now()
 
@@ -74,11 +84,11 @@ class ClosingPriceService:
         return closing_prices_responses
 
     @show_runtime
-    def get_all_by_analysis_uuid(self, uuid):
+    def get_all_by_analysis_uuid(self, uuid: UUID):
         analysis = self.repository.get_by_analysis_uuid(self.session, uuid)
         responses = [
             FirstStageAnalysisResponse(
-                currency=self.symbols_repository.get_currency_info_by_uuid(self.session, anylise.uuid_currency),
+                currency=self._get_currency_entity(anylise.uuid_currency),
                 week_increase_percentage=(
                     float(anylise.week_increase_percentage) if anylise.week_increase_percentage else None
                 ),
@@ -88,6 +98,27 @@ class ClosingPriceService:
             for anylise in analysis
         ]
         return responses
+
+    def _get_currency_entity(self, symbol_uuid: UUID) -> AnalysisCurrencyInfo:
+        currency = self.symbols_repository.get_currency_info_by_uuid(self.session, symbol_uuid)  # type: ignore
+        return AnalysisCurrencyInfo(
+            symbol=currency.symbol,  # type: ignore
+            logo=currency.logo,  # type: ignore
+            # cmc_id=currency.cmc_id, # type: ignore
+            # cmc_slug=currency.cmc_slug, # type: ignore
+            # name=currency.name, # type: ignore
+            # description=currency.description, # type: ignore
+            # technical_doc=currency.technical_doc, # type: ignore
+            # urls=currency.urls, # type: ignore
+            main_sector=self._get_sector_title_by_symbol(symbol_uuid),  # type: ignore
+        )
+
+    def _get_sector_title_by_symbol(self, symbol_uuid: UUID) -> str:
+        try:
+            return self.sectors_service.get_by_symbol_uuid(self.session, symbol_uuid)[0].title  # type: ignore
+        except Exception as e:
+            logger.error(f"Error on [{symbol_uuid}]:\n{e}")
+            return ""
 
     def get_closing_price_by_symbol(self, symbol_str: str, analysis_uuid) -> FirstStageAnalysisModel:
         symbol = self.symbols_repository.get_currency_info_by_symbol(self.session, symbol_str)
