@@ -71,3 +71,15 @@ class BinanceClosingPriceColletor:
         except Exception as e:
             logger.error(f"Error fetching price for {symbol} at timestamp {timestamp}: {e}")
         return None
+
+    def get_rolling_window_price(self, symbols: list, window_size: str | None = None):
+        try:
+            rolling_window_price = Spot().rolling_window_ticker(symbols=symbols, windowSize=window_size)
+            if rolling_window_price:
+                return rolling_window_price
+        except Exception as e:
+            logger.error(f"Error to collect rolling window price: {e}")
+        return None
+
+
+str
