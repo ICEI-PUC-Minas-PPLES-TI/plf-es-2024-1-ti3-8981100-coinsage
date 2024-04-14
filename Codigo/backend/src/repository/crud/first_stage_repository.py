@@ -1,12 +1,8 @@
-from typing import List
-
-from loguru import logger
 from sqlalchemy import Uuid
 from sqlalchemy.orm import Session
 
 from src.models.db.currency_base_info import CurrencyBaseInfoModel
 from src.models.db.first_stage_analysis import FirstStageAnalysisModel
-from src.models.schemas.analysis.first_stage_analysis import FirstStageAnalysisResponse
 from src.utilities.runtime import show_runtime
 
 
@@ -19,22 +15,10 @@ def get_by_analysis_uuid(db: Session, uuid: str) -> list[FirstStageAnalysisModel
     return db.query(FirstStageAnalysisModel).filter(FirstStageAnalysisModel.uuid_analysis == uuid).all()
 
 
-def get_client_formated(db: Session, uuid: Uuid) -> List[FirstStageAnalysisResponse]:
-    pass
-
-
 def get_by_symbol(db: Session, symbol: CurrencyBaseInfoModel, analysis_uuid: Uuid) -> FirstStageAnalysisModel | None:
     found = db.query(FirstStageAnalysisModel).filter(
         FirstStageAnalysisModel.uuid_currency == symbol.uuid and FirstStageAnalysisModel.uuid_analysis == analysis_uuid
     )
-
-    for founded in found:
-        logger.debug(
-            f"""
-                     Founded symbol: {founded.uuid_currency}
-                     Founded analysis: {founded.uuid_analysis}
-                     """
-        )
 
     return found.one_or_none()
 
