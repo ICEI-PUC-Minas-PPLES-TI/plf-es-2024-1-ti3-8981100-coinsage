@@ -9,5 +9,5 @@ from .base import Base
 class Analysis(Base):
     __tablename__ = "analysis"
 
-    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    date = Column(DateTime, default=datetime.now())
+    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)  # type: ignore
+    date = Column(DateTime, default=datetime.now())  # type: ignore

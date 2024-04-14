@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import List
-from uuid import UUID
 
 from src.models.schemas.base import BaseSchemaModel
 

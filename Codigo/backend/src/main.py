@@ -1,5 +1,6 @@
 import fastapi
 import uvicorn
+from fastapi import Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 

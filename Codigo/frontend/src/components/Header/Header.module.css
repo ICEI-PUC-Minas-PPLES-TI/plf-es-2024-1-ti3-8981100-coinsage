@@ -1,0 +1,15 @@
+.header {
+  background:  #0E37A3;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  padding: 1.25rem 0;
+  height: 60px;
+}
+
+
+.header h1 {
+  padding: 0.5rem;
+  text-align: left;
+  color: #FFF;
+}

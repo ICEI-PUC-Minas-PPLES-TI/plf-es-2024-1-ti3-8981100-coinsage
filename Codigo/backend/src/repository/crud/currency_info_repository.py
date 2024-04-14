@@ -1,8 +1,12 @@
+from typing import List
+
 from sqlalchemy import Uuid
 from sqlalchemy.orm import Session
 
 from src.models.db import currency_base_info
+from src.models.db.rel_setor_currency_base_info import SetorCurrencyBaseInfo
 from src.models.schemas import currency_info
+from src.utilities.runtime import show_runtime
 
 
 def get_crypto(db: Session, crypto_uuid: Uuid) -> currency_base_info.CurrencyBaseInfoModel | None:
@@ -22,14 +26,14 @@ def get_currency_info_by_uuid(db: Session, uuid_value: Uuid) -> currency_base_in
 
 
 def get_cryptos(db: Session, skip: int = 0, limit: int = 10000) -> list[currency_base_info.CurrencyBaseInfoModel]:
-    return db.query(currency_base_info.CurrencyBaseInfoModel).offset(skip).limit(limit).all()
+    return db.query(currency_base_info.CurrencyBaseInfoModel).all()
 
 
 def get_currency_info_by_symbol(db: Session, symbol: str) -> currency_base_info.CurrencyBaseInfoModel | None:
     return (
         db.query(currency_base_info.CurrencyBaseInfoModel)
         .filter(currency_base_info.CurrencyBaseInfoModel.symbol == symbol)
-        .first()
+        .one_or_none()
     )
 
 
@@ -52,3 +56,14 @@ def create_crypto(db: Session, crypto: currency_info.CurrencyInfo) -> currency_b
 
 def clear_table(db: Session) -> None:
     db.query(currency_base_info.CurrencyBaseInfoModel).delete()
+
+
+def get_coins_by_sector(db: Session, sector_uuid: Uuid) -> List[currency_base_info.CurrencyBaseInfoModel]:
+    return (
+        db.query(currency_base_info.CurrencyBaseInfoModel)
+        .join(
+            SetorCurrencyBaseInfo, SetorCurrencyBaseInfo.uuid_currency == currency_base_info.CurrencyBaseInfoModel.uuid
+        )
+        .filter(SetorCurrencyBaseInfo.uuid_setor == sector_uuid)
+        .all()
+    )

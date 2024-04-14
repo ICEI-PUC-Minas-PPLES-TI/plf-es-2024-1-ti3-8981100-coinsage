@@ -42,11 +42,19 @@ class BackendBaseSettings(BaseSettings):
     LOGGERS: tuple[str, str] = ("uvicorn.asgi", "uvicorn.access")
 
     CMC_API_KEY: str = decouple.config("CMC_API_KEY", cast=str)  # type: ignore
+    MIN_SECTOR_TOKENS_ACCEPTED: int = (
+        10  # Minimum number of cryptos accepted for a sector to be considered as relevant
+    )
 
     # ===== Schedules =====
     SCHEDULES: dict[str, dict[str, int]] = {
         "update_currencies_info": {
             "hour": 6,
+            "minute": 0,
+            "second": 0,
+        },
+        "update_all_analysis": {
+            "hour": 8,
             "minute": 0,
             "second": 0,
         },

@@ -9,7 +9,7 @@ def show_runtime(func):
     def wrapper(*args, **kwargs):
         start_time = time.time()
         result = func(*args, **kwargs)
-        logger.info(f"{func.__name__} executed in {time.time() - start_time} seconds")
+        logger.info(f"{func.__module__}.{func.__qualname__} executed in {time.time() - start_time} seconds")
         return result
 
     return wrapper
