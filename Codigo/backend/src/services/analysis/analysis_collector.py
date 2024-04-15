@@ -59,7 +59,7 @@ class AnalysisCollector:
         return datetime.datetime.now() + datetime.timedelta(days=1)
 
     @show_runtime
-    def get_last_analysis(self, limit: int, offset: int):
+    def get_last_first_stage_analysis(self, limit: int, offset: int):
         last_analysis: Analysis | None = self.repository.get_last(self.session)
         schedule: AnalysisInfoScheduleModel | None = self.schedule_repository.get_last_update(self.session)
 
