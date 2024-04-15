@@ -1,7 +1,7 @@
 from typing import List
 
 from loguru import logger
-from sqlalchemy import func, select, Uuid
+from sqlalchemy import func, select, union, Uuid
 from sqlalchemy.orm import Session
 
 from src.models.db.currency_base_info import CurrencyBaseInfoModel
@@ -22,13 +22,37 @@ def get_by_analysis_uuid(db: Session, uuid: str) -> list[FirstStageAnalysisModel
 def get_paginated_by_uuid(
     db: Session, uuid: Uuid, limit: int, offset: int
 ) -> tuple[list[FirstStageAnalysisModel], PaginatedResponse]:
-    items_query = (
-        select(FirstStageAnalysisModel)
-        .where(FirstStageAnalysisModel.uuid_analysis == uuid)
-        .limit(limit)
-        .offset(offset)
-    )
-    items = db.execute(items_query).scalars().all()
+    if offset == 0:
+        query_btc = (
+            select(FirstStageAnalysisModel)
+            .join(CurrencyBaseInfoModel, FirstStageAnalysisModel.uuid_currency == CurrencyBaseInfoModel.uuid)
+            .where(FirstStageAnalysisModel.uuid_analysis == uuid)
+            .where(CurrencyBaseInfoModel.symbol == "BTC")
+            .limit(1)
+            .offset(0)
+        )
+        specific_item = db.execute(query_btc).scalars().first()
+
+        items_query_regular = (
+            select(FirstStageAnalysisModel)
+            .where(FirstStageAnalysisModel.uuid_analysis == uuid)
+            .where(FirstStageAnalysisModel.uuid_currency != specific_item.uuid_currency if specific_item is not None else None)  # type: ignore
+            .limit(limit - 1 if specific_item is not None else limit)  # Remaining limit after the specific item
+            .offset(offset)
+        )
+
+        queried = db.execute(items_query_regular).scalars().all()
+
+        items = list(set([specific_item] + queried)) if specific_item is not None else queried
+    else:
+        items_query = (
+            select(FirstStageAnalysisModel)
+            .where(FirstStageAnalysisModel.uuid_analysis == uuid)
+            .limit(limit)
+            .offset(offset)
+        )
+
+        items = db.execute(items_query).scalars().all()
     count = db.scalar(select(func.count()).where(FirstStageAnalysisModel.uuid_analysis == uuid))
     remaining = max(count - (limit + offset), 0)  # type: ignore
 
