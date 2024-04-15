@@ -10,9 +10,9 @@ from sqlalchemy.orm import Session
 from src.models.db.analysis import Analysis
 from src.models.db.analysis_info_schedule import AnalysisInfoScheduleModel
 from src.models.schemas.analysis.analysis_info import AnalysisInfo, AnalysisInfoResponse, LastUpdate
-from src.models.schemas.generic_pagination import PaginatedResponse
 from src.repository.crud import analysis_info_repository, analysis_info_schedule_repository
 from src.services.analysis.first_stage.closing_price_service import PriceService
+from src.services.analysis.first_stage.ema_calculator_service import EmaCalculatorService
 from src.services.analysis.first_stage.week_percentage_val_service import WeekPercentageValorizationService
 from src.services.currencies_info_collector import CurrenciesLogoCollector
 from src.utilities.runtime import show_runtime
@@ -30,6 +30,7 @@ class AnalysisCollector:
         self.week_increse_service = WeekPercentageValorizationService(
             session=session, closing_price_service=self.prices_service
         )
+        self.ema_calculator_service = EmaCalculatorService()
 
     def _new_analysis(self) -> Analysis:
         analysis: Analysis = Analysis()

@@ -11,7 +11,7 @@ from src.models.schemas.analysis.closing_price_entity import PricesResponse
 from src.models.schemas.analysis.first_stage_analysis import AnalysisCurrencyInfo, FirstStageAnalysisResponse
 from src.models.schemas.sector import SectorRead
 from src.repository.crud import currency_info_repository, first_stage_repository
-from src.services.externals.binance_closing_price_colletor import BinanceClosingPriceColletor
+from src.services.externals.binance_price_colletor import BinancePriceColletor
 from src.services.sectors_info_collector import SectorsCollector
 from src.utilities.runtime import show_runtime
 
@@ -26,7 +26,7 @@ class PriceService:
         self.repository = first_stage_repository
         self.symbols_repository = currency_info_repository
         self.sectors_service = SectorsCollector()
-        self.binance_closing_price_colletor = BinanceClosingPriceColletor()
+        self.binance_closing_price_colletor = BinancePriceColletor()
 
     def _collect_binance_closing_prices(self, interval="1d", limit=7):
         symbols_str = [symbol.symbol for symbol in self.symbols_repository.get_cryptos(self.session)]
