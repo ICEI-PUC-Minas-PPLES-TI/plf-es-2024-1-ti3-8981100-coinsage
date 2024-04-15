@@ -43,7 +43,7 @@ def get_paginated_by_uuid(
 
         queried = db.execute(items_query_regular).scalars().all()
 
-        items = list(set([specific_item] + queried)) if specific_item is not None else queried
+        items = list(set([specific_item] + queried)) if specific_item is not None else queried  # type: ignore
     else:
         items_query = (
             select(FirstStageAnalysisModel)
