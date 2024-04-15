@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from src.api.dependencies.session import get_db
@@ -16,5 +16,7 @@ router = APIRouter(prefix="/edwin_method", tags=["edwin_method"])
     description="Coletar dados da última análise.",
     status_code=status.HTTP_200_OK,
 )
-async def get_accounts(db: Session = Depends(get_db)) -> AnalysisInfoResponse:
-    return AnalysisCollector(session=db).get_last_analysis()
+async def get_accounts(
+    db: Session = Depends(get_db), limit: int = Query(20, ge=0), offset: int = Query(0, ge=0)
+) -> AnalysisInfoResponse:
+    return AnalysisCollector(session=db).get_last_analysis(limit, offset)

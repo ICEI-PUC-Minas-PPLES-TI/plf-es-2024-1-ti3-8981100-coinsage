@@ -92,15 +92,15 @@ class PriceService:
         return prices_responses
 
     @show_runtime
-    def get_all_by_analysis_uuid(self, uuid: UUID):
-        analysis = self.repository.get_by_analysis_uuid(self.session, uuid)
+    def get_all_by_analysis_uuid(self, uuid: UUID, limit: int, offset: int):
+        analysis, paginated = self.repository.get_paginated_by_uuid(self.session, uuid, limit, offset)  # type: ignore
         responses = [
             FirstStageAnalysisResponse(
-                currency=self._get_currency_entity(anylise.uuid_currency),
+                currency=self._get_currency_entity(anylise.uuid_currency),  # type: ignore
                 week_increase_percentage=(
                     float(anylise.week_increase_percentage) if anylise.week_increase_percentage else None
                 ),
-                valorization_date=anylise.today if anylise.today else None,
+                valorization_date=anylise.today if anylise.today else None,  # type: ignore
                 closing_price=float(anylise.closing_price) if anylise.closing_price else None,
                 open_price=float(anylise.open_price) if anylise.open_price else None,
                 last_week_closing_price=(
@@ -109,7 +109,7 @@ class PriceService:
             )
             for anylise in analysis
         ]
-        return responses
+        return responses, paginated
 
     def _get_currency_entity(self, symbol_uuid: UUID) -> AnalysisCurrencyInfo:
         currency = self.symbols_repository.get_currency_info_by_uuid(self.session, symbol_uuid)  # type: ignore

@@ -10,8 +10,7 @@ from sqlalchemy.orm import Session
 from src.models.db.analysis import Analysis
 from src.models.db.analysis_info_schedule import AnalysisInfoScheduleModel
 from src.models.schemas.analysis.analysis_info import AnalysisInfo, AnalysisInfoResponse, LastUpdate
-from src.models.schemas.analysis.first_stage_analysis import FirstStageAnalysisResponse
-from src.models.schemas.currency_info import CurrencyInfo, CurrencyInfoResponse
+from src.models.schemas.generic_pagination import PaginatedResponse
 from src.repository.crud import analysis_info_repository, analysis_info_schedule_repository
 from src.services.analysis.first_stage.closing_price_service import PriceService
 from src.services.analysis.first_stage.week_percentage_val_service import WeekPercentageValorizationService
@@ -60,17 +59,19 @@ class AnalysisCollector:
         return datetime.datetime.now() + datetime.timedelta(days=1)
 
     @show_runtime
-    def get_last_analysis(self):
+    def get_last_analysis(self, limit: int, offset: int):
         last_analysis: Analysis | None = self.repository.get_last(self.session)
         schedule: AnalysisInfoScheduleModel | None = self.schedule_repository.get_last_update(self.session)
 
         if last_analysis and schedule:
-            all_first_stage: List[FirstStageAnalysisResponse] = self.prices_service.get_all_by_analysis_uuid(
-                last_analysis.uuid
+            all_first_stage, paginated = self.prices_service.get_all_by_analysis_uuid(
+                last_analysis.uuid, limit, offset
             )
 
             try:
-                analysis = AnalysisInfo(firstStageAnalysis=all_first_stage)
+                analysis = AnalysisInfo(
+                    data=all_first_stage, total=paginated.total, remaining=paginated.remaining, page=paginated.page
+                )
                 return AnalysisInfoResponse(
                     next_update=schedule.next_scheduled_time,  # type: ignore
                     last_update=LastUpdate(time=last_analysis.date, data=analysis),  # type: ignore

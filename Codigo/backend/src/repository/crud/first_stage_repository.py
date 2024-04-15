@@ -1,8 +1,12 @@
-from sqlalchemy import Uuid
+from typing import List
+
+from loguru import logger
+from sqlalchemy import func, select, Uuid
 from sqlalchemy.orm import Session
 
 from src.models.db.currency_base_info import CurrencyBaseInfoModel
 from src.models.db.first_stage_analysis import FirstStageAnalysisModel
+from src.models.schemas.generic_pagination import PaginatedResponse
 from src.utilities.runtime import show_runtime
 
 
@@ -13,6 +17,22 @@ def get_all(db: Session) -> list[FirstStageAnalysisModel]:
 @show_runtime
 def get_by_analysis_uuid(db: Session, uuid: str) -> list[FirstStageAnalysisModel]:
     return db.query(FirstStageAnalysisModel).filter(FirstStageAnalysisModel.uuid_analysis == uuid).all()
+
+
+def get_paginated_by_uuid(
+    db: Session, uuid: Uuid, limit: int, offset: int
+) -> tuple[list[FirstStageAnalysisModel], PaginatedResponse]:
+    items_query = (
+        select(FirstStageAnalysisModel)
+        .where(FirstStageAnalysisModel.uuid_analysis == uuid)
+        .limit(limit)
+        .offset(offset)
+    )
+    items = db.execute(items_query).scalars().all()
+    count = db.scalar(select(func.count()).where(FirstStageAnalysisModel.uuid_analysis == uuid))
+    remaining = max(count - (limit + offset), 0)  # type: ignore
+
+    return items, PaginatedResponse(total=count, remaining=remaining, page=limit if count > limit else count)  # type: ignore
 
 
 def get_by_symbol(db: Session, symbol: CurrencyBaseInfoModel, analysis_uuid: Uuid) -> FirstStageAnalysisModel | None:
