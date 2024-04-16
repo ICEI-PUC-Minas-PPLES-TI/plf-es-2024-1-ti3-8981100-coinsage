@@ -97,8 +97,6 @@ class PriceService:
         responses = []
 
         for anylise in analysis:
-            logger.info(f"Processing analysis for currency ema8: {anylise.ema8}")
-
             response = FirstStageAnalysisResponse(
                 currency=self._get_currency_entity(anylise.uuid_currency),  # type: ignore
                 week_increase_percentage=(
