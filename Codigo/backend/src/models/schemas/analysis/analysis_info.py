@@ -19,5 +19,5 @@ class LastUpdate(BaseSchemaModel):
 
 
 class AnalysisInfoResponse(BaseSchemaModel):
-    next_update: datetime
+    next_update: datetime | None
     last_update: LastUpdate

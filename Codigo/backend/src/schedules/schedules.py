@@ -1,3 +1,6 @@
+import asyncio
+import threading
+
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from loguru import logger
 from sqlalchemy.orm import Session
@@ -18,6 +21,10 @@ def start_schedules(app_db: Session):
     db = app_db
     logger.info("Checking all schedules")
     check_all_schedules()
+
+    # Set up event loop explicitly
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
 
     scheduler.start()
     logger.info("Schedules started")
