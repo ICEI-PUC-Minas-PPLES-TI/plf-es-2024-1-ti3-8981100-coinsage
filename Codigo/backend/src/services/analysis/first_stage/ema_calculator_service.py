@@ -1,24 +1,18 @@
 import threading
 import time
+from datetime import datetime
 from typing import List
 
 import pandas
 from loguru import logger
+from sqlalchemy import UUID
+from sqlalchemy.orm import Session
 
 from src.models.db.currency_base_info import CurrencyBaseInfoModel
 from src.models.schemas.base import BaseSchemaModel
+from src.repository.crud import first_stage_repository
 from src.services.externals.binance_price_colletor import BinancePriceColletor
 from src.utilities.runtime import show_runtime
-
-
-class EmaCalcReturn(BaseSchemaModel):
-    symbol: str
-    timeframe: str
-    ema_size: int
-    ema_values: List[pandas.DataFrame]
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class EmaCalculatorService:
@@ -36,10 +30,45 @@ class EmaCalculatorService:
     """
 
     def __init__(self):
-        self.binance_price_colletor = BinancePriceColletor()
         self.FIXED_QUANTITY = 1000
         self.NUMBER_THREDS = 3
+        self.binance_price_colletor = BinancePriceColletor()
+        self.repository = first_stage_repository
 
+    @show_runtime
+    def append_ema8_and_relations(
+        self, session: Session, symbols: List[CurrencyBaseInfoModel], analysis_uuid: UUID
+    ) -> None:
+        logger.info(
+            f"Starting ema_8 calculation for {len(symbols)} symbols at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        )
+
+        results = self.calculate(symbols, timeframe="1w", ema_size=8)
+        for result in results:
+            try:
+                crypto = result["symbol"]
+                current_analysis = self.repository.get_by_symbol_str(session, crypto, analysis_uuid)
+                df = result["ema_values"]
+                open_price = current_analysis.open_price  # type: ignore
+                close_price = current_analysis.closing_price  # type: ignore
+                ema8 = df.loc[df["crypto"] == f"{crypto}USDT", "ema_8"].tail(1).values[0]
+                ema8_lower_than_close_week = ema8 < close_price
+                ema8_greater_than_open_week = ema8 > open_price
+
+                current_analysis.ema8 = ema8  # type: ignore
+                current_analysis.ema8_greater_open = ema8_greater_than_open_week  # type: ignore
+                current_analysis.ema8_less_close = ema8_lower_than_close_week  # type: ignore
+
+                # logger.debug(f"EMA8 for {crypto} is {ema8}")
+                # logger.debug(f"EMA8 is greater than open price: {ema8_greater_than_open_week}")
+                # logger.debug(f"EMA8 is less than close price: {ema8_lower_than_close_week}")
+
+                session.commit()
+            except Exception as err:
+                logger.error(f"Error while calculating ema_8 for {result['symbol']}: {err}")
+                session.rollback()  # TODO: check need
+
+    @show_runtime
     def calculate(self, symbols: List[CurrencyBaseInfoModel], timeframe: str, ema_size: int) -> List[dict]:
         """
         Calculates the Exponential Moving Average (EMA) for the given symbols, timeframe, and EMA size.
@@ -71,7 +100,6 @@ class EmaCalculatorService:
 
         return results
 
-    @show_runtime
     def fetch_data(self, symbols: List[CurrencyBaseInfoModel], timeframe: str, ema_size: int) -> List[dict]:
         """
         Fetches the EMA data for the given symbols, timeframe, and EMA size.
@@ -94,7 +122,7 @@ class EmaCalculatorService:
                 time.sleep(0.1)
                 dict_data = self.calc_generic(symbol, timeframe, ema_size)  # type: ignore
 
-            logger.debug(type(dict_data))
+            # logger.debug(type(dict_data))
 
             data.append({"symbol": symbol, "timeframe": timeframe, "ema_size": ema_size, "ema_values": dict_data})
 

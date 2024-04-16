@@ -16,7 +16,7 @@ router = APIRouter(prefix="/analysis", tags=["analysis"])
     description="Coletar dados da primeira etapa da última análise realizada pelo sistem.",
     status_code=status.HTTP_200_OK,
 )
-async def get_accounts(
+async def get_last_first_stage_analysis(
     db: Session = Depends(get_db), limit: int = Query(20, ge=0), offset: int = Query(0, ge=0)
 ) -> AnalysisInfoResponse:
     return AnalysisCollector(session=db).get_last_first_stage_analysis(limit, offset)

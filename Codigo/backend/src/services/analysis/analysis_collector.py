@@ -45,10 +45,12 @@ class AnalysisCollector:
         try:
             new_analysis: Analysis = self._new_analysis()
 
-            cryptos_str: List[str] = [crypto.symbol for crypto in self.symbols_service.get_cryptos().last_update.data]
+            symbols = self.symbols_service.get_cryptos().last_update.data
+            cryptos_str: List[str] = [crypto.symbol for crypto in symbols]
 
             self.prices_service.collect(analysis_indentifier=new_analysis.uuid)
             self.week_increse_service.calculate_all_week_percentage_valorization(cryptos_str, new_analysis.uuid)
+            self.ema_calculator_service.append_ema8_and_relations(self.session, symbols, new_analysis.uuid)
 
             self.session.add(AnalysisInfoScheduleModel(next_scheduled_time=self.calculate_next_time()))
             self.session.commit()
