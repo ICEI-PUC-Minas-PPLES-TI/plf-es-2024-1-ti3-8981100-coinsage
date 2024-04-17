@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 
@@ -28,7 +29,7 @@ class DailyVolumeService:
             rolling_window_size.append(self.binance_closing_price_colletor.get_rolling_window_price(symbols=symbols))
         return rolling_window_size
 
-    def get_last_valuation_of_volume(self) -> list:
+    def get_last_volume_valuation(self) -> list:
         """
         Evaluates and tracks the changes in volume over the last 7 days for each asset, identifying if today's volume has exceeded the past volumes.
 
@@ -44,11 +45,11 @@ class DailyVolumeService:
                     symbol=volume["symbol"], window_size="{day}d".format(day=day)
                 )  # type: ignore
 
-                while not asset_info[0]["volume"] > volume["volume"]:
+                while not asset_info["volume"] > volume["volume"]:
                     day += 1
                     if day > 7:
                         day = 1
-                        logger.info(f"""In the last week the symbol: {volume["symbol"]} didn't appreciate.""")  # type: ignore[code]
+                        logger.info(f"In the last week the symbol: {volume['symbol']} didn't appreciate.")  # type: ignore
                         break
                     asset_info = self.binance_closing_price_colletor.get_rolling_window_price(
                         symbols=[volume["symbol"]], window_size="{day}d".format(day=day)
@@ -58,6 +59,27 @@ class DailyVolumeService:
                 day = 1
         logger.info(f"The valuation volumes were collected successful.")
         return valuation_result
+
+    def get_day_before_valuation(self) -> list:
+        """
+        Retrieves the valuation from the day before for each asset in the last volume valuation.
+
+        Returns:
+        - list: A list of valuation data for each symbol.
+        """
+        last_volume_valuation = self.get_last_volume_valuation()
+        for volume in last_volume_valuation:
+            volume_last_valuation = volume["last_valuation"]
+            day = datetime.fromtimestamp(volume_last_valuation["closeTime"]).day + 1
+            if day == 8:
+                logging.info(f"The symbol {volume_last_valuation['symbol']} has not day before valuation")  # type: ignore
+                continue
+            last_volume_valuation.append(
+                self.binance_closing_price_colletor.get_rolling_window_price(
+                    symbols=[volume_last_valuation["symbol"]], window_size="{day}d".format(day=day)
+                )
+            )  # type: ignore
+        return last_volume_valuation
 
     def _split_symbol_list(self, all_symbols: list) -> list:
         """
