@@ -11,7 +11,7 @@ from src.models.schemas.analysis.closing_price_entity import PricesResponse
 from src.models.schemas.analysis.first_stage_analysis import AnalysisCurrencyInfo, FirstStageAnalysisResponse
 from src.models.schemas.sector import SectorRead
 from src.repository.crud import currency_info_repository, first_stage_repository
-from src.services.externals.binance_closing_price_colletor import BinanceClosingPriceColletor
+from src.services.externals.binance_price_colletor import BinancePriceColletor
 from src.services.sectors_info_collector import SectorsCollector
 from src.utilities.runtime import show_runtime
 
@@ -26,7 +26,7 @@ class PriceService:
         self.repository = first_stage_repository
         self.symbols_repository = currency_info_repository
         self.sectors_service = SectorsCollector()
-        self.binance_closing_price_colletor = BinanceClosingPriceColletor()
+        self.binance_closing_price_colletor = BinancePriceColletor()
 
     def _collect_binance_closing_prices(self, interval="1d", limit=7):
         symbols_str = [symbol.symbol for symbol in self.symbols_repository.get_cryptos(self.session)]
@@ -94,8 +94,12 @@ class PriceService:
     @show_runtime
     def get_all_by_analysis_uuid(self, uuid: UUID, limit: int, offset: int):
         analysis, paginated = self.repository.get_paginated_by_uuid(self.session, uuid, limit, offset)  # type: ignore
-        responses = [
-            FirstStageAnalysisResponse(
+        responses = []
+
+        for anylise in analysis:
+            logger.info(f"Processing analysis for currency ema8: {anylise.ema8}")
+
+            response = FirstStageAnalysisResponse(
                 currency=self._get_currency_entity(anylise.uuid_currency),  # type: ignore
                 week_increase_percentage=(
                     float(anylise.week_increase_percentage) if anylise.week_increase_percentage else None
@@ -106,9 +110,13 @@ class PriceService:
                 last_week_closing_price=(
                     float(anylise.last_week_closing_price) if anylise.last_week_closing_price else None
                 ),
+                ema8=float(anylise.ema8) if anylise.ema8 else None,
+                ema8_greater_open=bool(anylise.ema8_greater_open),
+                ema8_less_close=bool(anylise.ema8_less_close),
             )
-            for anylise in analysis
-        ]
+
+            responses.append(response)
+
         return responses, paginated
 
     def _get_currency_entity(self, symbol_uuid: UUID) -> AnalysisCurrencyInfo:

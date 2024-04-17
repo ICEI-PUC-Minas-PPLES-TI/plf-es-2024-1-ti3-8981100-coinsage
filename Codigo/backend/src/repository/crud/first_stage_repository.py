@@ -35,6 +35,7 @@ def get_paginated_by_uuid(
 
         items_query_regular = (
             select(FirstStageAnalysisModel)
+            .order_by(FirstStageAnalysisModel.week_increase_percentage.desc())
             .where(FirstStageAnalysisModel.uuid_analysis == uuid)
             .where(FirstStageAnalysisModel.uuid_currency != specific_item.uuid_currency if specific_item is not None else None)  # type: ignore
             .limit(limit - 1 if specific_item is not None else limit)  # Remaining limit after the specific item
@@ -44,9 +45,11 @@ def get_paginated_by_uuid(
         queried = db.execute(items_query_regular).scalars().all()
 
         items = list(set([specific_item] + queried)) if specific_item is not None else queried  # type: ignore
+        items = sorted(items, key=lambda x: x.week_increase_percentage, reverse=True)  # type: ignore
     else:
         items_query = (
             select(FirstStageAnalysisModel)
+            .order_by(FirstStageAnalysisModel.week_increase_percentage.desc())
             .where(FirstStageAnalysisModel.uuid_analysis == uuid)
             .limit(limit)
             .offset(offset)
@@ -62,6 +65,16 @@ def get_paginated_by_uuid(
 def get_by_symbol(db: Session, symbol: CurrencyBaseInfoModel, analysis_uuid: Uuid) -> FirstStageAnalysisModel | None:
     found = db.query(FirstStageAnalysisModel).filter(
         FirstStageAnalysisModel.uuid_currency == symbol.uuid and FirstStageAnalysisModel.uuid_analysis == analysis_uuid
+    )
+
+    return found.one_or_none()
+
+
+def get_by_symbol_str(db: Session, symbol: str, analysis_uuid: Uuid) -> FirstStageAnalysisModel | None:
+    found = (
+        db.query(FirstStageAnalysisModel)
+        .join(CurrencyBaseInfoModel, FirstStageAnalysisModel.uuid_currency == CurrencyBaseInfoModel.uuid)
+        .filter(CurrencyBaseInfoModel.symbol == symbol and FirstStageAnalysisModel.uuid_analysis == analysis_uuid)
     )
 
     return found.one_or_none()

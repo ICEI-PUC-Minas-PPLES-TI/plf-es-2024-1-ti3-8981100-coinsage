@@ -20,3 +20,6 @@ class FirstStageAnalysisResponse(BaseSchemaModel):
     closing_price: float | None
     open_price: float | None
     last_week_closing_price: float | None
+    ema8: float | None
+    ema8_greater_open: bool | None
+    ema8_less_close: bool | None
