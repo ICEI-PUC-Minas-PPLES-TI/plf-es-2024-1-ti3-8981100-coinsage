@@ -1,6 +1,6 @@
 import "./styles/global.css";
 import Balanceamento from "./pages/Balanceamento/Balanceamento";
-import Layout from "./layout/Layout";
+import Layout from "./Layout/Layout";
 
 
 export const App: React.FC = () => {
