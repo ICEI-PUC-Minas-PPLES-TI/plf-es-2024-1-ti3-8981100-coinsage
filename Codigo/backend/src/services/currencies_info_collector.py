@@ -107,3 +107,6 @@ class CurrenciesLogoCollector:
 
     def get_crypto(self, crypto_uuid: Uuid):
         return self.repository.get_crypto(self.session, crypto_uuid)
+
+    def get_crypto_by_symbol(self, symbol: str):
+        return self.repository.get_currency_info_by_symbol(self.session, symbol)

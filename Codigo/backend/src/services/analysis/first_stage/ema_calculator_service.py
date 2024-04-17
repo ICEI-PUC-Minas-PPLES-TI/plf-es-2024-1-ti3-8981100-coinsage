@@ -66,7 +66,7 @@ class EmaCalculatorService:
                 session.commit()
             except Exception as err:
                 logger.error(f"Error while calculating ema_8 for {result['symbol']}: {err}")
-                session.rollback()  # TODO: check need
+                # session.rollback()  # TODO: check need
 
     @show_runtime
     def calculate(self, symbols: List[CurrencyBaseInfoModel], timeframe: str, ema_size: int) -> List[dict]:
@@ -82,23 +82,26 @@ class EmaCalculatorService:
             List[dict]: A list of dict objects.
 
         """
-        chunk_size = (len(symbols) + self.NUMBER_THREDS - 1) // self.NUMBER_THREDS
-        threads = []
-        results: List[dict] = []
+        if len(symbols) >= self.NUMBER_THREDS:
+            chunk_size = (len(symbols) + self.NUMBER_THREDS - 1) // self.NUMBER_THREDS
+            threads = []
+            results: List[dict] = []
 
-        for i in range(self.NUMBER_THREDS):
-            start_index = i * chunk_size
-            end_index = min((i + 1) * chunk_size, len(symbols))
-            chunk = symbols[start_index:end_index]
+            for i in range(self.NUMBER_THREDS):
+                start_index = i * chunk_size
+                end_index = min((i + 1) * chunk_size, len(symbols))
+                chunk = symbols[start_index:end_index]
 
-            thread = threading.Thread(target=lambda: results.extend(self.fetch_data(chunk, timeframe, ema_size)))
-            threads.append(thread)
-            thread.start()
+                thread = threading.Thread(target=lambda: results.extend(self.fetch_data(chunk, timeframe, ema_size)))
+                threads.append(thread)
+                thread.start()
 
-        for thread in threads:
-            thread.join()
+            for thread in threads:
+                thread.join()
 
-        return results
+            return results
+
+        return self.fetch_data(symbols, timeframe, ema_size)
 
     def fetch_data(self, symbols: List[CurrencyBaseInfoModel], timeframe: str, ema_size: int) -> List[dict]:
         """

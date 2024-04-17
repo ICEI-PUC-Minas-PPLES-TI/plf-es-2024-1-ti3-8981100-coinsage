@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -30,6 +31,7 @@ class PriceService:
 
     def _collect_binance_closing_prices(self, interval="1d", limit=7):
         symbols_str = [symbol.symbol for symbol in self.symbols_repository.get_cryptos(self.session)]
+        # symbols_str = ['BTC']
         return self.binance_closing_price_colletor.collect(symbols=symbols_str, interval=interval, limit=limit)
 
     def extract(self, analysis_indentifier: Uuid, prices):
@@ -68,10 +70,13 @@ class PriceService:
 
         self.repository.save_all(self.session, first_stage_models)
 
+        logger.debug(f"Closing prices extracted: {len(first_stage_models)}")
+
     @show_runtime
     def collect(self, analysis_indentifier: Uuid):
         logger.info(f"Starting collecting open, close prices at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         prices = self._collect_binance_closing_prices()
+        logger.debug(f"Prices collected: {len(prices)}")
         self.extract(analysis_indentifier, prices)
 
     def get_all_prices(self):
@@ -137,14 +142,16 @@ class PriceService:
             # logger.error(f"Error on [{symbol_uuid}]:\n{e}")
             return SectorRead(uuid=UUID("00000000-0000-0000-0000-000000000000"), title="Unknown")
 
-    def get_price_by_symbol(self, symbol_str: str, analysis_uuid) -> FirstStageAnalysisModel:
+    def get_price_by_symbol(self, symbol_str: str, analysis_uuid) -> Optional[FirstStageAnalysisModel]:
         symbol = self.symbols_repository.get_currency_info_by_symbol(self.session, symbol_str)
         if symbol is None:
-            raise HTTPException(status_code=404, detail="Criptomoeda não encontrada")
+            logger.error(f"Símbolo não encontrado: {symbol_str}")
+            return None
 
         first_stage = self.repository.get_by_symbol(self.session, symbol, analysis_uuid)
 
         if first_stage is None:
-            raise HTTPException(status_code=404, detail="Análise não encontrada")
+            logger.error(f"Análise não encontrada para símbolo: {symbol_str}, análise: {analysis_uuid}")
+            return None
 
         return first_stage
