@@ -95,6 +95,11 @@ def update_last_week_percentage(db: Session, symbol: str, week_percentage: float
     db.commit()
 
 
+def delete_not_ended(db: Session, uuid_analysis: Uuid):
+    db.query(FirstStageAnalysisModel).filter(FirstStageAnalysisModel.uuid_analysis == uuid_analysis).delete()
+    db.commit()
+
+
 def save_all(db: Session, closing_prices: list[FirstStageAnalysisModel]):
     db.add_all(closing_prices)
     db.commit()

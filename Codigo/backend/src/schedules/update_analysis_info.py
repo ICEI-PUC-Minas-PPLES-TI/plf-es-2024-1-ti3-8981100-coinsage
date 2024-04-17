@@ -5,7 +5,9 @@ from loguru import logger
 from sqlalchemy.orm import Session
 
 from src.config.manager import settings
+from src.models.db.analysis import Analysis
 from src.models.db.analysis_info_schedule import AnalysisInfoScheduleModel
+from src.repository.crud import analysis_info_repository, first_stage_repository
 from src.services.analysis.analysis_collector import AnalysisCollector
 
 
@@ -15,6 +17,19 @@ def update_analysis_info(db: Session) -> None:
 
 
 def check_update_analysis_info(db: Session, settings: dict) -> None:
+    not_ended_analyses = db.query(Analysis).filter(Analysis.ended == False).all()
+    for analysis in not_ended_analyses:
+        item = (
+            db.query(AnalysisInfoScheduleModel).where(AnalysisInfoScheduleModel.uuid_analysis == analysis.uuid).first()
+        )
+        if item is not None:
+            logger.warning(f"Deleting schedule for analysis {analysis.uuid}")
+            db.delete(item)
+            db.commit()
+        first_stage_repository.delete_not_ended(db, analysis.uuid)  # type: ignore
+        logger.warning(f"Analysis {analysis.uuid} is not ended. Deleting")
+        analysis_info_repository.delete(db, analysis.uuid)  # type: ignore
+
     next_update_time = (
         db.query(AnalysisInfoScheduleModel).order_by(AnalysisInfoScheduleModel.next_scheduled_time.desc()).first()
     )
