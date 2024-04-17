@@ -10,27 +10,22 @@ from sqlalchemy.orm import Session
 
 from src.models.db.first_stage_analysis import FirstStageAnalysisModel
 from src.repository.crud import first_stage_repository
-from src.services.analysis.first_stage.closing_price_service import ClosingPriceService
+from src.services.analysis.first_stage.closing_price_service import PriceService
 from src.utilities.runtime import show_runtime
 
 
 class WeekPercentageValorizationService:
-    def __init__(
-        self, session: Session, closing_price_service: Annotated[ClosingPriceService, Depends(ClosingPriceService)]
-    ):
+    def __init__(self, session: Session, closing_price_service: Annotated[PriceService, Depends(PriceService)]):
         self.session = session
         self.closing_price_service = closing_price_service
         self.repository = first_stage_repository
 
     def _calculate_week_percentage_valorization(self, symbol: str, analysis_uuid) -> float:
-        closes: FirstStageAnalysisModel = self.closing_price_service.get_closing_price_by_symbol(symbol, analysis_uuid)
+        closes: FirstStageAnalysisModel = self.closing_price_service.get_price_by_symbol(symbol, analysis_uuid)
         try:
             percentage_diff = (
                 (closes.closing_price - closes.last_week_closing_price) / closes.last_week_closing_price
             ) * 100
-            # logger.debug(
-            #     f"Symbol: {symbol}, Current Week: {closes.closing_price}, Last Week: {closes.last_week_closing_price}, Percentage Diff: {percentage_diff}"
-            # )
             return float(percentage_diff)
         except TypeError as e:
             logger.error(f"Error on [{symbol}]:\n{e}")

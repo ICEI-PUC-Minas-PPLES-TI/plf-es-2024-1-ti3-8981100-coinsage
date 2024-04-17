@@ -9,7 +9,6 @@ from src.repository.database import SessionLocal
 class UserService:
     def __init__(self, session: Session):
         self.session = session
-        pass
 
     def create_user(self, user: UserCreate) -> UserResponse:
         user_created: UserDB = create_user(self.session, user)
