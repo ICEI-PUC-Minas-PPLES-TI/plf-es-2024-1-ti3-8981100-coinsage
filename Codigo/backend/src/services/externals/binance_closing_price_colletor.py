@@ -80,6 +80,3 @@ class BinanceClosingPriceColletor:
         except Exception as e:
             logger.error(f"Error to collect rolling window price: {e}")
         return None
-
-
-str
