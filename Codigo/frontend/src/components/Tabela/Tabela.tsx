@@ -31,17 +31,17 @@ interface TabelaProps {
 
 const Tabela: React.FC<TabelaProps> = ({ tableData }) => {
   const columns: GridColDef<(typeof rows)[number]>[] = [
-    { field: 'setor', headerName: 'Setor', width: 150 },
-    { field: 'cripto', headerName: 'Cripto', width: 150 },
-    { field: 'ranking', headerName: 'Ranking', width: 150 },
-    { field: 'valorizacao', headerName: '% Valorização', width: 180 },
-    { field: 'preco', headerName: 'Preço Agora', width: 150 },
-    { field: 'emas', headerName: 'EMAs (d) Alinhados', width: 200 },
-    { field: 'dataValorizacaoVolume', headerName: 'Data Valorização Volume (d)', width: 250 },
-    { field: 'quantidadeVolumeValorizacao', headerName: 'Quantidade Volume Valorização', width: 280 },
-    { field: 'quantidadeVolumeDiaAnterior', headerName: 'Quantidade Volume Dia Anterior', width: 280 },
-    { field: 'percentDiaAnterior', headerName: '% Dia/Dia Anterior', width: 250 },
-    { field: 'ema8', headerName: 'EMA8 (s)', width: 150 },
+    { field: 'setor', headerName: 'Setor', flex: 1 },
+    { field: 'cripto', headerName: 'Cripto', flex: 1 },
+    { field: 'ranking', headerName: 'Ranking', flex: 1 },
+    { field: 'valorizacao', headerName: '% Valorização', flex: 1 },
+    { field: 'preco', headerName: 'Preço Agora', flex: 1 },
+    { field: 'emas', headerName: 'EMAs (d) Alinhados', flex: 1 },
+    { field: 'dataValorizacaoVolume', headerName: 'Data Valorização Volume (d)',flex: 1 },
+    { field: 'quantidadeVolumeValorizacao', headerName: 'Quantidade Volume Valorização', flex: 1 },
+    { field: 'quantidadeVolumeDiaAnterior', headerName: 'Quantidade Volume Dia Anterior', flex: 1 },
+    { field: 'percentDiaAnterior', headerName: '% Dia/Dia Anterior',flex: 1 },
+    { field: 'ema8', headerName: 'EMA8 (s)', flex: 1 },
   ];
   const rows = tableData.map((data, index) => ({
     id: index + 1,
@@ -51,7 +51,7 @@ const Tabela: React.FC<TabelaProps> = ({ tableData }) => {
     valorizacao: `${data.week_increase_percentage}%`,
     preco: `${data.closing_price}`,
     emas: data.ema8_greater_open && data.ema8_less_close ? 'SIM' : 'NÃO',
-    dataValorizacaoVolume: new Date(data.valorization_date).toLocaleDateString(),
+    dataValorizacaoVolume: data.valorization_date,
     quantidadeVolumeValorizacao: `${data.open_price}`,
     quantidadeVolumeDiaAnterior: `${data.last_week_closing_price}`,
     percentDiaAnterior: `${((data.open_price - data.last_week_closing_price) / data.last_week_closing_price * 100).toFixed(2)}%`,
