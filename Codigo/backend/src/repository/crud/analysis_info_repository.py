@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy import Uuid
+from sqlalchemy import func, select, Uuid
 from sqlalchemy.orm import Session
 
 from src.models.db import analysis
