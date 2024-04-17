@@ -80,6 +80,51 @@ class DailyVolumeService:
                 )
             )  # type: ignore
         return last_volume_valuation
+    
+    def get_increase_valuation_percentage(self)-> list:
+        """
+        Calculates the percentage increase in valuation for each symbol from the previous day's valuation to today.
+
+        Returns:
+        - list: A list of dictionaries, each containing the symbol and its increase percentage.
+        """
+        valuation_percentage = []
+        last_volume_valuation = self.get_last_volume_valuation()
+        for volume in last_volume_valuation:
+            increase_percentage = self._calculate_valuation_percentage(volume)
+            valuation_percentage.append(
+                {"symbol":volume["last_valuation"]["symbol"], "increase_percentage":increase_percentage}
+            )
+        return valuation_percentage
+    
+    def get_valuation_date(self) -> list:
+        """
+        Retrieves the valuation date for each symbol from the rolling windows of today.
+
+        Returns:
+        - list: A list of dictionaries, each containing the symbol and its valuation date.
+        """
+        valuation_date = []
+        rolling_windows_size_today = self.get_day_volume()
+        for set_volume in rolling_windows_size_today:
+            for volume in set_volume:
+                valuation_date.append(
+                    {"symbol": volume["symbol"], "valuation_date": datetime.fromtimestamp(volume["closeTime"])}
+                )
+        return valuation_date
+
+    def _calculate_valuation_percentage(self, volume: dict) -> float:
+        """
+        Helper function to calculate the increase percentage based on volumes.
+
+        Parameters:
+        - volume (dict): Dictionary containing volume data for today and the last valuation.
+
+        Returns:
+        - float: The calculated increase percentage.
+        """
+        increase_percentage = (volume["last_valuation"]["volume"] / volume["today_volume"]["volume"]) * 100
+        return increase_percentage
 
     def _split_symbol_list(self, all_symbols: list) -> list:
         """
