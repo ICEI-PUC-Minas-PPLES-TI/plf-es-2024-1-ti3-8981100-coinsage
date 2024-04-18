@@ -5,7 +5,7 @@ import pytest
 from src.models.db.analysis import Analysis
 from src.models.db.currency_base_info import CurrencyBaseInfoModel
 from src.models.db.first_stage_analysis import FirstStageAnalysisModel
-from src.services.analysis.first_stage.closing_price_service import ClosingPriceService
+from src.services.analysis.first_stage.closing_price_service import PriceService
 from src.services.analysis.first_stage.week_percentage_val_service import WeekPercentageValorizationService
 from tests.db.db_fixture import test_session
 
@@ -48,7 +48,7 @@ def test_week_percentage_positive_valorization_calculated_correctly(test_session
 
     # Act
     sut = WeekPercentageValorizationService(
-        session=test_session, closing_price_service=ClosingPriceService(session=test_session)
+        session=test_session, closing_price_service=PriceService(session=test_session)
     )
 
     symbol = "BTC"
@@ -96,7 +96,7 @@ def test_week_percentage_negative_valorization_calculated_correctly(test_session
 
     # Act
     sut = WeekPercentageValorizationService(
-        session=test_session, closing_price_service=ClosingPriceService(session=test_session)
+        session=test_session, closing_price_service=PriceService(session=test_session)
     )
 
     symbol = "BTC"
@@ -188,7 +188,7 @@ def test_calculate_all_week_percentage_valorization(test_session):
     test_session.refresh(fake_first_stage_analysis_current_week_ltc)
 
     sut = WeekPercentageValorizationService(
-        session=test_session, closing_price_service=ClosingPriceService(session=test_session)
+        session=test_session, closing_price_service=PriceService(session=test_session)
     )
 
     symbols = ["BTC", "ETH", "LTC"]
@@ -245,7 +245,7 @@ def test_update_last(test_session):
     test_session.refresh(fake_first_stage_analysis_last_week)
 
     sut = WeekPercentageValorizationService(
-        session=test_session, closing_price_service=ClosingPriceService(session=test_session)
+        session=test_session, closing_price_service=PriceService(session=test_session)
     )
 
     symbol = "BTC"

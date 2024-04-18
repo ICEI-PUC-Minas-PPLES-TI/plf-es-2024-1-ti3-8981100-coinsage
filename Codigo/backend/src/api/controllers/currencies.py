@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from src.api.dependencies.session import get_db
 from src.models.schemas.currency_info import CurrencyInfoResponse
-from src.services.analysis.first_stage.closing_price_service import ClosingPriceService
+from src.services.analysis.first_stage.closing_price_service import PriceService
 from src.services.currencies_info_collector import CurrenciesLogoCollector
 
 router = APIRouter(

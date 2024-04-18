@@ -1,3 +1,5 @@
+import threading
+
 import fastapi
 import uvicorn
 from fastapi import Depends, HTTPException
@@ -30,9 +32,10 @@ backend_app: fastapi.FastAPI = initialize_backend_application()
 
 
 @backend_app.on_event("startup")
-def schedules() -> None:
+async def schedules() -> None:
     with SessionLocal() as db:
-        start_schedules(app_db=db)
+        scheduler_thread = threading.Thread(target=start_schedules, args=(db,))
+        scheduler_thread.start()
 
 
 @backend_app.on_event("shutdown")
