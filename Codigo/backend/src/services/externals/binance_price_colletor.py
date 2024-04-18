@@ -20,19 +20,22 @@ class BinancePriceColletor:
         threads = []
         results = []
 
-        for i in range(self.NUMBER_THREDS):
-            start_index = i * chunk_size
-            end_index = min((i + 1) * chunk_size, len(symbols))
-            chunk = symbols[start_index:end_index]
+        if len(symbols) >= self.NUMBER_THREDS:
+            for i in range(self.NUMBER_THREDS):
+                start_index = i * chunk_size
+                end_index = min((i + 1) * chunk_size, len(symbols))
+                chunk = symbols[start_index:end_index]
 
-            thread = threading.Thread(target=lambda: results.extend(self.fetch_data(chunk, interval, limit)))
-            threads.append(thread)
-            thread.start()
+                thread = threading.Thread(target=lambda: results.extend(self.fetch_data(chunk, interval, limit)))
+                threads.append(thread)
+                thread.start()
 
-        for thread in threads:
-            thread.join()
+            for thread in threads:
+                thread.join()
 
-        return results
+            return results
+
+        return self.fetch_data(symbols, interval, limit)
 
     def fetch_data(self, coins, interval: str, limit: int):
         data = []

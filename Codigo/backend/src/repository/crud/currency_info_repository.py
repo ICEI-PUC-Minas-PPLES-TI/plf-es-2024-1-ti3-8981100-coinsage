@@ -33,7 +33,7 @@ def get_currency_info_by_symbol(db: Session, symbol: str) -> currency_base_info.
     return (
         db.query(currency_base_info.CurrencyBaseInfoModel)
         .filter(currency_base_info.CurrencyBaseInfoModel.symbol == symbol)
-        .one_or_none()
+        .first()
     )
 
 
