@@ -1,6 +1,8 @@
 import React from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import styles from './Tabela.module.css';
+import LogoSymbol from './Logo/LogoSymbol';
+import TextColoredCondition from './TextColoredCondition/TextColoredCondition';
 
 interface TableData {
   currency: {
@@ -20,32 +22,16 @@ interface TableData {
   ema8: number;
   ema8_greater_open: boolean;
   ema8_less_close: boolean;
+  ema_aligned: boolean;
 }
 
 interface TabelaProps {
   tableData: TableData[];
 }
 
-interface LogoSymbolProps {
-  logo: string;
-  symbol: string;
-}
-
-const LogoSymbol: React.FC<LogoSymbolProps> = ({ logo, symbol }) => {
-  return (
-    <div className={styles.logoSymbol} style={{
-      display: 'flex',
-      justifyContent: 'left',
-      alignItems: 'center',
-      gap: '10px',
-    }}>
-      <img src={logo} alt={symbol} style={{ width: '30px', height: '30px' }} />
-      <span>{symbol}</span>
-    </div>
-  );
-};
-
 const Tabela: React.FC<TabelaProps> = ({ tableData=[] }) => {
+  const areEmasAligned = (value: boolean) => value === true ? 'SIM' : (value === false ? 'NÃO' : '-')
+
   const columns: GridColDef[] = [
     { field: 'setor', headerName: 'Setor', flex: 1 },
     {
@@ -53,15 +39,18 @@ const Tabela: React.FC<TabelaProps> = ({ tableData=[] }) => {
       headerName: 'Cripto',
       width: 160,
       renderCell: (params) => (
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <LogoSymbol logo={params.row.currency.logo} symbol={params.row.currency.symbol} />
-        </div>
+        <LogoSymbol logo={params.row.currency.logo} symbol={params.row.currency.symbol} />
       ),
     },
-    { field: 'ranking', headerName: 'Ranking', flex: 1 },
     { field: 'valorizacao', headerName: '% Valorização', flex: 1 },
-    { field: 'preco', headerName: 'Preço Agora', flex: 1 },
-    { field: 'emas', headerName: 'EMAs (d) Alinhados', flex: 1 },
+    { field: 'preco', headerName: 'Preço na Avaliação', flex: 1 },
+    {
+      field: 'emas',
+      headerName: 'EMAs (d) Alinhados',
+      renderCell: (params) => (
+        <TextColoredCondition value={params.row.ema_aligned} conditionFn={areEmasAligned} />
+      )
+    },
     { field: 'dataValorizacaoVolume', headerName: 'Data Valorização Volume (d)', flex: 1 },
     { field: 'quantidadeVolumeValorizacao', headerName: 'Quantidade Volume Valorização', flex: 1 },
     { field: 'quantidadeVolumeDiaAnterior', headerName: 'Quantidade Volume Dia Anterior', flex: 1 },
@@ -72,17 +61,17 @@ const Tabela: React.FC<TabelaProps> = ({ tableData=[] }) => {
   const rows = tableData.map((data, index) => ({
     id: index + 1,
     setor: data.currency.main_sector.title,
-    cripto: '', // We don't need to render anything here as it's handled in renderCell
-    ranking: index + 1,
+    cripto: '',
     valorizacao: `${data.week_increase_percentage}%`,
     preco: `${data.closing_price}`,
-    emas: data.ema8_greater_open && data.ema8_less_close ? 'SIM' : 'NÃO',
+    emas: '',
     dataValorizacaoVolume: data.valorization_date,
     quantidadeVolumeValorizacao: `${data.open_price}`,
     quantidadeVolumeDiaAnterior: `${data.last_week_closing_price}`,
     percentDiaAnterior: `${((data.open_price - data.last_week_closing_price) / data.last_week_closing_price * 100).toFixed(2)}%`,
     ema8: data.ema8 ? data.ema8.toString() : "N/A",
-    currency: data.currency, // Include currency data for the renderCell function
+    currency: data.currency,
+    ema_aligned: data.ema_aligned,
   }));
 
   return (
