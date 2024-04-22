@@ -7,9 +7,10 @@ from loguru import logger
 
 def show_runtime(func):
     def wrapper(*args, **kwargs):
-        start_time = time.time()
+        start_time = time.perf_counter()
         result = func(*args, **kwargs)
-        logger.info(f"{func.__module__}.{func.__qualname__} executed in {time.time() - start_time} seconds")
+        total_time = time.perf_counter() - start_time
+        logger.info(f"{func.__module__}.{func.__qualname__} Took {total_time:.4f} seconds")
         return result
 
     return wrapper

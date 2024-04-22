@@ -45,7 +45,7 @@ const LogoSymbol: React.FC<LogoSymbolProps> = ({ logo, symbol }) => {
   );
 };
 
-const Tabela: React.FC<TabelaProps> = ({ tableData }) => {
+const Tabela: React.FC<TabelaProps> = ({ tableData=[] }) => {
   const columns: GridColDef[] = [
     { field: 'setor', headerName: 'Setor', flex: 1 },
     {
@@ -81,13 +81,13 @@ const Tabela: React.FC<TabelaProps> = ({ tableData }) => {
     quantidadeVolumeValorizacao: `${data.open_price}`,
     quantidadeVolumeDiaAnterior: `${data.last_week_closing_price}`,
     percentDiaAnterior: `${((data.open_price - data.last_week_closing_price) / data.last_week_closing_price * 100).toFixed(2)}%`,
-    ema8: data.ema8.toString(),
+    ema8: data.ema8 ? data.ema8.toString() : "N/A",
     currency: data.currency, // Include currency data for the renderCell function
   }));
 
   return (
     <div className={styles.datagrid}>
-      <DataGrid rows={rows} columns={columns} />
+      <DataGrid rows={rows} columns={columns}/>
     </div>
   );
 };

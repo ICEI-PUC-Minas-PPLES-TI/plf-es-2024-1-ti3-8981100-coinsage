@@ -1,7 +1,7 @@
 import threading
 import time
 from datetime import datetime
-from typing import List
+from typing import Any, List
 
 import pandas
 from loguru import logger
@@ -34,6 +34,8 @@ class EmaCalculatorService:
         self.NUMBER_THREDS = 3
         self.binance_price_colletor = BinancePriceColletor()
         self.repository = first_stage_repository
+        self.raws = {}
+        self.times_called = 0
 
     @show_runtime
     def append_ema8_and_relations(
@@ -44,6 +46,7 @@ class EmaCalculatorService:
         )
 
         results = self.calculate(symbols, timeframe="1w", ema_size=8)
+
         for result in results:
             try:
                 crypto = result["symbol"]
@@ -59,14 +62,136 @@ class EmaCalculatorService:
                 current_analysis.ema8_greater_open = ema8_greater_than_open_week  # type: ignore
                 current_analysis.ema8_less_close = ema8_lower_than_close_week  # type: ignore
 
-                # logger.debug(f"EMA8 for {crypto} is {ema8}")
-                # logger.debug(f"EMA8 is greater than open price: {ema8_greater_than_open_week}")
-                # logger.debug(f"EMA8 is less than close price: {ema8_lower_than_close_week}")
-
                 session.commit()
             except Exception as err:
                 logger.error(f"Error while calculating ema_8 for {result['symbol']}: {err}")
-                # session.rollback()  # TODO: check need
+
+    def extract_data_sets(self, raw) -> tuple:
+        try:
+            ema8 = raw["ema8"]
+        except:
+            logger.info("No EM8 data from parameter.")
+            ema8 = None
+        try:
+            ema21 = raw["ema21"]
+        except:
+            logger.info("No EM21 data from parameter.")
+            ema21 = None
+        try:
+            ema50 = raw["ema50"]
+        except:
+            logger.info("No EM50 data from parameter.")
+            ema50 = None
+        try:
+            ema200 = raw["ema200"]
+        except:
+            logger.info("No EM200 data from parameter.")
+            ema200 = None
+
+        return ema8, ema21, ema50, ema200
+
+    def _fetch_calculate_emas(self, symbols: List[CurrencyBaseInfoModel], emas_raws: tuple) -> pandas.DataFrame:
+        threads = []
+        results = []
+
+        if not emas_raws[0]:
+            results.extend(self.calculate(symbols, timeframe="1d", ema_size=8))
+
+        if not emas_raws[1]:
+            thread = threading.Thread(
+                target=lambda: results.extend(self.calculate(symbols, timeframe="1d", ema_size=21))
+            )
+            threads.append(thread)
+            thread.start()
+        if not emas_raws[2]:
+            thread = threading.Thread(
+                target=lambda: results.extend(self.calculate(symbols, timeframe="1d", ema_size=50))
+            )
+            threads.append(thread)
+            thread.start()
+        if not emas_raws[3]:
+            thread = threading.Thread(
+                target=lambda: results.extend(self.calculate(symbols, timeframe="1d", ema_size=200))
+            )
+            threads.append(thread)
+            thread.start()
+
+        for thread in threads:
+            thread.join()
+
+        return results
+
+    def _merge_ema_values(self, results: List[dict]) -> pandas.DataFrame:
+        merged_values = pandas.DataFrame()
+
+        for result in results:
+            merged_values["symbol"] = result["symbol"]
+            merged_values["closing_price"] = result["ema_values"]["close"]
+            merged_values["open_price"] = result["ema_values"]["open"]
+            merged_values["date"] = result["ema_values"]["time"]
+            merged_values[f'ema_{result["ema_size"]}'] = result["ema_values"][f'ema_{result["ema_size"]}']
+
+        merged_values["8_above_21"] = (merged_values["ema_8"] >= merged_values["ema_21"]).fillna(0).astype(int)
+        merged_values["21_above_50"] = (merged_values["ema_21"] >= merged_values["ema_50"]).fillna(0).astype(int)
+        merged_values["50_above_200"] = (merged_values["ema_50"] >= merged_values["ema_200"]).fillna(0).astype(int)
+
+        return merged_values
+
+    def _save_emas_aligned_on_db(
+        self,
+        session: Session,
+        symbols: List[CurrencyBaseInfoModel],
+        analysis_uuid: UUID,
+        merged_values: pandas.DataFrame,
+    ):
+        for symbol in symbols:
+            try:
+                current_analysis = self.repository.get_by_symbol_str(session, symbol.symbol, analysis_uuid)
+
+                if current_analysis is None:
+                    logger.warning(f"Analysis not found for {symbol.symbol} - {analysis_uuid}")
+                    continue
+
+                ema8_above_21_all = merged_values["8_above_21"].tail(1).values[0] == 1
+                ema21_above_50_all = merged_values["21_above_50"].tail(1).values[0] == 1
+                ema50_above_200_all = merged_values["50_above_200"].tail(1).values[0] == 1
+
+                emas_aligned = ema8_above_21_all and ema21_above_50_all and ema50_above_200_all
+                current_analysis.ema_aligned = emas_aligned
+                session.commit()
+            except Exception as err:
+                logger.error(f"Error while calculating ema crossovers for {symbol.symbol}: {err}")
+
+    @show_runtime
+    def calculate_crossovers(
+        self, session: Session, symbols: List[CurrencyBaseInfoModel], analysis_uuid: UUID, raw=None
+    ):
+        """
+        Calculates the EMA crossovers for a list of symbols.
+
+        Args:
+            session (Session): The database session.
+            symbols (List[CurrencyBaseInfoModel]): The list of symbols to calculate the EMA crossovers for.
+            analysis_uuid (UUID): The UUID of the analysis.
+            raw (Optional[dict]): The dictionary containing the EMA values to use for calculation.
+
+        Returns:
+            pandas.DataFrame: The merged values of the EMA crossovers.
+        """
+
+        logger.info(
+            f"Starting ema crossovers calculation for {len(symbols)} symbols at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        )
+
+        ema8, ema21, ema50, ema200 = self.extract_data_sets(raw)
+
+        results = self._fetch_calculate_emas(symbols, (ema8, ema21, ema50, ema200))
+
+        merged_values = self._merge_ema_values(results)
+
+        self._save_emas_aligned_on_db(session, symbols, analysis_uuid, merged_values)
+
+        return merged_values
 
     @show_runtime
     def calculate(self, symbols: List[CurrencyBaseInfoModel], timeframe: str, ema_size: int) -> List[dict]:
@@ -82,6 +207,9 @@ class EmaCalculatorService:
             List[dict]: A list of dict objects.
 
         """
+
+        logger.info(f"Calculating EMA{ema_size} for {len(symbols)} symbols.")
+
         if len(symbols) >= self.NUMBER_THREDS:
             chunk_size = (len(symbols) + self.NUMBER_THREDS - 1) // self.NUMBER_THREDS
             threads = []
@@ -125,11 +253,31 @@ class EmaCalculatorService:
                 time.sleep(0.1)
                 dict_data = self.calc_generic(symbol, timeframe, ema_size)  # type: ignore
 
-            # logger.debug(type(dict_data))
-
-            data.append({"symbol": symbol, "timeframe": timeframe, "ema_size": ema_size, "ema_values": dict_data})
+            data.append(
+                {
+                    "symbol": symbol,
+                    "timeframe": timeframe,
+                    "ema_size": ema_size,
+                    "ema_values": dict_data,
+                }
+            )
 
         return data
+
+    def calc_ema(self, raw_data, ema_size: int) -> pandas.DataFrame:
+        dataframe = pandas.DataFrame(raw_data)
+        ema_name = f"ema_{ema_size}"
+
+        # Calculate the initial mean for the first ema_size rows
+        initial_mean = dataframe["close"].rolling(window=ema_size, min_periods=ema_size).mean()
+
+        # Use rolling window to calculate EMA
+        dataframe[ema_name] = dataframe["close"].ewm(span=ema_size, adjust=False).mean()
+
+        # Fill NaN values with the initial mean
+        dataframe[ema_name].fillna(initial_mean, inplace=True)
+
+        return dataframe
 
     def calc_generic(self, symbol: str, timeframe: str, ema_size: int) -> pandas.DataFrame:
         """
@@ -148,22 +296,15 @@ class EmaCalculatorService:
             pandas.DataFrame: A DataFrame containing the EMA values.
 
         """
-        symbol_parsed = f"{symbol}USDT"
-        raw_data = self.binance_price_colletor.get_candlestick_data(
-            symbol=symbol_parsed, timeframe=timeframe, qty=self.FIXED_QUANTITY, get_raw_data=False
-        )
-        dataframe = pandas.DataFrame(raw_data)
-        ema_name = f"ema_{ema_size}"
-        multiplier = 2 / (ema_size + 1)
-        initial_mean = dataframe["close"].head(ema_size).mean()
+        if symbol not in self.raws:
+            symbol_parsed = f"{symbol}USDT"
+            self.times_called = self.times_called + 1
+            raw_data = self.binance_price_colletor.get_candlestick_data(
+                symbol=symbol_parsed, timeframe=timeframe, qty=self.FIXED_QUANTITY, get_raw_data=False
+            )
 
-        for i in range(len(dataframe)):
-            if i == ema_size:
-                dataframe.loc[i, ema_name] = initial_mean
-            elif i > ema_size:
-                ema_value = dataframe.loc[i, "close"] * multiplier + dataframe.loc[i - 1, ema_name] * (1 - multiplier)
-                dataframe.loc[i, ema_name] = ema_value
-            else:
-                dataframe.loc[i, ema_name] = 0.00
+            self.raws[symbol] = raw_data
+        else:
+            raw_data = self.raws[symbol]
 
-        return dataframe
+        return self.calc_ema(raw_data, ema_size)
