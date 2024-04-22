@@ -6,6 +6,20 @@
   padding: 1.25rem 0;
   height: 80px;
   fontStyle: 'italic';
+  color: #071947;
+  width: 100%;
+}
+
+.text {
+  background: rgba(255,0,0, .2);
+  border-radius: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.25rem 0;
+  height: 100%;
+  fontStyle: 'italic';
   color: #121212;
   width: 100%;
+  margin-bottom: 20px;
 }
