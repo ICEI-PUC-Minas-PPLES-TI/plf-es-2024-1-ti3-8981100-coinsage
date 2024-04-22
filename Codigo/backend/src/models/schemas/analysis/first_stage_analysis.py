@@ -23,3 +23,4 @@ class FirstStageAnalysisResponse(BaseSchemaModel):
     ema8: float | None
     ema8_greater_open: bool | None
     ema8_less_close: bool | None
+    ema_aligned: bool | None
