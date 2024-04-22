@@ -64,20 +64,20 @@ def get_paginated_by_uuid(
 
 def get_by_symbol(db: Session, symbol: CurrencyBaseInfoModel, analysis_uuid: Uuid) -> FirstStageAnalysisModel | None:
     found = db.query(FirstStageAnalysisModel).filter(
-        FirstStageAnalysisModel.uuid_currency == symbol.uuid and FirstStageAnalysisModel.uuid_analysis == analysis_uuid
+        FirstStageAnalysisModel.uuid_currency == symbol.uuid, FirstStageAnalysisModel.uuid_analysis == analysis_uuid
     )
 
-    return found.one_or_none()
+    return found.first()
 
 
 def get_by_symbol_str(db: Session, symbol: str, analysis_uuid: Uuid) -> FirstStageAnalysisModel | None:
     found = (
         db.query(FirstStageAnalysisModel)
         .join(CurrencyBaseInfoModel, FirstStageAnalysisModel.uuid_currency == CurrencyBaseInfoModel.uuid)
-        .filter(CurrencyBaseInfoModel.symbol == symbol and FirstStageAnalysisModel.uuid_analysis == analysis_uuid)
+        .filter(CurrencyBaseInfoModel.symbol == symbol, FirstStageAnalysisModel.uuid_analysis == analysis_uuid)
     )
 
-    return found.one_or_none()
+    return found.first()
 
 
 def update_last_week_percentage(db: Session, symbol: str, week_percentage: float, uuid_analysis: Uuid):
@@ -85,7 +85,7 @@ def update_last_week_percentage(db: Session, symbol: str, week_percentage: float
         db.query(FirstStageAnalysisModel)
         .join(CurrencyBaseInfoModel, FirstStageAnalysisModel.uuid_currency == CurrencyBaseInfoModel.uuid)
         .filter(CurrencyBaseInfoModel.symbol == symbol, FirstStageAnalysisModel.uuid_analysis == uuid_analysis)
-        .one_or_none()
+        .first()
     )
 
     if item is None:

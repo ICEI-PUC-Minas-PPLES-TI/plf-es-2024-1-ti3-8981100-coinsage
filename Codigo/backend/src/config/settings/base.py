@@ -31,10 +31,7 @@ class BackendBaseSettings(BaseSettings):
     DATABASE_NAME: str = decouple.config("DATABASE_NAME", cast=str)  # type: ignore
 
     IS_ALLOWED_CREDENTIALS: bool = decouple.config("IS_ALLOWED_CREDENTIALS", default=True, cast=bool)  # type: ignore
-    ALLOWED_ORIGINS: list[str] = [
-        "http://localhost:3000",  # React default port
-        "http://127.0.0.1:3000",  # React docker port
-    ]
+    ALLOWED_ORIGINS: list[str] = ["*"]
     ALLOWED_METHODS: list[str] = ["*"]
     ALLOWED_HEADERS: list[str] = ["*"]
 

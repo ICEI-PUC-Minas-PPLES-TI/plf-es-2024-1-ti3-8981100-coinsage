@@ -63,6 +63,8 @@ class AnalysisCollector:
         try:
             symbols = self.symbols_service.get_cryptos().last_update.data
             cryptos_str: List[str] = [crypto.symbol for crypto in symbols]
+            # symbols = [self.symbols_service.get_crypto_by_symbol('BTC')]
+            # cryptos_str: List[str] = ['BTC']
 
             self.prices_service.collect(analysis_indentifier=new_analysis.uuid)
             self.week_increse_service.calculate_all_week_percentage_valorization(cryptos_str, new_analysis.uuid)
