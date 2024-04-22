@@ -20,6 +20,7 @@ interface TableData {
   ema8: number;
   ema8_greater_open: boolean;
   ema8_less_close: boolean;
+  ema_aligned: boolean;
 }
 
 interface TabelaProps {
@@ -45,7 +46,22 @@ const LogoSymbol: React.FC<LogoSymbolProps> = ({ logo, symbol }) => {
   );
 };
 
+const TextColoredCondition: React.FC<{ value: boolean, conditionFn: (value: boolean) => string }> = ({ value, conditionFn }) => {
+  const text = conditionFn(value);
+
+  const style = {
+    color: text === 'SIM' ? '#29D30D' : (text === 'NÃO' ? 'red' : 'black'),
+    fontWeight: text === 'SIM' ? 'bold' : 'normal',
+  }
+
+  return (
+    <span style={style}>{text}</span>
+  );
+}
+
 const Tabela: React.FC<TabelaProps> = ({ tableData=[] }) => {
+  const areEmasAligned = (value: boolean) => value === true ? 'SIM' : (value === false ? 'NÃO' : '-')
+
   const columns: GridColDef[] = [
     { field: 'setor', headerName: 'Setor', flex: 1 },
     {
@@ -58,10 +74,16 @@ const Tabela: React.FC<TabelaProps> = ({ tableData=[] }) => {
         </div>
       ),
     },
-    { field: 'ranking', headerName: 'Ranking', flex: 1 },
+    // { field: 'ranking', headerName: 'Ranking', flex: 1 },
     { field: 'valorizacao', headerName: '% Valorização', flex: 1 },
-    { field: 'preco', headerName: 'Preço Agora', flex: 1 },
-    { field: 'emas', headerName: 'EMAs (d) Alinhados', flex: 1 },
+    { field: 'preco', headerName: 'Preço na Avaliação', flex: 1 },
+    {
+      field: 'emas',
+      headerName: 'EMAs (d) Alinhados',
+      renderCell: (params) => (
+        <TextColoredCondition value={params.row.ema_aligned} conditionFn={areEmasAligned} />
+      )
+    },
     { field: 'dataValorizacaoVolume', headerName: 'Data Valorização Volume (d)', flex: 1 },
     { field: 'quantidadeVolumeValorizacao', headerName: 'Quantidade Volume Valorização', flex: 1 },
     { field: 'quantidadeVolumeDiaAnterior', headerName: 'Quantidade Volume Dia Anterior', flex: 1 },
@@ -72,17 +94,18 @@ const Tabela: React.FC<TabelaProps> = ({ tableData=[] }) => {
   const rows = tableData.map((data, index) => ({
     id: index + 1,
     setor: data.currency.main_sector.title,
-    cripto: '', // We don't need to render anything here as it's handled in renderCell
-    ranking: index + 1,
+    cripto: '',
+    // ranking: index + 1,
     valorizacao: `${data.week_increase_percentage}%`,
     preco: `${data.closing_price}`,
-    emas: data.ema8_greater_open && data.ema8_less_close ? 'SIM' : 'NÃO',
+    emas: '',
     dataValorizacaoVolume: data.valorization_date,
     quantidadeVolumeValorizacao: `${data.open_price}`,
     quantidadeVolumeDiaAnterior: `${data.last_week_closing_price}`,
     percentDiaAnterior: `${((data.open_price - data.last_week_closing_price) / data.last_week_closing_price * 100).toFixed(2)}%`,
     ema8: data.ema8 ? data.ema8.toString() : "N/A",
     currency: data.currency, // Include currency data for the renderCell function
+    ema_aligned: data.ema_aligned,
   }));
 
   return (
