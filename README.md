@@ -1,3 +1,4 @@
+[![CI - Backend Code Quality](https://github.com/ICEI-PUC-Minas-PPLES-TI/plf-es-2024-1-ti3-8981100-coinsage/actions/workflows/ci-backend.yaml/badge.svg)](https://github.com/ICEI-PUC-Minas-PPLES-TI/plf-es-2024-1-ti3-8981100-coinsage/actions/workflows/ci-backend.yaml)
 # CoinSage
 
 O CoinSage é um software projetado para automatizar e simplificar a análise de criptomoedas. Utilizando dados da [Binance](https://binance.com/), o CoinSage aplica critérios técnicos para identificar as moedas com maior potencial de valorização, fornecendo relatórios detalhados que orientam decisões de compra e venda.
