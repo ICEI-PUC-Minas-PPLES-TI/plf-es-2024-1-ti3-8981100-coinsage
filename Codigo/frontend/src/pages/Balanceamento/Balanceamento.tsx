@@ -1,47 +1,41 @@
 import React, { useEffect, useState } from 'react'
+import { Fade, Zoom } from '@mui/material';
+import titleStyles from '../../components/Title/Title.module.css'
 import Title from '../../components/Title/Title'
 // import  DownloadButton  from '../../components/DownloadButton'
 import Tabela from '../../components/Tabela/Tabela'
 import styles from './Balanceamento.module.css'
 import { Endpoints } from '../../constants/apiConfig.json'
 import api from '../../service/api'
+import { Box, LinearProgress } from '@mui/material'
 
-// interface Currency {
-//   symbol: string;
-//   uuid: string;
-//   logo: string;
-//   main_sector: {
-//     uuid: string;
-//     title: string;
-//   };
-// }
+const LoadingTableComponent: React.FC = () => {
+  const [loadingText, setLoadingText] = useState<string>('Carregando dados da última análise...');
 
-// interface DataItem {
-//   currency: Currency;
-//   week_increase_percentage: number;
-//   valorization_date: string;
-//   closing_price: number;
-//   open_price: number;
-//   last_week_closing_price: number;
-//   ema8: number;
-//   ema8_greater_open: boolean;
-//   ema8_less_close: boolean;
-// }
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLoadingText((prev) => {
+        if (prev === 'Carregando dados da última análise...') {
+          return 'Por favor, aguarde...';
+        } else {
+          return 'Carregando dados da última análise...';
+        }
+      });
+    }, 1200);
 
-// interface LastUpdate {
-//   time: string;
-//   data: {
-//     page: number;
-//     total: number;
-//     remaining: number;
-//     data: DataItem[];
-//   };
-// }
+    return () => clearInterval(interval);
+  })
 
-// interface ApiResponse {
-//   next_update: string;
-//   last_update: LastUpdate;
-// }
+
+  return (
+    <>
+        <h1 className={titleStyles.title}>{loadingText}</h1>
+        <Box sx={{ width: '100%' }}>
+          <LinearProgress />
+        </Box>
+      </>
+  );
+}
 
 const Balanceamento: React.FC = () => {
   const [lastUpdate, setLastUpdate] = useState<string>('');
@@ -58,7 +52,6 @@ const Balanceamento: React.FC = () => {
           if (data) {
             setLastUpdate(data.last_update.time);
             setTableData(data.last_update.data.data);
-            console.log(response.data);
           } else {
             console.log('ERROR USUARIO NAO CADASTRADO');
           }
@@ -76,7 +69,10 @@ const Balanceamento: React.FC = () => {
 
   return (
     <div className={styles.content}>
-      {loading ? <h1>Carregando...</h1>
+      {loading ?
+      <>
+        <LoadingTableComponent />
+      </>
         :
         <>
           <Title lastUpdate={lastUpdate} />
