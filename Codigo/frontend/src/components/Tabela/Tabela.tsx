@@ -1,6 +1,8 @@
 import React from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import styles from './Tabela.module.css';
+import LogoSymbol from './Logo/LogoSymbol';
+import TextColoredCondition from './TextColoredCondition/TextColoredCondition';
 
 interface TableData {
   currency: {
@@ -27,38 +29,6 @@ interface TabelaProps {
   tableData: TableData[];
 }
 
-interface LogoSymbolProps {
-  logo: string;
-  symbol: string;
-}
-
-const LogoSymbol: React.FC<LogoSymbolProps> = ({ logo, symbol }) => {
-  return (
-    <div className={styles.logoSymbol} style={{
-      display: 'flex',
-      justifyContent: 'left',
-      alignItems: 'center',
-      gap: '10px',
-    }}>
-      <img src={logo} alt={symbol} style={{ width: '30px', height: '30px' }} />
-      <span>{symbol}</span>
-    </div>
-  );
-};
-
-const TextColoredCondition: React.FC<{ value: boolean, conditionFn: (value: boolean) => string }> = ({ value, conditionFn }) => {
-  const text = conditionFn(value);
-
-  const style = {
-    color: text === 'SIM' ? '#29D30D' : (text === 'NÃO' ? 'red' : 'black'),
-    fontWeight: text === 'SIM' ? 'bold' : 'normal',
-  }
-
-  return (
-    <span style={style}>{text}</span>
-  );
-}
-
 const Tabela: React.FC<TabelaProps> = ({ tableData=[] }) => {
   const areEmasAligned = (value: boolean) => value === true ? 'SIM' : (value === false ? 'NÃO' : '-')
 
@@ -69,12 +39,9 @@ const Tabela: React.FC<TabelaProps> = ({ tableData=[] }) => {
       headerName: 'Cripto',
       width: 160,
       renderCell: (params) => (
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <LogoSymbol logo={params.row.currency.logo} symbol={params.row.currency.symbol} />
-        </div>
+        <LogoSymbol logo={params.row.currency.logo} symbol={params.row.currency.symbol} />
       ),
     },
-    // { field: 'ranking', headerName: 'Ranking', flex: 1 },
     { field: 'valorizacao', headerName: '% Valorização', flex: 1 },
     { field: 'preco', headerName: 'Preço na Avaliação', flex: 1 },
     {
@@ -95,7 +62,6 @@ const Tabela: React.FC<TabelaProps> = ({ tableData=[] }) => {
     id: index + 1,
     setor: data.currency.main_sector.title,
     cripto: '',
-    // ranking: index + 1,
     valorizacao: `${data.week_increase_percentage}%`,
     preco: `${data.closing_price}`,
     emas: '',
@@ -104,7 +70,7 @@ const Tabela: React.FC<TabelaProps> = ({ tableData=[] }) => {
     quantidadeVolumeDiaAnterior: `${data.last_week_closing_price}`,
     percentDiaAnterior: `${((data.open_price - data.last_week_closing_price) / data.last_week_closing_price * 100).toFixed(2)}%`,
     ema8: data.ema8 ? data.ema8.toString() : "N/A",
-    currency: data.currency, // Include currency data for the renderCell function
+    currency: data.currency,
     ema_aligned: data.ema_aligned,
   }));
 
