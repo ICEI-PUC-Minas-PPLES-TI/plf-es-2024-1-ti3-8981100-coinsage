@@ -1,10 +1,10 @@
+import os
 import threading
+import time
 
 import fastapi
 import uvicorn
-from fastapi import Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
 
 from src.api.endpoints import router as api_endpoint_router
 from src.config.manager import settings
@@ -33,6 +33,9 @@ backend_app: fastapi.FastAPI = initialize_backend_application()
 
 @backend_app.on_event("startup")
 async def schedules() -> None:
+    os.environ["TZ"] = "America/Sao_Paulo"
+    time.tzset()
+
     with SessionLocal() as db:
         scheduler_thread = threading.Thread(target=start_schedules, args=(db,))
         scheduler_thread.start()
