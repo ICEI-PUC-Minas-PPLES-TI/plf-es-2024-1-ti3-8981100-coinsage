@@ -13,3 +13,7 @@
   height: 100%;
   min-height: 600px;
 }
+
+.oddRowStyle:nth-of-type(odd){
+  background-color: #f5f5f5;
+}

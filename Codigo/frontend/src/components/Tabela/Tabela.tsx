@@ -1,84 +1,204 @@
-import React from 'react';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import styles from './Tabela.module.css';
-import LogoSymbol from './Logo/LogoSymbol';
-import TextColoredCondition from './TextColoredCondition/TextColoredCondition';
+import * as React from "react";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableFooter from "@mui/material/TableFooter";
+import TablePagination from "@mui/material/TablePagination";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import { TableHead } from "@mui/material";
+import LogoSymbol from "./Logo/LogoSymbol";
+import TextColoredCondition from "./TextColoredCondition/TextColoredCondition";
+import { LinearProgress } from "@mui/material";
+import TablePaginationActions from "./TablePaginationActions/TablePaginationActions";
+import tableStyles from "./Tabela.module.css";
 
-interface TableData {
-  currency: {
-    symbol: string;
-    uuid: string;
-    logo: string;
-    main_sector: {
-      uuid: string;
-      title: string;
-    };
-  };
-  week_increase_percentage: number;
-  valorization_date: string;
-  closing_price: number;
-  open_price: number;
-  last_week_closing_price: number;
-  ema8: number;
-  ema8_greater_open: boolean;
-  ema8_less_close: boolean;
-  ema_aligned: boolean;
+interface Column {
+  id: string;
+  label: string;
+  minWidth?: number;
+  align?: "right";
+  format?: (value: number) => string;
+  renderCell?: (params: any) => JSX.Element;
 }
 
-interface TabelaProps {
-  tableData: TableData[];
-}
+const areEmasAligned = (value: boolean) =>
+  value === true ? "SIM" : value === false ? "NÃO" : "-";
 
-const Tabela: React.FC<TabelaProps> = ({ tableData=[] }) => {
-  const areEmasAligned = (value: boolean) => value === true ? 'SIM' : (value === false ? 'NÃO' : '-')
+const columns: readonly Column[] = [
+  { id: "setor", label: "Setor" },
+  {
+    id: "cripto",
+    label: "Cripto",
+    minWidth: 160,
+  },
+  { id: "valorizacao", label: "% Valorização" },
+  { id: "preco", label: "Preço na Avaliação" },
+  { id: "emas", label: "EMAs (d) Alinhados" },
+  {
+    id: "dataValorizacaoVolume",
+    label: "Data Valorização Volume (d)",
+  },
+  {
+    id: "quantidadeVolumeValorizacao",
+    label: "Quantidade Volume Valorização",
+  },
+  {
+    id: "quantidadeVolumeDiaAnterior",
+    label: "Quantidade Volume Dia Anterior",
+  },
+  { id: "percentDiaAnterior", label: "% Dia Atual/Dia Anterior" },
+  { id: "ema8", label: "EMA8 (s)" },
+];
 
-  const columns: GridColDef[] = [
-    { field: 'setor', headerName: 'Setor', flex: 1 },
-    {
-      field: 'cripto',
-      headerName: 'Cripto',
-      width: 160,
-      renderCell: (params) => (
-        <LogoSymbol logo={params.row.currency.logo} symbol={params.row.currency.symbol} />
-      ),
-    },
-    { field: 'valorizacao', headerName: '% Valorização', flex: 1 },
-    { field: 'preco', headerName: 'Preço na Avaliação', flex: 1 },
-    {
-      field: 'emas',
-      headerName: 'EMAs (d) Alinhados',
-      renderCell: (params) => (
-        <TextColoredCondition value={params.row.ema_aligned} conditionFn={areEmasAligned} />
-      )
-    },
-    { field: 'dataValorizacaoVolume', headerName: 'Data Valorização Volume (d)', flex: 1 },
-    { field: 'quantidadeVolumeValorizacao', headerName: 'Quantidade Volume Valorização', flex: 1 },
-    { field: 'quantidadeVolumeDiaAnterior', headerName: 'Quantidade Volume Dia Anterior', flex: 1 },
-    { field: 'percentDiaAnterior', headerName: '% Dia/Dia Anterior', flex: 1 },
-    { field: 'ema8', headerName: 'EMA8 (s)', flex: 1 },
-  ];
+const renderLogoSymbol = (logo: string, symbol: string, index: number) => (
+  <LogoSymbol logo={logo} symbol={symbol} key={index} />
+);
 
-  const rows = tableData.map((data, index) => ({
+const renderEmasAligned = (value: boolean, index: number) => (
+  <TextColoredCondition
+    value={value}
+    conditionFn={areEmasAligned}
+    key={index}
+  />
+);
+
+const dataRowsMapper = (data: any) => {
+  const newData = data.map((item: any, index: number) => ({
     id: index + 1,
-    setor: data.currency.main_sector.title,
-    cripto: '',
-    valorizacao: `${data.week_increase_percentage}%`,
-    preco: `${data.closing_price}`,
-    emas: '',
-    dataValorizacaoVolume: data.valorization_date,
-    quantidadeVolumeValorizacao: `${data.open_price}`,
-    quantidadeVolumeDiaAnterior: `${data.last_week_closing_price}`,
-    percentDiaAnterior: `${((data.open_price - data.last_week_closing_price) / data.last_week_closing_price * 100).toFixed(2)}%`,
-    ema8: data.ema8 ? data.ema8.toString() : "N/A",
-    currency: data.currency,
-    ema_aligned: data.ema_aligned,
+    setor: item.currency.main_sector.title,
+    cripto: renderLogoSymbol(item.currency.logo, item.currency.symbol, index),
+    valorizacao: `${item.week_increase_percentage.toFixed(2)}%`,
+    preco: `${item.closing_price.toFixed(2)}`,
+    emas: renderEmasAligned(item.ema_aligned, index),
+    dataValorizacaoVolume: item.valorization_date,
+    quantidadeVolumeValorizacao: `${item.open_price.toFixed(2)}`,
+    quantidadeVolumeDiaAnterior: `${item.last_week_closing_price.toFixed(2)}`,
+    percentDiaAnterior: `${(
+      ((item.open_price - item.last_week_closing_price) /
+        item.last_week_closing_price) *
+      100
+    ).toFixed(2)}%`,
+    ema8: item.ema8 ? item.ema8.toFixed(2).toString() : "N/A",
+    currency: item.currency,
+    ema_aligned: item.ema_aligned,
   }));
 
-  return (
-    <div className={styles.datagrid}>
-      <DataGrid rows={rows} columns={columns}/>
-    </div>
-  );
+  return newData;
 };
 
-export default Tabela;
+export default function CustomPaginationActionsTable(
+  {
+    rowsRaw,
+    page,
+    setPage,
+    rowsPerPage,
+    setRowsPerPage,
+    count,
+    tableLoading,
+  }: {
+    rowsRaw: any[];
+    page: number;
+    setPage: React.Dispatch<React.SetStateAction<number>>;
+    rowsPerPage: number;
+    setRowsPerPage: React.Dispatch<React.SetStateAction<number>>;
+    count: number;
+    tableLoading: boolean;
+  }
+) {
+  const rows = dataRowsMapper(rowsRaw);
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length);
+
+  const handleChangePage = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number
+  ) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  return (
+    <TableContainer component={Paper}>
+      <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
+        <TableHead>
+          <TableRow>
+            {columns.map((column) => (
+              <TableCell
+                key={column.id}
+                align={column.align}
+                style={{ minWidth: column.minWidth }}
+              >
+                {column.label}
+              </TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row: any) => (
+            <TableRow key={row.id} style={{ height: 40}} className={tableStyles.oddRowStyle}>
+              <TableCell component="th" scope="row">
+                {row.setor}
+              </TableCell>
+              <TableCell style={{ width: 160 }} align="left">
+                {row.cripto}
+              </TableCell>
+              <TableCell align="left">{row.valorizacao}</TableCell>
+              <TableCell align="left">{row.preco}</TableCell>
+              <TableCell align="left">{row.emas}</TableCell>
+              <TableCell align="left">{row.dataValorizacaoVolume}</TableCell>
+              <TableCell align="left">
+                {row.quantidadeVolumeValorizacao}
+              </TableCell>
+              <TableCell align="left">
+                {row.quantidadeVolumeDiaAnterior}
+              </TableCell>
+              <TableCell align="left">{row.percentDiaAnterior}</TableCell>
+              <TableCell align="left">{row.ema8}</TableCell>
+            </TableRow>
+          ))}
+          {tableLoading && (
+            <TableRow style={{ height: 40}}>
+            <TableCell colSpan={10}>
+              <LinearProgress />
+            </TableCell>
+          </TableRow>
+          )}
+          {emptyRows > 0 && (
+            <TableRow style={{ height: 40 * emptyRows }}>
+              <TableCell colSpan={6} />
+            </TableRow>
+          )}
+        </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TablePagination
+              rowsPerPageOptions={[10, 20, 50, 100]}
+              colSpan={columns.length}
+              count={count}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              slotProps={{
+                select: {
+                  inputProps: {
+                    "aria-label": "rows per page",
+                  },
+                  native: true,
+                },
+              }}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              ActionsComponent={TablePaginationActions}
+            />
+          </TableRow>
+        </TableFooter>
+      </Table>
+    </TableContainer>
+  );
+}
