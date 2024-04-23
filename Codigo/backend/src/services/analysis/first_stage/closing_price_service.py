@@ -116,6 +116,7 @@ class PriceService:
                 ema8=float(anylise.ema8) if anylise.ema8 else None,
                 ema8_greater_open=bool(anylise.ema8_greater_open),
                 ema8_less_close=bool(anylise.ema8_less_close),
+                ema_aligned=bool(anylise.ema_aligned),
             )
 
             responses.append(response)
