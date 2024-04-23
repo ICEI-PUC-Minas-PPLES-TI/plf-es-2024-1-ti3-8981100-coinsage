@@ -275,7 +275,7 @@ class EmaCalculatorService:
         dataframe[ema_name] = dataframe["close"].ewm(span=ema_size, adjust=False).mean()
 
         # Fill NaN values with the initial mean
-        dataframe[ema_name].fillna(initial_mean, inplace=True)
+        dataframe[ema_name] = dataframe[ema_name].fillna(initial_mean)
 
         return dataframe
 
