@@ -11,7 +11,8 @@ class ClosingPriceEntity(BaseSchemaModel):
     week: datetime
 
 
-class ClosingPriceResponse(BaseSchemaModel):
+class PricesResponse(BaseSchemaModel):
     symbol: str
     closing_price: float
+    open_price: float
     week: datetime

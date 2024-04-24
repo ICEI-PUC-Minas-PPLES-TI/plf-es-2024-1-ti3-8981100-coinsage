@@ -1,0 +1,83 @@
+@startuml
+title Diagrama de Classes de Domínio | Coinsage - Sprint 3
+
+class Cryptocurrency {
+    - uuid: UUID
+    - symbol: String
+    - cmc_id: Integer
+    - cmc_slug: String
+    - logo: String
+    - name: String
+    - description: String
+    - technical_doc: List[String]
+    - urls: List[String]
+}
+
+class Sector {
+    - uuid: UUID
+    - name: String
+    - title: String
+    - coins_quantity: Integer
+    - cmc_id: String
+    - active: Boolean
+}
+
+class Analysis {
+    - uuid: UUID
+    - date: DateTime
+    - ended: Boolean
+}
+
+class User {
+    - id: Integer
+    - email: String
+    - hashed_password: String
+    - is_active: Boolean
+}
+
+class AnalysisInfoSchedule {
+    - id: Integer
+    - uuid_analysis: UUID
+    - last_update_time: DateTime
+    - next_scheduled_time: DateTime
+}
+
+class FirstStageAnalysis {
+    - uuid: UUID
+    - uuid_analysis: UUID
+    - uuid_currency: UUID
+    - ranking: Integer
+    - market_value: Numeric
+    - week_increase_percentage: Numeric
+    - increase_date: DateTime
+    - closing_price: Numeric
+    - last_week_closing_price: Numeric
+    - open_price: Numeric
+    - ema8: Numeric
+    - ema8_greater_open: Boolean
+    - ema8_less_close: Boolean
+    - week_increase_volume: Numeric
+    - increase_volume_day: DateTime
+    - day_before_volume: Numeric
+    - volumes_relation: Numeric
+    - expressive_volume_increase: Boolean
+    - ema_aligned: Boolean
+    - buying_signal: Boolean
+}
+
+class MarketData {
+    - symbol: String
+    - base_asset: String
+    - quote_asset: String
+    - closing_price: Numeric
+    - open_price: Numeric
+}
+
+' Relações entre as classes
+Cryptocurrency "1" -- "0..*" Sector
+Cryptocurrency "1" -- "0..*" Analysis
+User "1" -- "*" Analysis : owns
+Analysis "1" -- "*" AnalysisInfoSchedule : schedules
+Analysis "1" -- "*" FirstStageAnalysis : includes
+
+@enduml
