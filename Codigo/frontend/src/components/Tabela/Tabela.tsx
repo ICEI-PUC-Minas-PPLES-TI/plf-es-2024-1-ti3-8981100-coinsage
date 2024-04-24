@@ -64,6 +64,14 @@ const renderEmasAligned = (value: boolean, index: number) => (
   />
 );
 
+const renderDateFormatted = (date: string) => {
+  const parts = date.split(' ');
+  const datePart = parts[0];
+  const formattedDate = datePart.split('-').join('/');
+  return formattedDate;
+};
+
+
 const dataRowsMapper = (data: any) => {
   const newData = data.map((item: any, index: number) => ({
     id: index + 1,
@@ -72,7 +80,7 @@ const dataRowsMapper = (data: any) => {
     valorizacao: `${item.week_increase_percentage.toFixed(2)}%`,
     preco: `${item.closing_price.toFixed(2)}`,
     emas: renderEmasAligned(item.ema_aligned, index),
-    dataValorizacaoVolume: item.valorization_date,
+    dataValorizacaoVolume: renderDateFormatted(item.valorization_date),
     quantidadeVolumeValorizacao: `${item.open_price.toFixed(2)}`,
     quantidadeVolumeDiaAnterior: `${item.last_week_closing_price.toFixed(2)}`,
     percentDiaAnterior: `${(
