@@ -23,11 +23,16 @@ rectangle "Coinsage"{
 
     ' Schedules use cases
     ' Sp1
-    usecase "Iniciar Análise" as sch_analysis #LightBlue
-    usecase "Coletar Informações das moedas" as sch_cripto_info #LightBlue
-    usecase "RF06 -Coletar variação semanal" as collect_cripto_week_incresse #LightBlue
+    usecase "Schedule Coletar Informações das moedas" as sch_cripto_info #LightBlue
+    usecase "Schedule Iniciar Análise" as sch_analysis #LightBlue
+    ' Sp3
+    usecase "RF01 - Schedule Coletar Setores" as sch_sectors #LightCoral /' Should be sprint 2 but not ended '/
+
+    ' Analyse use cases
+    ' Sp1
+    usecase "RF06 - Coletar variação semanal" as collect_cripto_week_incresse #LightBlue
     ' Sp2
-    usecase "RF01 - Coletar Setores" as sch_sectors #LightGreen
+    usecase "RF01 - Coletar Setores" as collect_sectors #LightGreen
     usecase "RF18 - Coletar preços de abertura e fechamento" as collect_cripto_open_close #LightGreen
     usecase "RF17 - Calcular relações de ema8" as collect_ema8_relations #LightGreen
     usecase "RF14 - Calcular relações de volume" as collect_volume_relations #LightGreen
@@ -57,11 +62,10 @@ rectangle "Coinsage"{
 
 ' Schedules use cases
 schedule -- sch_analysis
-schedule -- sch_sectors
 schedule -- sch_cripto_info
+schedule -- sch_sectors
 
 ' APIS use cases
-sch_sectors -- cmc
 sch_cripto_info -- binance
 sch_cripto_info -- cmc
 collect_cripto_week_incresse -- binance
@@ -73,6 +77,8 @@ collect_expressive_volume_date -- binance
 collect_market_cap -- cmc
 collect_emas_aligned -- binance
 collect_cripto_price_variations -- binance
+sch_sectors -- collect_sectors
+collect_sectors -- cmc
 
 ' Investor use cases
 investor -- view_sectors
