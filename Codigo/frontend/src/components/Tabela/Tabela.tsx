@@ -9,10 +9,11 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { TableHead } from "@mui/material";
 import LogoSymbol from "./Logo/LogoSymbol";
-import TextColoredCondition from "./TextColoredCondition/TextColoredCondition";
+import EmasAlignedCell from "./EmasAlignedCell/EmasAlignedCell";
 import { LinearProgress } from "@mui/material";
 import TablePaginationActions from "./TablePaginationActions/TablePaginationActions";
 import tableStyles from "./Tabela.module.css";
+import TextColoredCondition from "./TextColoredCondition/TextColoredCondition";
 
 interface Column {
   id: string;
@@ -57,19 +58,25 @@ const renderLogoSymbol = (logo: string, symbol: string, index: number) => (
 );
 
 const renderEmasAligned = (value: boolean, index: number) => (
-  <TextColoredCondition
+  <EmasAlignedCell
     value={value}
     conditionFn={areEmasAligned}
     key={index}
   />
 );
 
+const renderValorizationPercentage = (value: any, index: number, symbol: string) => {
+  const validator: 'good' | 'bad' | 'normal' = symbol === 'BTC' ? (value >= 10.0 ? 'good' : (value < 0) ? 'bad' : 'normal') : (value >= 10.0 ? 'good' : (value < 0) ? 'bad' : 'normal');
+
+  return <TextColoredCondition value={value} condition={validator} key={index} />;
+}
+
 const dataRowsMapper = (data: any) => {
   const newData = data.map((item: any, index: number) => ({
     id: index + 1,
     setor: item.currency.main_sector.title,
     cripto: renderLogoSymbol(item.currency.logo, item.currency.symbol, index),
-    valorizacao: `${item.week_increase_percentage.toFixed(2)}%`,
+    valorizacao: renderValorizationPercentage(item.week_increase_percentage.toFixed(2), index, item.currency.symbol),
     preco: `${item.closing_price.toFixed(2)}`,
     emas: renderEmasAligned(item.ema_aligned, index),
     dataValorizacaoVolume: item.valorization_date,
