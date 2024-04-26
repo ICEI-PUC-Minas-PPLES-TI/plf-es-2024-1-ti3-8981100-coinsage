@@ -1,12 +1,12 @@
 import "./styles/global.css";
-import Balanceamento from "./pages/Balanceamento/Balanceamento";
+import Analise from "./pages/Analise/Analise";
 import Layout from "./Layout/Layout";
 
 
 export const App: React.FC = () => {
   return (
     <Layout>
-      <Balanceamento />
+      <Analise />
     </Layout>
   );
 }
