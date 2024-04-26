@@ -1,14 +1,14 @@
-const TextColoredCondition: React.FC<{ value: boolean, conditionFn: (value: boolean) => string }> = ({ value, conditionFn }) => {
-    const text = conditionFn(value);
+import React from "react";
 
-    const style = {
-      color: text === 'SIM' ? '#29D30D' : (text === 'NÃO' ? 'red' : 'black'),
-      fontWeight: text === 'SIM' ? 'bold' : 'normal',
-    }
+const TextColoredCondition: React.FC<{ value: any, condition: 'bad' | 'good' | 'normal', openMoreInfo?: (event: React.MouseEvent<HTMLElement>) => void }> = ({ value, condition, openMoreInfo }) => {
+  const style = {
+    color: condition === 'good' ? '#29D30D' : (condition === 'bad' ? 'red' : 'black'),
+    fontWeight: condition == 'good' ? 'bold' : 'normal',
+  }
 
-    return (
-      <span style={style}>{text}</span>
-    );
+  return (
+    openMoreInfo === undefined ? <span style={style}>{value}</span> : <span onMouseEnter={openMoreInfo} onMouseLeave={openMoreInfo} style={style}>{value}</span>
+  );
 }
 
 export default TextColoredCondition;
