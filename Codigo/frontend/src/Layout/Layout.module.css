@@ -1,12 +1,17 @@
 .headerFixed {
-  position: fixed;
+  position: sticky;
   top: 0;
   width: 100%;
-  z-index: 9999;
 }
 
 .content {
   padding: 16px;
   margin-top: 60px;
-  /* height: 1500px; Used in this example to enable scrolling */
+  min-height: calc(100vh - 240px); /* Subtract header height */
+  width: 100%;
+}
+
+.footerFixed {
+  bottom: 0;
+  width: 100%;
 }
