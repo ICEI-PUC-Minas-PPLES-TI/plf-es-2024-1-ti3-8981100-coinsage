@@ -1,10 +1,10 @@
 .header {
-  background:  #0E37A3;
+  background:  #FF650E;
   display: flex;
   justify-content: left;
   align-items: center;
   padding: 1.25rem 0;
-  height: 60px;
+  height: 80px;
 }
 
 

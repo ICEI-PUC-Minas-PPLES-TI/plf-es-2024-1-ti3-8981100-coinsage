@@ -23,9 +23,9 @@ const LoadingTableComponent: React.FC = () => {
 
   return (
     <>
-      <h1 className={titleStyles.title}>{loadingText}</h1>
+      <h1 className={titleStyles.title} style={{marginBottom: '1rem'}}>{loadingText}</h1>
       <Box sx={{ width: "100%" }}>
-        <LinearProgress />
+        <LinearProgress color="warning" />
       </Box>
     </>
   );
