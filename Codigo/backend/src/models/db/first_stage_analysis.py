@@ -12,7 +12,7 @@ class FirstStageAnalysisModel(Base):
     uuid_analysis = Column(UUID(as_uuid=True), ForeignKey("analysis.uuid"))
     uuid_currency = Column(UUID(as_uuid=True), ForeignKey("currency_base_info.uuid"))
     ranking = Column(Integer)  # type: ignore
-    market_value = Column(NUMERIC(precision=15, scale=8))  # type: ignore
+    market_cap = Column(NUMERIC(precision=24, scale=4))  # type: ignore
     week_increase_percentage = Column(NUMERIC(precision=15, scale=8))  # type: ignore
     increase_date = Column(DateTime)
     closing_price = Column(NUMERIC(precision=15, scale=8))  # type: ignore

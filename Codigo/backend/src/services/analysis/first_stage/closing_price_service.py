@@ -101,22 +101,23 @@ class PriceService:
         analysis, paginated = self.repository.get_paginated_by_uuid(self.session, uuid, limit, offset)  # type: ignore
         responses = []
 
-        for anylise in analysis:
+        for analyse in analysis:
             response = FirstStageAnalysisResponse(
-                currency=self._get_currency_entity(anylise.uuid_currency),  # type: ignore
+                currency=self._get_currency_entity(analyse.uuid_currency),  # type: ignore
                 week_increase_percentage=(
-                    float(anylise.week_increase_percentage) if anylise.week_increase_percentage else None
+                    float(analyse.week_increase_percentage) if analyse.week_increase_percentage else None
                 ),
-                valorization_date=anylise.today if anylise.today else None,  # type: ignore
-                closing_price=float(anylise.closing_price) if anylise.closing_price else None,
-                open_price=float(anylise.open_price) if anylise.open_price else None,
+                valorization_date=analyse.today if analyse.today else None,  # type: ignore
+                closing_price=float(analyse.closing_price) if analyse.closing_price else None,
+                open_price=float(analyse.open_price) if analyse.open_price else None,
                 last_week_closing_price=(
-                    float(anylise.last_week_closing_price) if anylise.last_week_closing_price else None
+                    float(analyse.last_week_closing_price) if analyse.last_week_closing_price else None
                 ),
-                ema8=float(anylise.ema8) if anylise.ema8 else None,
-                ema8_greater_open=bool(anylise.ema8_greater_open),
-                ema8_less_close=bool(anylise.ema8_less_close),
-                ema_aligned=bool(anylise.ema_aligned),
+                ema8=float(analyse.ema8) if analyse.ema8 else None,
+                ema8_greater_open=bool(analyse.ema8_greater_open),
+                ema8_less_close=bool(analyse.ema8_less_close),
+                ema_aligned=bool(analyse.ema_aligned),
+                market_cap=float(analyse.market_cap) if analyse.market_cap else None,
             )
 
             responses.append(response)

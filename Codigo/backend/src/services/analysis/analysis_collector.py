@@ -13,6 +13,7 @@ from src.models.schemas.analysis.analysis_info import AnalysisInfo, AnalysisInfo
 from src.repository.crud import analysis_info_repository, analysis_info_schedule_repository, first_stage_repository
 from src.services.analysis.first_stage.closing_price_service import PriceService
 from src.services.analysis.first_stage.ema_calculator_service import EmaCalculatorService
+from src.services.analysis.first_stage.market_cap_service import MarketCapService
 from src.services.analysis.first_stage.week_percentage_val_service import WeekPercentageValorizationService
 from src.services.currencies_info_collector import CurrenciesLogoCollector
 from src.utilities.runtime import show_runtime
@@ -32,6 +33,7 @@ class AnalysisCollector:
             session=session, closing_price_service=self.prices_service
         )
         self.ema_calculator_service = EmaCalculatorService()
+        self.market_cap_service = MarketCapService()
 
     def _new_analysis(self) -> Analysis:
         analysis: Analysis = Analysis()
@@ -65,6 +67,7 @@ class AnalysisCollector:
             cryptos_str: List[str] = [crypto.symbol for crypto in symbols]
 
             self.prices_service.collect(analysis_indentifier=new_analysis.uuid)
+            self.market_cap_service.collect(db=self.session, analysis=new_analysis, cryptos_str=cryptos_str)
             self.week_increse_service.calculate_all_week_percentage_valorization(cryptos_str, new_analysis.uuid)
             self.ema_calculator_service.append_ema8_and_relations(self.session, symbols, new_analysis.uuid)
             self.ema_calculator_service.calculate_crossovers(self.session, symbols, new_analysis.uuid)
