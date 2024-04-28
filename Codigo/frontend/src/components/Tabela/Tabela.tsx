@@ -69,7 +69,7 @@ const dataRowsMapper = (data: any) => {
     id: index + 1,
     setor: item.currency.main_sector.title,
     cripto: renderLogoSymbol(item.currency.logo, item.currency.symbol, index),
-    valorizacao: `${item.week_increase_percentage.toFixed(2)}%`,
+    valorizacao: item.week_increase_percentage ? `${item.week_increase_percentage.toFixed(2)}%` : '-',
     preco: `${item.closing_price.toFixed(2)}`,
     emas: renderEmasAligned(item.ema_aligned, index),
     dataValorizacaoVolume: item.valorization_date,
@@ -108,7 +108,7 @@ export default function CustomPaginationActionsTable(
   }
 ) {
   const rows = dataRowsMapper(rowsRaw);
-  const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length);
+  const emptyRows = rowsPerPage - Math.min(10, rows.length);
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -141,8 +141,14 @@ export default function CustomPaginationActionsTable(
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row: any) => (
-            <TableRow key={row.id} style={{ height: 40}} className={tableStyles.oddRowStyle}>
+          {tableLoading ? (
+            <TableRow style={{ height: 40 }}>
+              <TableCell colSpan={10}>
+                <LinearProgress color="warning" />
+              </TableCell>
+            </TableRow>
+          ) : (rows.map((row: any) => (
+            <TableRow key={row.id} style={{ height: 40 }} className={tableStyles.oddRowStyle}>
               <TableCell component="th" scope="row">
                 {row.setor}
               </TableCell>
@@ -162,17 +168,10 @@ export default function CustomPaginationActionsTable(
               <TableCell align="left">{row.percentDiaAnterior}</TableCell>
               <TableCell align="left">{row.ema8}</TableCell>
             </TableRow>
-          ))}
-          {tableLoading && (
-            <TableRow style={{ height: 40}}>
-            <TableCell colSpan={10}>
-              <LinearProgress />
-            </TableCell>
-          </TableRow>
-          )}
+          )))}
           {emptyRows > 0 && (
             <TableRow style={{ height: 40 * emptyRows }}>
-              <TableCell colSpan={6} />
+              <TableCell colSpan={10} />
             </TableRow>
           )}
         </TableBody>

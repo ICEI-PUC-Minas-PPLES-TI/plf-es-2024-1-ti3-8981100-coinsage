@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Fade, Zoom } from "@mui/material";
 import Title from "../../components/Title/Title";
 import CustomPaginationActionsTable from "../../components/Tabela/Tabela";
-import styles from "./Balanceamento.module.css";
+import styles from "./Analise.module.css";
 import { Endpoints } from "../../constants/apiConfig.json";
 import api from "../../service/api";
-import { Box, LinearProgress } from "@mui/material";
 import LoadingTableComponent from "../../components/Tabela/LoadingTableComponent/LoadingTableComponent";
+import AnaliseDownloadContainer from "../../components/AnaliseHeader/AnaliseDownloadContainer";
 
 
-const Balanceamento: React.FC = () => {
+const Analise: React.FC = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [rows, setRows] = useState<any[]>([]);
@@ -23,8 +22,7 @@ const Balanceamento: React.FC = () => {
     setRows([]);
     api
       .get(
-        `${Endpoints.FirstStage}?limit=${rowsPerPage}&offset=${
-          page * rowsPerPage ?? 0
+        `${Endpoints.FirstStage}?limit=${rowsPerPage}&offset=${page * rowsPerPage ?? 0
         }`
       )
       .then((response: any) => {
@@ -51,27 +49,37 @@ const Balanceamento: React.FC = () => {
   }, [page, rowsPerPage]);
 
   return (
-    <div className={styles.content}>
-      {initialLoading ? (
-        <>
-          <LoadingTableComponent />
-        </>
-      ) : (
-        <>
-          <Title lastUpdate={lastUpdate} />
-          <CustomPaginationActionsTable
-            rowsRaw={rows}
-            page={page}
-            setPage={setPage}
-            rowsPerPage={rowsPerPage}
-            setRowsPerPage={setRowsPerPage}
-            count={count}
-            tableLoading={tableLoading}
-          />
-        </>
-      )}
-    </div>
+    <>
+      {!initialLoading &&
+        <div className={styles.analyseHeader}>
+          <Title title="Análise" lastUpdate={lastUpdate} />
+        </div>
+      }
+      <div className={styles.content}>
+        {initialLoading ? (
+          <>
+            <LoadingTableComponent />
+          </>
+        ) : (
+            <CustomPaginationActionsTable
+              rowsRaw={rows}
+              page={page}
+              setPage={setPage}
+              rowsPerPage={rowsPerPage}
+              setRowsPerPage={setRowsPerPage}
+              count={count}
+              tableLoading={tableLoading}
+            />
+        )}
+      </div>
+      {!initialLoading &&
+        <div className={`${styles.analyseHeader} ${styles.completeLogContainer}`}>
+          <Title title="Relatório Completo" />
+          <AnaliseDownloadContainer />
+        </div>
+      }
+    </>
   );
 };
 
-export default Balanceamento;
+export default Analise;
