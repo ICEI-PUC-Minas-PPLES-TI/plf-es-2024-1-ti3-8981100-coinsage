@@ -1,0 +1,1 @@
+from .cmc_market_cap_collector import CMCMarketCapCollector
