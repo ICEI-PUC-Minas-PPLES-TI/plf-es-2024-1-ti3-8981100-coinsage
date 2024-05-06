@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, List
 
 from fastapi.encoders import jsonable_encoder
 from loguru import logger
@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from src.models.db.currency_base_info import CurrencyBaseInfoModel
 from src.models.db.first_stage_analysis import FirstStageAnalysisModel
+from src.models.schemas.analysis.first_stage_analysis import VolumeAnalysis
 from src.models.schemas.generic_pagination import PaginatedResponse
 from src.utilities.runtime import show_runtime
 
@@ -109,37 +110,51 @@ def save_all(db: Session, closing_prices: list[FirstStageAnalysisModel]):
     # return closing_prices
 
 
-def update_current_price(db: Session, symbol: str, current_price: float | None) -> FirstStageAnalysisModel:
-    """
-    Update the current price of a currency symbol in the database.
+def update_current_price(db: Session, symbols_current_price: List[str]) -> list[FirstStageAnalysisModel]:
+    update_current_price_encoded = []
+    if symbols_current_price is None:
+        raise ValueError(f"Failed to get current price for the symbols")
+    for current_price in symbols_current_price:
+        currency_info = db.execute(
+            select(CurrencyBaseInfoModel).where(CurrencyBaseInfoModel.symbol == current_price["symbol"])  # type:ignore
+        ).scalar()
 
-    Args:
-        db (Session): SQLAlchemy database session.
-        symbol (str): The symbol of the currency.
-        current_price (float): The current price to be updated.
+        if currency_info:
+            new_analysis = FirstStageAnalysisModel(
+                uuid_currency=currency_info.uuid, current_price=current_price["price"]  # type:ignore
+            )
+            db.add(new_analysis)
+        else:
+            logger.info(f"Moeda com símbolo {current_price['symbol']} não encontrada.")  # type:ignore
+        update_current_price_encoded.append(jsonable_encoder(new_analysis))
+        db.commit()
+        db.close()
 
-    Raises:
-        ValueError: If the current_price is None or if no item is found for the given symbol.
-
-    Returns:
-        FirstStageAnalysisModel
-    """
-    if current_price is None:
-        raise ValueError(f"Failed to get current price for symbol {symbol}")
-
-    item = (
-        db.query(FirstStageAnalysisModel)
-        .join(CurrencyBaseInfoModel, FirstStageAnalysisModel.uuid_currency == CurrencyBaseInfoModel.uuid)
-        .filter(CurrencyBaseInfoModel.symbol == symbol)
-        .order_by(FirstStageAnalysisModel.today.desc())
-        .first()
-    )
-
-    if item is None:
-        raise ValueError(f"Item not found for symbol {symbol}")
-
-    update_current_price_encoded = jsonable_encoder(item)
-
-    item.current_price = current_price
-    db.commit()
     return update_current_price_encoded
+
+
+def add_volume_analysis(db: Session, volume_analysis_data: List[VolumeAnalysis]) -> None:
+    try:
+        for data in volume_analysis_data:
+            currency_info = db.execute(
+                select(CurrencyBaseInfoModel).where(CurrencyBaseInfoModel.symbol == data["symbol"])
+            ).scalar()
+
+            if currency_info:
+                new_analysis = FirstStageAnalysisModel(
+                    uuid_currency=currency_info.uuid,
+                    volume_before_increase=data["volume_before_increase"],
+                    increase_volume_day=data["increase_volume_day"],
+                    expressive_volume_increase=data["expressive_volume_increase"],
+                    increase_volume=data["increase_volume"],
+                    today_volume=data["today_volume"],
+                )
+                db.add(new_analysis)
+            else:
+                logger.info(f"Moeda com símbolo {data['symbol']} não encontrada.")
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        logger.info(f"Erro ao adicionar análises: {e}")
+    finally:
+        db.close()

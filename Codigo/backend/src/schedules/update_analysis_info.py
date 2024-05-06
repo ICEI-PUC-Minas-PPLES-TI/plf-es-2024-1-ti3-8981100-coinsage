@@ -9,11 +9,15 @@ from src.models.db.analysis import Analysis
 from src.models.db.analysis_info_schedule import AnalysisInfoScheduleModel
 from src.repository.crud import analysis_info_repository, first_stage_repository
 from src.services.analysis.analysis_collector import AnalysisCollector
+from src.services.analysis.first_stage.closing_price_service import PriceService
+from src.services.analysis.first_stage.daily_volume_service import DailyVolumeService
 
 
 def update_analysis_info(db: Session) -> None:
     logger.info("Updating analysis info")
     AnalysisCollector(session=db).start_analysis()
+    PriceService(session=db).collect_current_price()
+    DailyVolumeService(session=db).fetch_volume_data()
 
 
 def check_update_analysis_info(db: Session, settings: dict) -> None:

@@ -23,7 +23,9 @@ class FirstStageAnalysisModel(Base):
     ema8_less_close = Column(Boolean)  # type: ignore
     week_increase_volume = Column(NUMERIC(precision=15, scale=8))  # type: ignore
     increase_volume_day = Column(DateTime)
-    day_before_volume = Column(NUMERIC(precision=15, scale=8))  # type: ignore
+    increase_volume = Column(NUMERIC(precision=18, scale=8))
+    today_volume = Column(NUMERIC(precision=18, scale=8))
+    volume_before_increase = Column(NUMERIC(precision=18, scale=8))  # type: ignore
     volumes_relation = Column(NUMERIC(precision=15, scale=8))  # type: ignore
     expressive_volume_increase = Column(Boolean)  # type: ignore
     ema_aligned = Column(Boolean)  # type: ignore
