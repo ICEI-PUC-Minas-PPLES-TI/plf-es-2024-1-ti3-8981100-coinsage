@@ -22,6 +22,8 @@ class FirstStageAnalysisResponse(BaseSchemaModel):
     ema8: float | None
     ema8_greater_open: bool | None
     ema8_less_close: bool | None
+    ema_aligned: bool | None
+    market_cap: float | None
 
 
 class VolumeAnalysis(BaseSchemaModel):
@@ -31,5 +33,3 @@ class VolumeAnalysis(BaseSchemaModel):
     expressive_volume_increase: bool
     increase_volume: float | None
     today_volume: float
-    ema_aligned: bool | None
-    market_cap: float | None
