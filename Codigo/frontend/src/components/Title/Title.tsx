@@ -1,10 +1,16 @@
 import styles from './Title.module.css'
 
-const Title: React.FC = () => {
-  return(
-    <div>
-      <h1 className={styles.title}>Balanceamento inicial</h1>
-      <p className={styles.title}>Última análise: 16/03/2024 às 20:54</p>
+interface TitleProps {
+  title: string;
+  lastUpdate?: string;
+}
+
+const Title: React.FC<TitleProps> = ({ lastUpdate, title }) => {
+  const formatedDate = lastUpdate ? `${lastUpdate.split(' ')[0].replaceAll('-', '/')} ${lastUpdate.split(' ')[1].split(':').slice(0, 2).join(':')}` : 'Unknown'
+  return (
+    <div className={styles.titleContainer}>
+      <h1 className={styles.title}>{title}</h1>
+      {lastUpdate && <span className={styles.text}>Última análise: {formatedDate}</span>}
     </div>
   );
 }

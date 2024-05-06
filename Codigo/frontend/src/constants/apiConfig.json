@@ -1,0 +1,6 @@
+{
+  "Endpoints": {
+      "FirstStage": "/api/analysis/first_stage",
+      "ObterInfoMoedas": "/api/currency/"
+  }
+}

@@ -1,11 +1,26 @@
 .title {
-  background:  #fff;
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  font-style: 'italic';
+  font-weight: 400;
+}
+
+.text {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1.25rem 0;
-  height: 80px;
-  fontStyle: 'italic';
-  color: #121212;
+  font-style: 'italic';
+  text-align: center;
+}
+
+.titleContainer{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
+  gap: 1.5rem;
+  color: #FF650E;
+  border-bottom: 2px solid #FF650E;
 }

@@ -31,3 +31,5 @@ class VolumeAnalysis(BaseSchemaModel):
     expressive_volume_increase: bool
     increase_volume: float | None
     today_volume: float
+    ema_aligned: bool | None
+    market_cap: float | None

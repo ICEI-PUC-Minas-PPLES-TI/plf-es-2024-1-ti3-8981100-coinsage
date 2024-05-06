@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+from typing import Optional
 from uuid import UUID
 
 from binance.spot import Spot
@@ -34,6 +35,7 @@ class PriceService:
 
     def _collect_binance_closing_prices(self, interval="1d", limit=7):
         symbols_str = [symbol.symbol for symbol in self.symbols_repository.get_cryptos(self.session)]
+        # symbols_str = ['BTC']
         return self.binance_closing_price_colletor.collect(symbols=symbols_str, interval=interval, limit=limit)
 
     def collect_current_price(self):
@@ -92,10 +94,13 @@ class PriceService:
 
         self.repository.save_all(self.session, first_stage_models)
 
+        logger.debug(f"Closing prices extracted: {len(first_stage_models)}")
+
     @show_runtime
     def collect(self, analysis_indentifier: Uuid):
         logger.info(f"Starting collecting open, close prices at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         prices = self._collect_binance_closing_prices()
+        logger.debug(f"Prices collected: {len(prices)}")
         self.extract(analysis_indentifier, prices)
 
     def get_all_prices(self):
@@ -120,21 +125,23 @@ class PriceService:
         analysis, paginated = self.repository.get_paginated_by_uuid(self.session, uuid, limit, offset)  # type: ignore
         responses = []
 
-        for anylise in analysis:
+        for analyse in analysis:
             response = FirstStageAnalysisResponse(
-                currency=self._get_currency_entity(anylise.uuid_currency),  # type: ignore
+                currency=self._get_currency_entity(analyse.uuid_currency),  # type: ignore
                 week_increase_percentage=(
-                    float(anylise.week_increase_percentage) if anylise.week_increase_percentage else None
+                    float(analyse.week_increase_percentage) if analyse.week_increase_percentage else None
                 ),
-                valorization_date=anylise.today if anylise.today else None,  # type: ignore
-                closing_price=float(anylise.closing_price) if anylise.closing_price else None,
-                open_price=float(anylise.open_price) if anylise.open_price else None,
+                valorization_date=analyse.today if analyse.today else None,  # type: ignore
+                closing_price=float(analyse.closing_price) if analyse.closing_price else None,
+                open_price=float(analyse.open_price) if analyse.open_price else None,
                 last_week_closing_price=(
-                    float(anylise.last_week_closing_price) if anylise.last_week_closing_price else None
+                    float(analyse.last_week_closing_price) if analyse.last_week_closing_price else None
                 ),
-                ema8=float(anylise.ema8) if anylise.ema8 else None,
-                ema8_greater_open=bool(anylise.ema8_greater_open),
-                ema8_less_close=bool(anylise.ema8_less_close),
+                ema8=float(analyse.ema8) if analyse.ema8 else None,
+                ema8_greater_open=bool(analyse.ema8_greater_open),
+                ema8_less_close=bool(analyse.ema8_less_close),
+                ema_aligned=bool(analyse.ema_aligned),
+                market_cap=float(analyse.market_cap) if analyse.market_cap else None,
             )
 
             responses.append(response)
@@ -161,14 +168,16 @@ class PriceService:
             # logger.error(f"Error on [{symbol_uuid}]:\n{e}")
             return SectorRead(uuid=UUID("00000000-0000-0000-0000-000000000000"), title="Unknown")
 
-    def get_price_by_symbol(self, symbol_str: str, analysis_uuid) -> FirstStageAnalysisModel:
+    def get_price_by_symbol(self, symbol_str: str, analysis_uuid) -> Optional[FirstStageAnalysisModel]:
         symbol = self.symbols_repository.get_currency_info_by_symbol(self.session, symbol_str)
         if symbol is None:
-            raise HTTPException(status_code=404, detail="Criptomoeda não encontrada")
+            logger.error(f"Símbolo não encontrado: {symbol_str}")
+            return None
 
         first_stage = self.repository.get_by_symbol(self.session, symbol, analysis_uuid)
 
         if first_stage is None:
-            raise HTTPException(status_code=404, detail="Análise não encontrada")
+            logger.error(f"Análise não encontrada para símbolo: {symbol_str}, análise: {analysis_uuid}")
+            return None
 
         return first_stage

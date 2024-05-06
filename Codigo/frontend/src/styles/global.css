@@ -29,11 +29,14 @@ body {
   /* background: var(--gray-900);
   color: var(--gray-300);
   -webkit-font-smoothing: antialiased; */
+  width: 100vw;
+  height: 100vh;
   color: #000;
+
 }
 
 body, input, textarea, button {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight:  400;
   font-size: 1rem;
 }
