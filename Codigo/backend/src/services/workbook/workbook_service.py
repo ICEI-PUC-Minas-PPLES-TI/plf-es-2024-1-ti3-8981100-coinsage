@@ -1,22 +1,32 @@
-from openpyxl import Workbook
 from typing import List
+from openpyxl import Workbook
+from sqlalchemy.orm import Session
 from src.models.db.first_stage_analysis import FirstStageAnalysisModel
-from datetime import datetime
+from src.models.db.currency_base_info import CurrencyBaseInfoModel
+from src.models.db.setor import Setor
+from src.models.db.rel_setor_currency_base_info import SetorCurrencyBaseInfo
 
 class WorkbookService:
-    @staticmethod
-    def create_workbook(headers: List[str]) -> Workbook:
+    def __init__(self, session: Session):
+        self.session = session
+
+    def create_workbook(self, headers: List[str]) -> Workbook:
         workbook = Workbook()
         worksheet = workbook.active
         for col, header in enumerate(headers, start=1):
             worksheet.cell(row=1, column=col, value=header)
         return workbook
 
-    @staticmethod
-    def fill_workbook(workbook: Workbook, data: List[FirstStageAnalysisModel], headers: List[str]) -> Workbook:
+    def fill_workbook(self, workbook: Workbook, headers: List[str]) -> Workbook:
         worksheet = workbook.active
+        data = self.session.query(FirstStageAnalysisModel).join(
+            CurrencyBaseInfoModel,
+            FirstStageAnalysisModel.uuid_currency == CurrencyBaseInfoModel.uuid
+        )
+
         header_to_model_attr = {
-            
+            #"CATEGORY": ,
+            "SYMBOL": lambda item: item.currency.symbol if item.currency else "N/A",
             "RANKING": "ranking",
             "MARKET CAP": "market_cap",
             "INCREASE DATE": "increase_date",
@@ -32,16 +42,18 @@ class WorkbookService:
             "% VOLUME/VOLUME DAY BEFORE": "volumes_relation",
             "VOLUME > 200%": "expressive_volume_increase",
             "BUY SIGNAL": "buying_signal",
+            #"1 YEAR": "year_variation_per",
+            #"180 DAYS": "semester_variation_per",
+            #"90 DAYS": "quarter_variation_per",
+            #"30 DAYS": "month_variation_per",
+            #"7 DAYS": "week_variation_per"
         }
+        
         for row_idx, item in enumerate(data, start=2):
             for header in headers:
                 col_idx = headers.index(header) + 1
                 model_attr = header_to_model_attr.get(header)
-                if model_attr:
-                    value = getattr(item, model_attr)
-                    if value is None:
-                        value = "N/A"
-                    worksheet.cell(row=row_idx, column=col_idx, value=value)
-                else:
-                    worksheet.cell(row=row_idx, column=col_idx, value="N/A")
+                
+                value = model_attr(item) if callable(model_attr) else getattr(item, model_attr, "N/A") if model_attr is not None else "N/A"
+                worksheet.cell(row=row_idx, column=col_idx, value=value)
         return workbook

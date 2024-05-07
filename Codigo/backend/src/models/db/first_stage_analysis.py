@@ -1,6 +1,7 @@
 import uuid
 
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, NUMERIC, UUID
+from sqlalchemy.orm import relationship
 
 from .base import Base
 
@@ -29,3 +30,4 @@ class FirstStageAnalysisModel(Base):
     ema_aligned = Column(Boolean)  # type: ignore
     buying_signal = Column(Boolean)  # type: ignore
     today = Column(DateTime)
+    currency = relationship("CurrencyBaseInfoModel", back_populates="first_stage_analysis")
