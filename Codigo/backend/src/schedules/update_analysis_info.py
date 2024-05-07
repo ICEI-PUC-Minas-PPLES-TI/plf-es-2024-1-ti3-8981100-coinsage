@@ -16,8 +16,6 @@ from src.services.analysis.first_stage.daily_volume_service import DailyVolumeSe
 def update_analysis_info(db: Session) -> None:
     logger.info("Updating analysis info")
     AnalysisCollector(session=db).start_analysis()
-    PriceService(session=db).collect_current_price()
-    DailyVolumeService(session=db).fetch_volume_data()
 
 
 def check_update_analysis_info(db: Session, settings: dict) -> None:

@@ -31,4 +31,4 @@ class FirstStageAnalysisModel(Base):
     ema_aligned = Column(Boolean)  # type: ignore
     buying_signal = Column(Boolean)  # type: ignore
     today = Column(DateTime)
-    current_price = Column(Float)  # type: ignore
+    current_price = Column(NUMERIC(precision=15, scale=8))  # type: ignore

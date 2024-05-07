@@ -111,7 +111,9 @@ def save_all(db: Session, closing_prices: list[FirstStageAnalysisModel]):
     # return closing_prices
 
 
-def update_current_price(db: Session, symbols_current_price: List[str]) -> list[FirstStageAnalysisModel]:
+def update_current_price(
+    db: Session, symbols_current_price: list[dict], analysis_indentifier: Uuid
+) -> list[FirstStageAnalysisModel]:
     update_current_price_encoded = []
     if symbols_current_price is None:
         raise ValueError(f"Failed to get current price for the symbols")
@@ -122,7 +124,9 @@ def update_current_price(db: Session, symbols_current_price: List[str]) -> list[
 
         if currency_info:
             new_analysis = FirstStageAnalysisModel(
-                uuid_currency=currency_info.uuid, current_price=current_price["price"]  # type:ignore
+                uuid_analysis=analysis_indentifier,
+                uuid_currency=currency_info.uuid,
+                current_price=current_price["price"],  # type:ignore
             )
             db.add(new_analysis)
         else:
@@ -134,7 +138,7 @@ def update_current_price(db: Session, symbols_current_price: List[str]) -> list[
     return update_current_price_encoded
 
 
-def add_volume_analysis(db: Session, volume_analysis_data: List[VolumeAnalysis]) -> None:
+def add_volume_analysis(db: Session, volume_analysis_data: List[VolumeAnalysis], analysis_indentifier: Uuid) -> None:
     try:
         for data in volume_analysis_data:
             currency_info = db.execute(
@@ -143,6 +147,7 @@ def add_volume_analysis(db: Session, volume_analysis_data: List[VolumeAnalysis])
 
             if currency_info:
                 new_analysis = FirstStageAnalysisModel(
+                    uuid_analysis=analysis_indentifier,
                     uuid_currency=currency_info.uuid,
                     volume_before_increase=data["volume_before_increase"],
                     increase_volume_day=data["increase_volume_day"],

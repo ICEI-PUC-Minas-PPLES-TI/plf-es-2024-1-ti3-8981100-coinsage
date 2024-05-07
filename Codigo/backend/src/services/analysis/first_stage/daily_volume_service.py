@@ -2,14 +2,16 @@ import logging
 import re
 from concurrent.futures import as_completed, ThreadPoolExecutor
 from datetime import datetime
-from typing import Any, List
+from typing import List
 
+from sqlalchemy import Uuid
 from sqlalchemy.orm import Session
 
 from src.models.schemas.analysis.first_stage_analysis import VolumeAnalysis
 from src.repository.crud import first_stage_repository
 from src.services.externals.binance_closing_price_colletor import BinanceClosingPriceColletor
 from src.services.externals.binance_symbol_colletor import BinanceSymbolCollector
+from src.utilities.runtime import show_runtime
 
 logger = logging.getLogger(__name__)
 
@@ -129,13 +131,14 @@ class DailyVolumeService:
     def _split_symbol_list(self, all_symbols: list) -> list:
         return [[symbol.symbol for symbol in all_symbols[i : i + 100]] for i in range(0, len(all_symbols), 100)]
 
-    def fetch_volume_data(self) -> None:
+    @show_runtime
+    def fetch_volume_data(self, analysis_identifier: Uuid) -> None:
         today_volume = self.get_today_volume()
         last_volume_valuation = self.get_last_volume_valuation(today_volume)
         increase_valuation_percentage = self.get_increase_valuation_percentage(last_volume_valuation)
         volume_before_increase = self.get_volume_before_increase(increase_valuation_percentage)
         volume_analysis_data = self.parser_quote_asset(volume_before_increase)
-        self.repository.add_volume_analysis(self.session, volume_analysis_data)
+        self.repository.add_volume_analysis(self.session, volume_analysis_data, analysis_identifier)
 
     def parser_quote_asset(self, volume_analysis: List[VolumeAnalysis]) -> List[VolumeAnalysis]:
         def remove_suffix(input_string):

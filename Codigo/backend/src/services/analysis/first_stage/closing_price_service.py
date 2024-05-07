@@ -38,13 +38,16 @@ class PriceService:
         # symbols_str = ['BTC']
         return self.binance_closing_price_colletor.collect(symbols=symbols_str, interval=interval, limit=limit)
 
-    def collect_current_price(self):
+    @show_runtime
+    def collect_current_price(self, analysis_indentifier: Uuid):
         all_symbols = self.binance_symbol_collector.get_symbols()
 
         symbols = self._split_symbol_list(all_symbols)
         symbols_current_price = Spot().ticker_price(symbols=symbols)
         parsed_symbols = self.parser_quote_asset(symbols_current_price)
-        return self.repository.update_current_price(db=self.session, symbols_current_price=parsed_symbols)
+        return self.repository.update_current_price(
+            db=self.session, symbols_current_price=parsed_symbols, analysis_indentifier=analysis_indentifier
+        )
 
     def _split_symbol_list(self, all_symbols: list) -> list:
         return [symbol.symbol for symbol in all_symbols]
