@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from src.api.dependencies.session import get_db
@@ -6,9 +6,18 @@ from src.services.workbook.workbook_service import WorkbookService
 from src.repository.crud.analysis_info_repository import get_last
 import os
 
-router = APIRouter(prefix="/workbook", tags=["Workbook"])
+router = APIRouter(
+    prefix="/workbook",
+    tags=["Workbook"]
+)
 
-@router.get("/generate", response_class=FileResponse)
+@router.get(
+    path="/", 
+    name="Workbook Analysis",
+    response_class=FileResponse,
+    description="Download de planilha com a análise completa",
+    status_code=status.HTTP_200_OK
+)
 async def generate_workbook(db: Session = Depends(get_db)):
     last_analysis = get_last(db)
     if not last_analysis:
@@ -16,6 +25,7 @@ async def generate_workbook(db: Session = Depends(get_db)):
     
     formatted_datetime = last_analysis.date.strftime("%d-%m-%Y às %H.%M")
     file_path = f"análise {formatted_datetime}.xlsx"
+    filename = file_path
     
     headers = [
         "CATEGORY",
@@ -50,6 +60,6 @@ async def generate_workbook(db: Session = Depends(get_db)):
     filled_workbook.save(file_path)
     
     if os.path.exists(file_path):
-        return FileResponse(path=file_path, filename=file_path, media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        return FileResponse(path=file_path, filename=filename, media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     else:
         raise HTTPException(status_code=404, detail="File not found.")

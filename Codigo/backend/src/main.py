@@ -21,6 +21,7 @@ def initialize_backend_application() -> fastapi.FastAPI:
         allow_credentials=settings.IS_ALLOWED_CREDENTIALS,
         allow_methods=settings.ALLOWED_METHODS,
         allow_headers=settings.ALLOWED_HEADERS,
+        expose_headers=["content-disposition"]
     )
 
     app.include_router(router=api_endpoint_router, prefix=settings.API_PREFIX)
@@ -34,7 +35,7 @@ backend_app: fastapi.FastAPI = initialize_backend_application()
 @backend_app.on_event("startup")
 async def schedules() -> None:
     os.environ["TZ"] = "America/Sao_Paulo"
-    time.tzset()
+    #time.tzset()
 
     with SessionLocal() as db:
         scheduler_thread = threading.Thread(target=start_schedules, args=(db,))
