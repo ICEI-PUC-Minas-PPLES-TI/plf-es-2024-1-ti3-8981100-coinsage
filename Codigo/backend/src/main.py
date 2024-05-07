@@ -35,7 +35,7 @@ backend_app: fastapi.FastAPI = initialize_backend_application()
 @backend_app.on_event("startup")
 async def schedules() -> None:
     os.environ["TZ"] = "America/Sao_Paulo"
-    #time.tzset()
+    time.tzset()
 
     with SessionLocal() as db:
         scheduler_thread = threading.Thread(target=start_schedules, args=(db,))
