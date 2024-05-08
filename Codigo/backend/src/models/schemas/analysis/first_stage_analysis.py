@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import List
 from uuid import UUID
 
 from src.models.schemas.base import BaseSchemaModel
@@ -25,3 +24,12 @@ class FirstStageAnalysisResponse(BaseSchemaModel):
     ema8_less_close: bool | None
     ema_aligned: bool | None
     market_cap: float | None
+
+
+class VolumeAnalysis(BaseSchemaModel):
+    symbol: str
+    volume_before_increase: float | None
+    increase_volume_day: datetime | None
+    expressive_volume_increase: bool
+    increase_volume: float | None
+    today_volume: float
