@@ -2,6 +2,6 @@
   "Endpoints": {
       "FirstStage": "/api/analysis/first_stage",
       "ObterInfoMoedas": "/api/currency/",
-      "Workbook": "/api/workbook"
+      "Workbook": "/api/workbook/"
   }
 }
