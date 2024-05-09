@@ -3,7 +3,7 @@
 Este diretório mantém os artefatos do projeto. Para visualizar [versões antigas dos documentos](versoes-antigas/).
 
 ## Documentos
-- [Documento de Visão CoinSage](docs/Documento-de-Visao-CoinSage.pdf)
+- [Documento de Visão CoinSage](docs/README.md)
 - [Termo de Sigilo e Confidencialidade](docs/termos/Termo-de-Sigilo-e-Confidencialidade.pdf)
 - [Termo de ciência e compromisso CoinSage](docs/termos/Termo-de-ciência-e-compromisso-CoinSage.pdf)
 
