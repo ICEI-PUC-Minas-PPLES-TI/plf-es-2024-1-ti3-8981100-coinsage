@@ -123,15 +123,24 @@ def update_current_price(
         ).scalar()
 
         if currency_info:
-            new_analysis = FirstStageAnalysisModel(
-                uuid_analysis=analysis_indentifier,
-                uuid_currency=currency_info.uuid,
-                current_price=current_price["price"],  # type:ignore
-            )
-            db.add(new_analysis)
+            first_stage = db.execute(
+                select(FirstStageAnalysisModel)
+                .where(FirstStageAnalysisModel.uuid_analysis == analysis_indentifier)
+                .where(FirstStageAnalysisModel.uuid_currency == currency_info.uuid)
+            ).scalar()
+
+            # new_analysis = FirstStageAnalysisModel(
+            #     uuid_analysis=analysis_indentifier,
+            #     uuid_currency=currency_info.uuid,
+            #     current_price=current_price["price"],  # type:ignore
+            # )
+
+            first_stage.current_price = current_price["price"]  # type:ignore
+            db.commit()
+            # db.add(new_analysis)
         else:
             logger.info(f"Moeda com símbolo {current_price['symbol']} não encontrada.")  # type:ignore
-        update_current_price_encoded.append(jsonable_encoder(new_analysis))
+        update_current_price_encoded.append(jsonable_encoder(first_stage))
         db.commit()
         db.close()
 
@@ -146,16 +155,29 @@ def add_volume_analysis(db: Session, volume_analysis_data: List[VolumeAnalysis],
             ).scalar()
 
             if currency_info:
-                new_analysis = FirstStageAnalysisModel(
-                    uuid_analysis=analysis_indentifier,
-                    uuid_currency=currency_info.uuid,
-                    volume_before_increase=data["volume_before_increase"],
-                    increase_volume_day=data["increase_volume_day"],
-                    expressive_volume_increase=data["expressive_volume_increase"],
-                    increase_volume=data["increase_volume"],
-                    today_volume=data["today_volume"],
-                )
-                db.add(new_analysis)
+                first_stage = db.execute(
+                    select(FirstStageAnalysisModel)
+                    .where(FirstStageAnalysisModel.uuid_analysis == analysis_indentifier)
+                    .where(FirstStageAnalysisModel.uuid_currency == currency_info.uuid)
+                ).scalar()
+
+                # new_analysis = FirstStageAnalysisModel(
+                #     uuid_analysis=analysis_indentifier,
+                #     uuid_currency=currency_info.uuid,
+                #     volume_before_increase=data["volume_before_increase"],
+                #     increase_volume_day=data["increase_volume_day"],
+                #     expressive_volume_increase=data["expressive_volume_increase"],
+                #     increase_volume=data["increase_volume"],
+                #     today_volume=data["today_volume"],
+                # )
+                first_stage.volume_before_increase = data["volume_before_increase"]
+                first_stage.increase_volume_day = data["increase_volume_day"]
+                first_stage.expressive_volume_increase = data["expressive_volume_increase"]
+                first_stage.increase_volume = data["increase_volume"]
+                first_stage.today_volume = data["today_volume"]
+
+                db.commit()
+                # db.add(new_analysis)
             else:
                 logger.info(f"Moeda com símbolo {data['symbol']} não encontrada.")
         db.commit()

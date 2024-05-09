@@ -68,8 +68,8 @@ class AnalysisCollector:
             symbols = self.symbols_service.get_cryptos().last_update.data
             cryptos_str: List[str] = [crypto.symbol for crypto in symbols]
 
-            thread1 = threading.Thread(target=self.prices_service.collect_current_price, args=(new_analysis.uuid,))
-            thread2 = threading.Thread(target=self.volume_service.fetch_volume_data, args=(new_analysis.uuid,))
+            # thread1 = threading.Thread(target=self.prices_service.collect_current_price, args=(new_analysis.uuid,))
+            # thread2 = threading.Thread(target=self.volume_service.fetch_volume_data, args=(new_analysis.uuid,))
 
             self.prices_service.collect(analysis_indentifier=new_analysis.uuid)
             self.market_cap_service.collect(db=self.session, analysis=new_analysis, cryptos_str=cryptos_str)
@@ -77,11 +77,11 @@ class AnalysisCollector:
             self.ema_calculator_service.append_ema8_and_relations(self.session, symbols, new_analysis.uuid)
             self.ema_calculator_service.calculate_crossovers(self.session, symbols, new_analysis.uuid)
 
-            thread1.start()
-            thread2.start()
+            # thread1.start()
+            # thread2.start()
 
-            thread1.join()
-            thread2.join()
+            # thread1.join()
+            # thread2.join()
 
             self.session.add(
                 AnalysisInfoScheduleModel(
@@ -93,8 +93,8 @@ class AnalysisCollector:
             self._finish_analysis(new_analysis)
         except Exception as err:
             logger.error(f"Error on start_analysis: {err}")
-            self.session.rollback()
             self._delete_analysis_related(new_analysis)
+            self.session.rollback()
 
     def calculate_next_time(self) -> datetime.datetime:
         return datetime.datetime.now() + datetime.timedelta(days=1)
