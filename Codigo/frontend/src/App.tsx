@@ -1,12 +1,11 @@
-import "./styles/global.css";
-import Analise from "./pages/Analise/Analise";
 import Layout from "./Layout/Layout";
-
+import { BrowserRouter as Router } from "react-router-dom";
+import "./styles/global.css";
 
 export const App: React.FC = () => {
   return (
-    <Layout>
-      <Analise />
-    </Layout>
+    <Router>
+        <Layout />
+    </Router>
   );
 }
