@@ -47,3 +47,29 @@ async def read_cryptos(db: Session = Depends(get_db)) -> CurrencyInfoResponse:
 async def get_price_by_date_time(date: str, crypto: str, db: Session = Depends(get_db)):
     packet = schemas.TimestampPrice(crypto=crypto, date=date)
     return PriceAtTimestampService().get_price_by_date_time(packet, session=db)
+
+
+@router.get(
+    path="/query/{match}",
+    name="Consultar criptomoeda por nome ou símbolo",
+    description="Consultar informações de uma criptomoeda por nome ou símbolo",
+    responses={
+        status.HTTP_200_OK: {"description": "Informações da criptomoeda recuperadas com sucesso."},
+        status.HTTP_404_NOT_FOUND: {"description": "Criptomoeda não encontrada."},
+    },
+)
+async def query_crypto(match: str, db: Session = Depends(get_db)):
+    return CurrenciesLogoCollector(session=db).get_crypto_by_name_or_symbol(match)
+
+
+@router.get(
+    path="/query",
+    name="Consultar criptomoeda por nome ou símbolo",
+    description="Consultar informações de uma criptomoeda por nome ou símbolo",
+    responses={
+        status.HTTP_200_OK: {"description": "Informações da criptomoeda recuperadas com sucesso."},
+        status.HTTP_404_NOT_FOUND: {"description": "Criptomoeda não encontrada."},
+    },
+)
+async def query_all(db: Session = Depends(get_db)):
+    return CurrenciesLogoCollector(session=db).get_all_reduced()
