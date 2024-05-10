@@ -1,0 +1,14 @@
+.mainPageTitle{
+    user-select: none;
+    font-size: 32px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #ff650e;
+    margin-bottom: 3rem;
+}
+
+.contentWrapper{
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
