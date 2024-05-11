@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+from decimal import Decimal
 from typing import Optional
 from uuid import UUID
 
@@ -13,7 +14,9 @@ from src.models.db.first_stage_analysis import FirstStageAnalysisModel
 from src.models.schemas.analysis.closing_price_entity import PricesResponse
 from src.models.schemas.analysis.first_stage_analysis import AnalysisCurrencyInfo, FirstStageAnalysisResponse
 from src.models.schemas.sector import SectorRead
+from src.models.schemas.timestamp_price import TimestampPrice
 from src.repository.crud import currency_info_repository, first_stage_repository
+from src.services.externals.binance_price_at_timestamp import BinancePriceAtTimestampService
 from src.services.externals.binance_price_colletor import BinancePriceColletor
 from src.services.externals.binance_symbol_colletor import BinanceSymbolCollector
 from src.services.sectors_info_collector import SectorsCollector

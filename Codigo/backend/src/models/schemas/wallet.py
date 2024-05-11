@@ -1,0 +1,32 @@
+from datetime import datetime
+from decimal import Decimal
+from typing import Annotated
+from uuid import UUID
+
+from pydantic import Field
+
+from src.models.schemas.base import BaseSchemaModel
+
+
+class BuyWalletCreate(BaseSchemaModel):
+    crypto: str
+    date: str = Field(
+        ...,
+        pattern="^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-[0-9]{4} (0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$",
+        description="Data da compra da criptomoeda",
+    )
+    quantity: Annotated[Decimal, Field(..., max_digits=20, decimal_places=8, gt=0)] | None
+    amount: Annotated[Decimal, Field(..., max_digits=20, decimal_places=8, gt=0)] | None
+    price_on_purchase: Annotated[Decimal, Field(..., max_digits=15, decimal_places=8, gt=0)] | None
+
+    @property
+    def _date(self):
+        return datetime.strptime(self.date, "%d-%m-%Y %H:%M")
+
+
+class CompleteWalletTransaction(BuyWalletCreate):
+    uuid: UUID
+    created_at: datetime
+
+    class Config:
+        orm_mode = True

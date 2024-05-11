@@ -172,7 +172,6 @@ export default function CustomPaginationActionsTable(
   }
 ) {
   const rows = dataRowsMapper(rowsRaw);
-  const emptyRows = rowsPerPage - Math.min(10, rows.length);
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -226,11 +225,6 @@ export default function CustomPaginationActionsTable(
               <TableCell align="left">{row.ema8}</TableCell>
             </TableRow>
           )))}
-          {emptyRows > 0 && (
-            <TableRow style={{ height: 40 * emptyRows }}>
-              <TableCell colSpan={10} />
-            </TableRow>
-          )}
         </TableBody>
         <TableFooter>
           <TableRow>

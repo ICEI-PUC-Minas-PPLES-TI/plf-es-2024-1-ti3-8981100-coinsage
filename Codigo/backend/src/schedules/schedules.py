@@ -31,7 +31,8 @@ def start_schedules(app_db: Session):
 
 
 def stop_schedules():
-    scheduler.shutdown()
+    if scheduler.running:
+        scheduler.shutdown()
     logger.info("Schedules stopped")
 
 

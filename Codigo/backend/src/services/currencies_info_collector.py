@@ -1,6 +1,6 @@
 import datetime
 import time
-from typing import Any
+from typing import Any, List
 
 from fastapi import HTTPException, status
 from loguru import logger
@@ -24,6 +24,20 @@ class CurrenciesLogoCollector:
 
     def _clear_table(self):
         self.repository.clear_table(self.session)
+
+    def get_crypto_by_name_or_symbol(self, match: str) -> List[dict]:
+        founded = self.repository.get_by_match(self.session, match)
+        return [
+            {"symbol": crypto.symbol, "name": crypto.name, "uuid": crypto.uuid, "logo": crypto.logo}  # type: ignore
+            for crypto in founded
+        ]
+
+    def get_all_reduced(self) -> List[dict[str, Any]]:
+        founded = self.repository.get_by_match(self.session, "")
+        return [
+            {"symbol": crypto.symbol, "uuid": crypto.uuid, "name": crypto.name, "logo": crypto.logo}  # type: ignore
+            for crypto in founded
+        ]
 
     def collect_symbols_info(self):
         self.cmc_symbols = CmcSymbolCollector(BinanceSymbolCollector().get_base_assets_as_str()).get_symbols()

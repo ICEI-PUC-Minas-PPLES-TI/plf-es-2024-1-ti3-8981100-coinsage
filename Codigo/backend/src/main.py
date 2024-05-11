@@ -41,9 +41,9 @@ async def schedules() -> None:
         scheduler_thread.start()
 
 
-@backend_app.on_event("shutdown")
-def shutdown_event() -> None:
-    stop_schedules()
+# @backend_app.on_event("shutdown")
+# def shutdown_event() -> None:
+#     stop_schedules()
 
 
 if __name__ == "__main__":
