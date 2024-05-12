@@ -1,0 +1,15 @@
+.formSectionTitleContainer{
+    width: 98vw;
+    border-bottom: 0.5px solid black;
+}
+
+.formSectionTitleContainer span{
+    user-select: none;
+    font-size: 25px;
+    color: #ff650e;
+    font-weight: 500;
+}
+
+.formContainer{
+    padding: .8rem 0;
+}

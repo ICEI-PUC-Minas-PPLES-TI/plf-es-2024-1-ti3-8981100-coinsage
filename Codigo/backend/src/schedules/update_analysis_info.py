@@ -9,6 +9,8 @@ from src.models.db.analysis import Analysis
 from src.models.db.analysis_info_schedule import AnalysisInfoScheduleModel
 from src.repository.crud import analysis_info_repository, first_stage_repository
 from src.services.analysis.analysis_collector import AnalysisCollector
+from src.services.analysis.first_stage.closing_price_service import PriceService
+from src.services.analysis.first_stage.daily_volume_service import DailyVolumeService
 
 
 def update_analysis_info(db: Session) -> None:

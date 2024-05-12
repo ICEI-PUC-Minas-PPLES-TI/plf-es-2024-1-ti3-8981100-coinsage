@@ -1,6 +1,6 @@
 import datetime
-import time
-from typing import Any, List
+import threading
+from typing import List
 
 from fastapi import HTTPException, status
 from loguru import logger
@@ -12,6 +12,7 @@ from src.models.db.analysis_info_schedule import AnalysisInfoScheduleModel
 from src.models.schemas.analysis.analysis_info import AnalysisInfo, AnalysisInfoResponse, LastUpdate
 from src.repository.crud import analysis_info_repository, analysis_info_schedule_repository, first_stage_repository
 from src.services.analysis.first_stage.closing_price_service import PriceService
+from src.services.analysis.first_stage.daily_volume_service import DailyVolumeService
 from src.services.analysis.first_stage.ema_calculator_service import EmaCalculatorService
 from src.services.analysis.first_stage.market_cap_service import MarketCapService
 from src.services.analysis.first_stage.week_percentage_val_service import WeekPercentageValorizationService
@@ -34,6 +35,7 @@ class AnalysisCollector:
         )
         self.ema_calculator_service = EmaCalculatorService()
         self.market_cap_service = MarketCapService()
+        self.volume_service = DailyVolumeService(session=session)
 
     def _new_analysis(self) -> Analysis:
         analysis: Analysis = Analysis()
@@ -66,11 +68,20 @@ class AnalysisCollector:
             symbols = self.symbols_service.get_cryptos().last_update.data
             cryptos_str: List[str] = [crypto.symbol for crypto in symbols]
 
+            # thread1 = threading.Thread(target=self.prices_service.collect_current_price, args=(new_analysis.uuid,))
+            # thread2 = threading.Thread(target=self.volume_service.fetch_volume_data, args=(new_analysis.uuid,))
+
             self.prices_service.collect(analysis_indentifier=new_analysis.uuid)
             self.market_cap_service.collect(db=self.session, analysis=new_analysis, cryptos_str=cryptos_str)
             self.week_increse_service.calculate_all_week_percentage_valorization(cryptos_str, new_analysis.uuid)
             self.ema_calculator_service.append_ema8_and_relations(self.session, symbols, new_analysis.uuid)
             self.ema_calculator_service.calculate_crossovers(self.session, symbols, new_analysis.uuid)
+
+            # thread1.start()
+            # thread2.start()
+
+            # thread1.join()
+            # thread2.join()
 
             self.session.add(
                 AnalysisInfoScheduleModel(
@@ -82,8 +93,8 @@ class AnalysisCollector:
             self._finish_analysis(new_analysis)
         except Exception as err:
             logger.error(f"Error on start_analysis: {err}")
-            self.session.rollback()
             self._delete_analysis_related(new_analysis)
+            self.session.rollback()
 
     def calculate_next_time(self) -> datetime.datetime:
         return datetime.datetime.now() + datetime.timedelta(days=1)

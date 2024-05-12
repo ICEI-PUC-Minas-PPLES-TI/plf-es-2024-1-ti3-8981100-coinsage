@@ -1,7 +1,10 @@
+import re
 from datetime import datetime
+from decimal import Decimal
 from typing import Optional
 from uuid import UUID
 
+from binance.spot import Spot
 from fastapi import HTTPException
 from loguru import logger
 from sqlalchemy import Uuid
@@ -11,8 +14,11 @@ from src.models.db.first_stage_analysis import FirstStageAnalysisModel
 from src.models.schemas.analysis.closing_price_entity import PricesResponse
 from src.models.schemas.analysis.first_stage_analysis import AnalysisCurrencyInfo, FirstStageAnalysisResponse
 from src.models.schemas.sector import SectorRead
+from src.models.schemas.timestamp_price import TimestampPrice
 from src.repository.crud import currency_info_repository, first_stage_repository
+from src.services.externals.binance_price_at_timestamp import BinancePriceAtTimestampService
 from src.services.externals.binance_price_colletor import BinancePriceColletor
+from src.services.externals.binance_symbol_colletor import BinanceSymbolCollector
 from src.services.sectors_info_collector import SectorsCollector
 from src.utilities.runtime import show_runtime
 
@@ -28,11 +34,35 @@ class PriceService:
         self.symbols_repository = currency_info_repository
         self.sectors_service = SectorsCollector()
         self.binance_closing_price_colletor = BinancePriceColletor()
+        self.binance_symbol_collector = BinanceSymbolCollector()
 
     def _collect_binance_closing_prices(self, interval="1d", limit=7):
         symbols_str = [symbol.symbol for symbol in self.symbols_repository.get_cryptos(self.session)]
         # symbols_str = ['BTC']
         return self.binance_closing_price_colletor.collect(symbols=symbols_str, interval=interval, limit=limit)
+
+    @show_runtime
+    def collect_current_price(self, analysis_indentifier: Uuid):
+        all_symbols = self.binance_symbol_collector.get_symbols()
+
+        symbols = self._split_symbol_list(all_symbols)
+        symbols_current_price = Spot().ticker_price(symbols=symbols)
+        parsed_symbols = self.parser_quote_asset(symbols_current_price)
+        return self.repository.update_current_price(
+            db=self.session, symbols_current_price=parsed_symbols, analysis_indentifier=analysis_indentifier
+        )
+
+    def _split_symbol_list(self, all_symbols: list) -> list:
+        return [symbol.symbol for symbol in all_symbols]
+
+    def parser_quote_asset(self, symbols_current_prices: list[dict]) -> list[dict]:
+        def remove_suffix(input_string):
+            return re.sub(r"(BTC|USDT)$", "", input_string)
+
+        for current_price in symbols_current_prices:
+            current_price["symbol"] = remove_suffix(input_string=current_price["symbol"])
+
+        return symbols_current_prices
 
     def extract(self, analysis_indentifier: Uuid, prices):
         first_stage_models: list[FirstStageAnalysisModel] = []

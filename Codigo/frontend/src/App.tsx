@@ -1,12 +1,17 @@
 import "./styles/global.css";
-import Analise from "./pages/Analise/Analise";
-import Layout from "./Layout/Layout";
 
+import { BrowserRouter as Router } from "react-router-dom";
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+
+import Layout from "./Layout/Layout";
 
 export const App: React.FC = () => {
   return (
-    <Layout>
-      <Analise />
-    </Layout>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Router>
+        <Layout />
+      </Router>
+    </LocalizationProvider>
   );
 }

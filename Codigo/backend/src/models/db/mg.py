@@ -10,3 +10,4 @@ from src.models.db.rel_setor_currency_base_info import SetorCurrencyBaseInfo
 from src.models.db.second_stage_analysis import SecondStageAnalysisModel
 from src.models.db.setor import Setor
 from src.models.db.third_stage_analysis import ThirdStageAnalysisModel
+from src.models.db.wallet_transaction import WalletTransaction

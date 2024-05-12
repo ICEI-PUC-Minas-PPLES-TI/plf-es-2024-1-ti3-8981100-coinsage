@@ -2,9 +2,10 @@ import React from 'react'
 import styles from './Layout.module.css'
 import Header from '../components/Header/Header'
 import Footer from '../components/Footer/Footer';
+import PagesRouters from '../PagesRouters';
 
 interface ILayout {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const Layout: React.FC<ILayout> = ({ children }) => {
@@ -15,7 +16,7 @@ const Layout: React.FC<ILayout> = ({ children }) => {
       </div>
 
       <div className={styles.content}>
-        {children}
+        <PagesRouters />
       </div>
 
       <div className={styles.footerFixed}>
