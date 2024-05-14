@@ -1,5 +1,5 @@
 @startuml
-title Coinsage - Sprint 3
+title Coinsage - Sprint 4
 
 left to right direction
 actor "Investidor" as investor
@@ -15,7 +15,8 @@ rectangle "Legenda"{
     rectangle "Sprint 1" #LightBlue
     rectangle "Sprint 2" #LightGreen
     rectangle "Sprint 3" #LightCoral
-    ' rectangle "Sprint 4" #LightYellow
+    rectangle "Sprint 4" #LightYellow
+    ' rectangle "Sprint 5" #LightPink
 }
 
 rectangle "Coinsage"{
@@ -58,6 +59,10 @@ rectangle "Coinsage"{
     usecase "RF18 - Visualizar preço de abertura e fechamento" as view_cripto_open_close #LightCoral /' Should be sprint 2 but not ended '/
     usecase "RF27 - Visualizar alinhamento das médias móveis" as view_emas_aligned #LightCoral
     usecase "RF07 - Visualizar vaiações de preço para: 1y, 6m, 3m, 1m e 7d" as view_cripto_price_variations #LightCoral
+
+    ' Wallet usecases
+    ' Sp4
+    usecase "RF20 - Cadastrar compra de criptomoedas" as register_cripto #LightYellow
 }
 
 ' Schedules use cases
@@ -66,6 +71,7 @@ schedule -- sch_cripto_info
 schedule -- sch_sectors
 
 ' APIS use cases
+register_cripto -- binance
 sch_cripto_info -- binance
 sch_cripto_info -- cmc
 collect_cripto_week_incresse -- binance
@@ -92,6 +98,7 @@ investor -- view_expressive_volume_increase
 investor -- view_market_cap
 investor -- view_emas_aligned
 investor -- view_cripto_price_variations
+investor -- register_cripto
 
 ' Use cases relations
 sch_analysis --> collect_cripto_week_incresse  : <<include>>
