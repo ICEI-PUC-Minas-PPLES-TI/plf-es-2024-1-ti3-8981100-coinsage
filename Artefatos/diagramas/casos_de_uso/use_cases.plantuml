@@ -63,6 +63,7 @@ rectangle "Coinsage"{
     ' Wallet usecases
     ' Sp4
     usecase "RF20 - Cadastrar compra de criptomoedas" as register_cripto #LightYellow
+    usecase "RF08, RF13, RF18, RF19 - Planilha xlsl com dados da análise das criptomoedas" as view_xlsl #LightYellow
 }
 
 ' Schedules use cases
@@ -98,7 +99,9 @@ investor -- view_expressive_volume_increase
 investor -- view_market_cap
 investor -- view_emas_aligned
 investor -- view_cripto_price_variations
+investor -- view_xlsl
 investor -- register_cripto
+
 
 ' Use cases relations
 sch_analysis --> collect_cripto_week_incresse  : <<include>>
