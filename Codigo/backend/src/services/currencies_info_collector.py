@@ -60,7 +60,7 @@ class CurrenciesLogoCollector:
 
                 self.repository.create_crypto(
                     self.session,
-                    CurrencyInfo(
+                    CurrencyBaseInfoModel(
                         symbol=coin["symbol"],
                         cmc_id=coin["id"],
                         cmc_slug=coin["slug"],

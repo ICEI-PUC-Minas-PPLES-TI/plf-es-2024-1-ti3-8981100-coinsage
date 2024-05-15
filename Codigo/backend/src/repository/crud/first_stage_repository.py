@@ -47,7 +47,7 @@ def get_paginated_by_uuid(
     queried = db.execute(items_query_regular).scalars().all()
 
     items = list(set([specific_item] + queried)) if specific_item is not None else queried  # type: ignore
-    items = sorted(items, key=lambda x: x.week_increase_percentage, reverse=True)  # type: ignore
+    items = sorted(items, key=lambda x: (x.week_increase_percentage is None, x.week_increase_percentage), reverse=True)  # type: ignore
     items = [items.pop(items.index(specific_item))] + items if specific_item is not None else items  # type: ignore
     # else:
     #     items_query = (
