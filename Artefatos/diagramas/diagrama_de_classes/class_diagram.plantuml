@@ -85,7 +85,6 @@ class WalletTransaction {
 Cryptocurrency "1" -- "*" CurrencyInfoSchedule: schedules
 Cryptocurrency "1" -- "0..*" Sector
 Cryptocurrency "1" -- "0..*" Analysis
-User "1" -- "*" Analysis : owns
 Analysis "1" -- "*" AnalysisInfoSchedule : schedules
 Analysis "1" -- "*" FirstStageAnalysis : includes
 User "1" -- "0...*" WalletTransaction : owns
