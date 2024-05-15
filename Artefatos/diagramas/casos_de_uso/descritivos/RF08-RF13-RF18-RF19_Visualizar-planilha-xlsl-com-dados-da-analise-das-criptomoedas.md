@@ -10,4 +10,3 @@
 1. O usuário acessa a tela inicial do CoinSage.
 2. O usuário seleciona o botão de download para realizar download da planilha em relação à última análise realizada.
 4. O usuário recebe em sua pasta de downloads a planilha xlsl contendo os dados.
-
