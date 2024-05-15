@@ -15,7 +15,7 @@ rectangle "Legenda"{
     rectangle "Sprint 1" #LightBlue
     rectangle "Sprint 2" #LightGreen
     rectangle "Sprint 3" #LightCoral
-    ' rectangle "Sprint 4" #LightYellow
+    rectangle "Sprint 4" #LightYellow
 }
 
 rectangle "Coinsage"{
@@ -58,12 +58,15 @@ rectangle "Coinsage"{
     usecase "RF18 - Visualizar preço de abertura e fechamento" as view_cripto_open_close #LightCoral /' Should be sprint 2 but not ended '/
     usecase "RF27 - Visualizar alinhamento das médias móveis" as view_emas_aligned #LightCoral
     usecase "RF07 - Visualizar vaiações de preço para: 1y, 6m, 3m, 1m e 7d" as view_cripto_price_variations #LightCoral
+    ' Sp4
+    usecase "RF03 - Coletar rankings das criptomoedas" as collect_rankings #LightYellow
 }
 
 ' Schedules use cases
 schedule -- sch_analysis
 schedule -- sch_cripto_info
 schedule -- sch_sectors
+schedule -- collect_rankings
 
 ' APIS use cases
 sch_cripto_info -- binance
@@ -79,6 +82,8 @@ collect_emas_aligned -- binance
 collect_cripto_price_variations -- binance
 sch_sectors -- collect_sectors
 collect_sectors -- cmc
+collect_rankings -- binance
+collect_rankings -- cmc
 
 ' Investor use cases
 investor -- view_sectors
@@ -104,5 +109,6 @@ sch_analysis --> collect_market_cap : <<include>>
 sch_analysis --> collect_cripto_current_price : <<include>>
 sch_analysis --> collect_emas_aligned : <<include>>
 sch_analysis --> collect_cripto_price_variations : <<include>>
+sch_analysis --> collect_rankings : <<include>>
 
 @enduml
