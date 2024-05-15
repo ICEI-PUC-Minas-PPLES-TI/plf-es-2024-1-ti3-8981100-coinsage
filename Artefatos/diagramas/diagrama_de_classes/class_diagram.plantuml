@@ -81,6 +81,14 @@ class WalletTransaction {
     - price_on_purchase: Numeric
 }
 
+class CryptoRanking {
+    - uuid: UUID
+    - symbol: String
+    - market_cap: Numeric
+    - closing_price: Numeric
+    - ranking_value: Numeric
+}
+
 ' Relações entre as classes
 Cryptocurrency "1" -- "*" CurrencyInfoSchedule: schedules
 Cryptocurrency "1" -- "0..*" Sector
@@ -88,6 +96,6 @@ Cryptocurrency "1" -- "0..*" Analysis
 Analysis "1" -- "*" AnalysisInfoSchedule : schedules
 Analysis "1" -- "*" FirstStageAnalysis : includes
 User "1" -- "0...*" WalletTransaction : owns
-
+Cryptocurrency "1" -- "*" CryptoRanking : "has ranking"
 
 @enduml
