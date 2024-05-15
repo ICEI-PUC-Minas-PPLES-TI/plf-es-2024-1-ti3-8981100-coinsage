@@ -64,12 +64,15 @@ rectangle "Coinsage"{
     ' Sp4
     usecase "RF20 - Cadastrar compra de criptomoedas" as register_cripto #LightYellow
     usecase "RF08, RF13, RF18, RF19 - Visualizar planilha xlsl com dados da análise das criptomoedas" as view_xlsl #LightYellow
+    ' Sp4
+    usecase "RF03 - Coletar rankings das criptomoedas" as collect_rankings #LightYellow
 }
 
 ' Schedules use cases
 schedule -- sch_analysis
 schedule -- sch_cripto_info
 schedule -- sch_sectors
+schedule -- collect_rankings
 
 ' APIS use cases
 register_cripto -- binance
@@ -86,6 +89,8 @@ collect_emas_aligned -- binance
 collect_cripto_price_variations -- binance
 sch_sectors -- collect_sectors
 collect_sectors -- cmc
+collect_rankings -- binance
+collect_rankings -- cmc
 
 ' Investor use cases
 investor -- view_sectors
@@ -114,5 +119,6 @@ sch_analysis --> collect_market_cap : <<include>>
 sch_analysis --> collect_cripto_current_price : <<include>>
 sch_analysis --> collect_emas_aligned : <<include>>
 sch_analysis --> collect_cripto_price_variations : <<include>>
+sch_analysis --> collect_rankings : <<include>>
 
 @enduml
