@@ -1,8 +1,8 @@
-@startuml
-title Diagrama de Classes de Domínio | Coinsage - Sprint 3
+@startuml Diagrama de Classes
+title Diagrama de Classes de Domínio | Coinsage - Sprint 4
 
 class Cryptocurrency {
-    - uuid: UUID
+    + uuid: UUID
     - symbol: String
     - cmc_id: Integer
     - cmc_slug: String
@@ -11,10 +11,19 @@ class Cryptocurrency {
     - description: String
     - technical_doc: List[String]
     - urls: List[String]
+    - created_at: DateTime
+    - last_update: DateTime
+}
+
+class CurrencyInfoSchedule {
+    + id: Integer
+    - last_update_time: DateTime
+    - next_scheduled_time: DateTime
+
 }
 
 class Sector {
-    - uuid: UUID
+    + uuid: UUID
     - name: String
     - title: String
     - coins_quantity: Integer
@@ -23,31 +32,27 @@ class Sector {
 }
 
 class Analysis {
-    - uuid: UUID
+    + uuid: UUID
     - date: DateTime
     - ended: Boolean
 }
 
 class User {
-    - id: Integer
-    - email: String
-    - hashed_password: String
-    - is_active: Boolean
 }
 
 class AnalysisInfoSchedule {
-    - id: Integer
+    + id: Integer
     - uuid_analysis: UUID
     - last_update_time: DateTime
     - next_scheduled_time: DateTime
 }
 
 class FirstStageAnalysis {
-    - uuid: UUID
+    + uuid: UUID
     - uuid_analysis: UUID
-    - uuid_currency: UUID
+    - currency: string
     - ranking: Integer
-    - market_value: Numeric
+    - market_cap: Numeric
     - week_increase_percentage: Numeric
     - increase_date: DateTime
     - closing_price: Numeric
@@ -58,26 +63,32 @@ class FirstStageAnalysis {
     - ema8_less_close: Boolean
     - week_increase_volume: Numeric
     - increase_volume_day: DateTime
-    - day_before_volume: Numeric
+    - increase_volume: Numeric
+    - today_volume: Numeric
+    - volume_before_increase: Numeric
     - volumes_relation: Numeric
     - expressive_volume_increase: Boolean
     - ema_aligned: Boolean
     - buying_signal: Boolean
+    - today: DateTime
 }
 
-class MarketData {
-    - symbol: String
-    - base_asset: String
-    - quote_asset: String
-    - closing_price: Numeric
-    - open_price: Numeric
+class WalletTransaction {
+    + uudi: UUID
+    - quantity: Numeric
+    - amount: Numeric
+    - date: DateTime
+    - price_on_purchase: Numeric
 }
 
 ' Relações entre as classes
+Cryptocurrency "1" -- "*" CurrencyInfoSchedule: schedules
 Cryptocurrency "1" -- "0..*" Sector
 Cryptocurrency "1" -- "0..*" Analysis
 User "1" -- "*" Analysis : owns
 Analysis "1" -- "*" AnalysisInfoSchedule : schedules
 Analysis "1" -- "*" FirstStageAnalysis : includes
+User "1" -- "0...*" WalletTransaction : owns
+
 
 @enduml
