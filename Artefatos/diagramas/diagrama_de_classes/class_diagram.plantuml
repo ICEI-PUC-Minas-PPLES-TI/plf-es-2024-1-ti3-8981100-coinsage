@@ -73,11 +73,20 @@ class MarketData {
     - open_price: Numeric
 }
 
+class CryptoRanking {
+    - uuid: UUID
+    - symbol: String
+    - market_cap: Numeric
+    - closing_price: Numeric
+    - ranking_value: Numeric
+}
+
 ' Relações entre as classes
 Cryptocurrency "1" -- "0..*" Sector
 Cryptocurrency "1" -- "0..*" Analysis
 User "1" -- "*" Analysis : owns
 Analysis "1" -- "*" AnalysisInfoSchedule : schedules
 Analysis "1" -- "*" FirstStageAnalysis : includes
+Cryptocurrency "1" -- "*" CryptoRanking : "has ranking"
 
 @enduml
