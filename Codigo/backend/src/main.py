@@ -21,6 +21,7 @@ def initialize_backend_application() -> fastapi.FastAPI:
         allow_credentials=settings.IS_ALLOWED_CREDENTIALS,
         allow_methods=settings.ALLOWED_METHODS,
         allow_headers=settings.ALLOWED_HEADERS,
+        expose_headers=["content-disposition"]
     )
 
     app.include_router(router=api_endpoint_router, prefix=settings.API_PREFIX)
