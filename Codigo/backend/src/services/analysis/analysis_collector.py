@@ -125,3 +125,20 @@ class AnalysisCollector:
                 )
 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No analysis found")
+    
+    def update_market_cap_rankings(self):
+        market_caps = self.market_cap_service.collect_and_return(
+            self.session, self.get_current_analysis_uuid(), self.get_crypto_symbols()
+        )
+        sorted_market_caps = sorted(market_caps, key=lambda x: x["quote"]["USD"]["market_cap"], reverse=True)
+
+        for index, cap in enumerate(sorted_market_caps):
+            symbol = cap["symbol"]
+            new_rank = index + 1
+            self.first_stage_repo.update_ranking(self.session, symbol, new_rank, self.get_current_analysis_uuid())
+    
+    def get_current_analysis_uuid(self):
+        return self._new_analysis().uuid
+    
+    def get_crypto_symbols(self):
+        return [crypto.symbol for crypto in self.symbols_service.get_cryptos()]
