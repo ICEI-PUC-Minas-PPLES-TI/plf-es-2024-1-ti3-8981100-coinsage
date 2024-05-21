@@ -2,6 +2,7 @@
   "Endpoints": {
       "FirstStage": "/api/analysis/first_stage",
       "ObterInfoMoedas": "/api/currency/",
+      "Workbook": "/api/workbook/",
       "PriceAtTimestamp": "/api/currency/price",
       "QuerySymbol": "/api/currency/query",
       "CreateWalletBuy": "/api/wallet"

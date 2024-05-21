@@ -1,6 +1,7 @@
 import uuid
 
 from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, NUMERIC, UUID
+from sqlalchemy.orm import relationship
 
 from .base import Base
 
@@ -32,3 +33,4 @@ class FirstStageAnalysisModel(Base):
     buying_signal = Column(Boolean)  # type: ignore
     today = Column(DateTime)
     current_price = Column(NUMERIC(precision=15, scale=8))  # type: ignore
+    currency = relationship("CurrencyBaseInfoModel", back_populates="first_stage_analysis")
