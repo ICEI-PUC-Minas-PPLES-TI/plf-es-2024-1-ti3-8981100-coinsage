@@ -12,7 +12,8 @@ class WorkbookService:
         workbook = Workbook()
         worksheet = workbook.active
         for col, header in enumerate(headers, start=1):
-            worksheet.cell(row=1, column=col, value=header)
+            cell = worksheet.cell(row=1, column=col, value=header)
+            worksheet.column_dimensions[cell.column_letter].width = len(header) + 2 
         return workbook
 
     def fill_workbook(self, workbook: Workbook, headers: List[str], analysis_uuid: str) -> Workbook:
@@ -27,9 +28,9 @@ class WorkbookService:
         header_to_model_attr = {
             # "CATEGORY": ,
             "SYMBOL": lambda item: item.currency.symbol if item.currency else "N/A",
-            "RANKING": "ranking",
+            #"RANKING": "ranking",
             "MARKET CAP": "market_cap",
-            "INCREASE DATE": "increase_date",
+            #"INCREASE DATE": "increase_date",
             "% WEEK INCREASE": "week_increase_percentage",
             "CLOSING PRICE": "closing_price",
             "LAST WEEK CLOSING PRICE": "last_week_closing_price",
@@ -39,13 +40,14 @@ class WorkbookService:
             "EMA8 > WEEK OPEN PRICE": "ema8_greater_open",
             "EMAs ALIGNED": "ema_aligned",
             "INCREASE VOLUME(d) DATE": "increase_volume_day",
-            "INCREASE VOLUME(w)": "week_increase_volume",
+            #"INCREASE VOLUME(w)": "week_increase_volume",
             "INCREASE VOLUME": "increase_volume",
             "TODAY VOLUME": "today_volume",
             "VOLUME BEFORE INCREASE": "volume_before_increase",
-            "% VOLUME/VOLUME DAY BEFORE": "volumes_relation",
+            #"% VOLUME/VOLUME DAY BEFORE": "volumes_relation",
             "VOLUME > 200%": "expressive_volume_increase",
-            "BUY SIGNAL": "buying_signal",
+            #"BUY SIGNAL": "buying_signal",
+            "CURRENT PRICE": "current_price"
             # "1 YEAR": "year_variation_per",
             # "180 DAYS": "semester_variation_per",
             # "90 DAYS": "quarter_variation_per",
