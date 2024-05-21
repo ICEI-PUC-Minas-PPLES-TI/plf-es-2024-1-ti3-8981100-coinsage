@@ -28,29 +28,33 @@ async def generate_workbook(db: Session = Depends(get_db)):
     filename = file_path
 
     headers = [
-        "CATEGORY",
+        #"CATEGORY",
         "SYMBOL",
         "RANKING",
         "MARKET CAP",
         "INCREASE DATE",
         "% WEEK INCREASE",
-        "WEEK CLOSING PRICE",
-        "WEEK OPEN PRICE",
+        "CLOSING PRICE",
+        "LAST WEEK CLOSING PRICE"
+        "OPEN PRICE",
+        "EMA8",
         "WEEK CLOSING PRICE > EMA8(w)",
         "EMA8 > WEEK OPEN PRICE",
         "EMAs ALIGNED",
         "INCREASE VOLUME(d) DATE",
-        "INCREASE VOLUME(d)",
-        "DAY BEFORE VOLUME(d)",
+        "INCREASE VOLUME(w)",
+        "INCREASE VOLUME",
+        "TODAY VOLUME",
+        "VOLUME BEFORE INCREASE",
         "% VOLUME/VOLUME DAY BEFORE",
         "VOLUME > 200%",
         "BUY SIGNAL",
-        "1 YEAR",
-        "180 DAYS",
-        "90 DAYS",
-        "30 DAYS",
-        "7 DAYS",
-        "APPRECIATION IS GREATER THAN BITCOIN"
+        #"1 YEAR",
+        #"180 DAYS",
+        #"90 DAYS",
+        #"30 DAYS",
+        #"7 DAYS",
+        #"APPRECIATION IS GREATER THAN BITCOIN"
     ]
 
     workbook_service = WorkbookService(db)
