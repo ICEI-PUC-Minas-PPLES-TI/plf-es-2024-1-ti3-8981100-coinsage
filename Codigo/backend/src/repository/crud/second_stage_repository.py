@@ -27,6 +27,7 @@ def add_variation_analysis(
                     quarter_variation_per=data["quarter_variation_per"],
                     month_variation_per=data["month_variation_per"],
                     week_variation_per=data["week_variation_per"],
+                    variation_greater_bitcoin=data["variation_greater_bitcoin"],
                 )
 
                 db.commit()

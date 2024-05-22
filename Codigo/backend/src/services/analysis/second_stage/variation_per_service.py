@@ -8,6 +8,7 @@ from sqlalchemy import Uuid
 from sqlalchemy.orm import Session
 
 from src.models.schemas.analysis.second_stage_analysis import VariationPerSchema
+from src.models.schemas.external.binance_symbols_collected import BinanceSymbolsCollected
 from src.repository.crud import second_stage_repository
 from src.services.externals.binance_price_at_timestamp import BinancePriceAtTimestampService
 from src.services.externals.binance_symbol_colletor import BinanceSymbolCollector
@@ -30,12 +31,12 @@ class VariationPer:
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=30) as executor:
             future_to_symbol = {
-                executor.submit(self.process_symbol, symbol, self.dates_to_collect): symbol for symbol in all_symbols
+                executor.submit(self.process_symbol, symbol, dates_to_collect): symbol for symbol in all_symbols
             }
             for future in concurrent.futures.as_completed(future_to_symbol):
                 variation_per_list.append(future.result())
 
-        return variation_per_list
+        return self.variation_greater_bitcoin(variation_per_list, dates_to_collect)
 
     def process_symbol(self, symbol, dates_to_collect):
         symbol_data = {"symbol": symbol.base_asset}
@@ -79,3 +80,21 @@ class VariationPer:
         self.repository.add_variation_analysis(
             db=self.session, variation_analysis_data=variation_price, analysis_indentifier=analysis_identifier
         )
+
+    def variation_greater_bitcoin(self, symbol_data: list[VariationPerSchema], dates_to_collect: list[dict]):
+        btc_asset = BinanceSymbolsCollected(symbol="BTCUSDT", base_asset="BTC", quote_asset="USDT")
+        btc_variation = self.process_symbol(btc_asset, dates_to_collect)
+        for data in symbol_data:
+            print(data)
+            if not data["year_variation_per"] or not data["semester_variation_per"]:
+                data["variation_greater_bitcoin"] = False
+                continue
+
+            if (
+                data["year_variation_per"] > btc_variation["year_variation_per"]
+                and data["semester_variation_per"] > btc_variation["semester_variation_per"]
+            ):
+                data["variation_greater_bitcoin"] = True
+            else:
+                data["variation_greater_bitcoin"] = False
+        return symbol_data

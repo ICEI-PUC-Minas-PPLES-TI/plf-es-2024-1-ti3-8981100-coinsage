@@ -88,8 +88,8 @@ class AnalysisCollector:
             thread3.start()
 
             thread1.join()
-            thread2.start()
-            thread3.start()
+            thread2.join()
+            thread3.join()
 
             self.session.add(
                 AnalysisInfoScheduleModel(
