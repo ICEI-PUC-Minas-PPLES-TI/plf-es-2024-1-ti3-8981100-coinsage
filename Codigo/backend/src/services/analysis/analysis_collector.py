@@ -72,12 +72,12 @@ class AnalysisCollector:
             thread1 = threading.Thread(target=self.prices_service.collect_current_price, args=(new_analysis.uuid,))
             thread2 = threading.Thread(target=self.volume_service.fetch_volume_data, args=(new_analysis.uuid,))
 
+            self.update_market_cap_rankings(new_analysis.uuid)
             self.prices_service.collect(analysis_indentifier=new_analysis.uuid)
             self.market_cap_service.collect(db=self.session, analysis=new_analysis, cryptos_str=cryptos_str)
             self.week_increse_service.calculate_all_week_percentage_valorization(cryptos_str, new_analysis.uuid)
             self.ema_calculator_service.append_ema8_and_relations(self.session, symbols, new_analysis.uuid)
             self.ema_calculator_service.calculate_crossovers(self.session, symbols, new_analysis.uuid)
-            self.update_market_cap_rankings()
 
             thread1.start()
             thread2.start()
@@ -127,19 +127,18 @@ class AnalysisCollector:
 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No analysis found")
     
-    def update_market_cap_rankings(self):
+    def update_market_cap_rankings(self, analysis_indentifier: Uuid):
         market_caps = self.market_cap_service.collect_and_return(
-            self.session, self.get_current_analysis_uuid(), self.get_crypto_symbols()
+            self.session, analysis_indentifier, self.get_crypto_symbols()
         )
         sorted_market_caps = sorted(market_caps, key=lambda x: x["quote"]["USD"]["market_cap"], reverse=True)
 
         for index, cap in enumerate(sorted_market_caps):
             symbol = cap["symbol"]
             new_rank = index + 1
-            self.first_stage_repo.update_ranking(self.session, symbol, new_rank, self.get_current_analysis_uuid())
-    
-    def get_current_analysis_uuid(self):
-        return self._new_analysis().uuid
+            self.first_stage_repo.update_ranking(self.session, symbol, new_rank, analysis_indentifier)
     
     def get_crypto_symbols(self):
-        return [crypto.symbol for crypto in self.symbols_service.get_cryptos()]
+        symbols = self.symbols_service.get_cryptos().last_update.data
+        cryptos_str: List[str] = [crypto.symbol for crypto in symbols]
+        return cryptos_str
