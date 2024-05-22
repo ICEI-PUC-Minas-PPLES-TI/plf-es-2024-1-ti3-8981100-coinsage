@@ -2,60 +2,33 @@
 
 ## Precondições
 
-1. O sistema deve ter coletado e armazenado informações das criptomoedas da binance.
+O sistema deve ter coletado e armazenado informações das criptomoedas da binance.
 
 
 ## Fluxo principal
 
-1. O usuário acessa a tela de cadastro de compra de criptomoedas.
-2. O usuário seleciona a criptomoeda que deseja registrar a compra.
-4. O usuário informa a data, hora e minuto da aquisição.
-5. O sistema busca a cotação da criptomoeda na data e hora informada.
-6. O usuário informa a quantidade de criptomoedas adquiridas.
-7. O usuário clica no botão "Cadastrar compra".
-8. O sistema armazena a transação de compra.
-
-## Fluxo alternativos
-
-### FLA01 - Usuário informa a cotação da criptomoeda no momento da compra
-
-#### Passos
-
-1. O usuário acessa a tela de cadastro de compra de criptomoedas.
-2. O usuário seleciona a criptomoeda que deseja registrar a compra.
-4. O usuário informa a data, hora e minuto da aquisição.
-5. O sistema busca a cotação da criptomoeda na data e hora informada.
-6. O usuário informa a cotação da criptomoeda no momento da compra (substituindo a cotação obtida pelo sistema).
-7. O usuário informa a quantidade de criptomoedas adquiridas.
-8. O usuário clica no botão "Cadastrar compra".
-9. O sistema armazena a transação de compra.
-
-
-### FLA02 - Usuário retoma a cotação da criptomoeda no momento da compra
+> No caso de uso "Cadastro de Compra de Criptomoedas", inicialmente o usuário acessa a tela específica para este fim. Em seguida, ele seleciona a criptomoeda que deseja registrar a compra. Posteriormente, o usuário é solicitado a informar a data, hora e minuto da aquisição da criptomoeda. Além disso, ele deve informar a quantidade de criptomoedas que foram adquiridas. Por fim, para concluir o processo, o usuário clica no botão "Cadastrar compra".
 
 #### Passos
 
 1. O usuário acessa a tela de cadastro de compra de criptomoedas.
 2. O usuário seleciona a criptomoeda que deseja registrar a compra.
 3. O usuário informa a data, hora e minuto da aquisição.
-4. O sistema busca a cotação da criptomoeda na data e hora informada.
-5. O usuário informa a cotação da criptomoeda no momento da compra (substituindo a cotação obtida pelo sistema).
-6. O usuário clica no botão "Retomar preço automático".
-7. O sistema retoma a cotação da criptomoeda na data e hora informada.
-8. O usuário informa a quantidade de criptomoedas adquiridas.
-9. O usuário clica no botão "Cadastrar compra".
-10. O sistema armazena a transação de compra.
+4. O usuário informa a quantidade de criptomoedas adquiridas.
+5. O usuário clica no botão "Cadastrar compra".
+
+## Fluxo alternativos
+
+### FLA01 - Usuário informa a cotação da criptomoeda no momento da compra
+
+>No fluxo alternativo "Usuário informa a cotação da criptomoeda no momento da compra", entre os passos 3 e 4, após o sistema buscar a cotação da criptomoeda na data e hora informada, o usuário tem a opção de informar manualmente a cotação da criptomoeda em dólares no momento da compra, substituindo a cotação que foi obtida pelo sistema. O restante do processo segue conforme o fluxo principal.
+
+
+### FLA02 - Usuário retoma a cotação da criptomoeda no momento da compra
+
+>No fluxo alternativo "Usuário retoma a cotação da criptomoeda no momento da compra", entre os passos 3 e 4, após o usuário ter informado manualmente a cotação da criptomoeda no momento da compra, ele tem a opção de clicar no botão "Retomar preço automático". Ao fazer isso, o sistema retoma a cotação da criptomoeda que havia sido buscada inicialmente na data e hora informada. O restante do processo segue conforme o fluxo principal.
 
 
 ### FLA03 - Cadastrar compra pelo valor e não pela quantidade comprada
 
-#### Passos
-
-1. O usuário acessa a tela de cadastro de compra de criptomoedas.
-2. O usuário seleciona a criptomoeda que deseja registrar a compra.
-4. O usuário informa a data, hora e minuto da aquisição.
-5. O sistema busca a cotação da criptomoeda na data e hora informada.
-6. O usuário seleciona a opção "Valor Comprado"
-7. O usuário informa o valor comprado em dólares.
-8. O usuário clica no botão "Cadastrar compra".
-9. O sistema armazena a transação de compra.
+>No fluxo alternativo "Cadastrar compra pelo valor e não pela quantidade comprada", no passo 4, o usuário tem a opção de selecionar "Valor Comprado" em vez de informar a quantidade de criptomoedas adquiridas. Nesse caso, o usuário informa o valor comprado em dólares. O restante do processo segue conforme o fluxo principal.
