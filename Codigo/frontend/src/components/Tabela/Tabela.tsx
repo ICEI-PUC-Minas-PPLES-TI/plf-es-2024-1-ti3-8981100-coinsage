@@ -36,6 +36,7 @@ const columns: readonly Column[] = [
     label: "Cripto",
     minWidth: 160,
   },
+  { id: "ranking", label: "Ranking" },
   { id: "valorizacao", label: "% Valorização semanal" },
   { id: "emas", label: "EMAs (d) Alinhados" },
   {
@@ -142,6 +143,7 @@ const dataRowsMapper = (data: any) => {
     id: index + 1,
     setor: item.currency.main_sector.title,
     cripto: renderLogoSymbol(item.currency.logo, item.currency.symbol, index),
+    ranking:item.ranking,
     valorizacao: renderValorizationPercentage(item.week_increase_percentage.toFixed(2), index, item.currency.symbol),
     emas: renderEmasAligned(item.ema_aligned, index),
     ema8: item.ema8 ? renderEma8Validation(item, index) : "N/A",
@@ -220,6 +222,7 @@ export default function CustomPaginationActionsTable(
               <TableCell style={{ width: 160 }} align="left">
                 {row.cripto}
               </TableCell>
+              <TableCell align="left">{row.ranking}</TableCell>
               <TableCell align="left">{row.valorizacao}</TableCell>
               <TableCell align="left">{row.emas}</TableCell>
               <TableCell align="left">{row.ema8}</TableCell>
