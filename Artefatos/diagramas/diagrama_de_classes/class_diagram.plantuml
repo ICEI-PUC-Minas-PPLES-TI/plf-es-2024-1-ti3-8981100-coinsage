@@ -37,9 +37,6 @@ class Analysis {
     - ended: Boolean
 }
 
-class User {
-}
-
 class AnalysisInfoSchedule {
     + id: Integer
     - uuid_analysis: UUID
@@ -95,7 +92,7 @@ Cryptocurrency "1" -- "0..*" Sector
 Cryptocurrency "1" -- "0..*" Analysis
 Analysis "1" -- "*" AnalysisInfoSchedule : schedules
 Analysis "1" -- "*" FirstStageAnalysis : includes
-User "1" -- "0...*" WalletTransaction : owns
 Cryptocurrency "1" -- "*" CryptoRanking : "has ranking"
+WalletTransaction "1" -- "1" Cryptocurrency : "has"
 
 @enduml
