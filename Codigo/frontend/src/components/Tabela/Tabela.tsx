@@ -36,7 +36,6 @@ const columns: readonly Column[] = [
     label: "Cripto",
     minWidth: 160,
   },
-  { id: "ranking", label: "Ranking" },
   { id: "valorizacao", label: "% Valorização semanal" },
   { id: "emas", label: "EMAs (d) Alinhados" },
   {
@@ -126,7 +125,7 @@ const renderEma8Validation = (item: any, index: number) => {
       <div style={{
         cursor: 'help'
       }}>
-        <TextColoredCondition value={item.ema8.toFixed(2)} condition={validator} key={index} openMoreInfo={handleHover} />
+        <TextColoredCondition value={item.ema8 ? item.ema8.toFixed(2) : 'N/A'} condition={validator} key={index} openMoreInfo={handleHover} />
       </div>
     </div>
   )
@@ -135,7 +134,7 @@ const renderEma8Validation = (item: any, index: number) => {
 const renderValorizationPercentage = (value: any, index: number, symbol: string) => {
   const validator: 'good' | 'bad' | 'normal' = symbol === 'BTC' ? (value >= 10.0 ? 'good' : (value < 0) ? 'bad' : 'normal') : (value >= 10.0 ? 'good' : (value < 0) ? 'bad' : 'normal');
 
-  return <TextColoredCondition value={value} condition={validator} key={index} />;
+  return <TextColoredCondition value={value !== null && value !== undefined ? value.toFixed(2) : 'N/A'} condition={validator} key={index} />;
 }
 
 const dataRowsMapper = (data: any) => {
@@ -143,8 +142,7 @@ const dataRowsMapper = (data: any) => {
     id: index + 1,
     setor: item.currency.main_sector.title,
     cripto: renderLogoSymbol(item.currency.logo, item.currency.symbol, index),
-    ranking:item.ranking,
-    valorizacao: renderValorizationPercentage(item.week_increase_percentage.toFixed(2), index, item.currency.symbol),
+    valorizacao: renderValorizationPercentage(item.week_increase_percentage, index, item.currency.symbol),
     emas: renderEmasAligned(item.ema_aligned, index),
     ema8: item.ema8 ? renderEma8Validation(item, index) : "N/A",
     currency: item.currency,
@@ -222,7 +220,6 @@ export default function CustomPaginationActionsTable(
               <TableCell style={{ width: 160 }} align="left">
                 {row.cripto}
               </TableCell>
-              <TableCell align="left">{row.ranking}</TableCell>
               <TableCell align="left">{row.valorizacao}</TableCell>
               <TableCell align="left">{row.emas}</TableCell>
               <TableCell align="left">{row.ema8}</TableCell>
