@@ -142,7 +142,7 @@ const dataRowsMapper = (data: any) => {
     id: index + 1,
     setor: item.currency.main_sector.title,
     cripto: renderLogoSymbol(item.currency.logo, item.currency.symbol, index),
-    valorizacao: renderValorizationPercentage(item.week_increase_percentage.toFixed(2), index, item.currency.symbol),
+    valorizacao: renderValorizationPercentage(item.week_increase_percentage ? item.week_increase_percentage.toFixed(2) : 'N/A', index, item.currency.symbol),
     emas: renderEmasAligned(item.ema_aligned, index),
     ema8: item.ema8 ? renderEma8Validation(item, index) : "N/A",
     currency: item.currency,
