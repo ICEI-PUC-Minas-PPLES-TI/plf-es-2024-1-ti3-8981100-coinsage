@@ -77,6 +77,7 @@ class AnalysisCollector:
             self.week_increse_service.calculate_all_week_percentage_valorization(cryptos_str, new_analysis.uuid)
             self.ema_calculator_service.append_ema8_and_relations(self.session, symbols, new_analysis.uuid)
             self.ema_calculator_service.calculate_crossovers(self.session, symbols, new_analysis.uuid)
+            self.update_market_cap_rankings()
 
             thread1.start()
             thread2.start()
