@@ -38,7 +38,7 @@ class AnalysisCollector:
         self.ema_calculator_service = EmaCalculatorService()
         self.market_cap_service = MarketCapService()
         self.volume_service = DailyVolumeService(session=session)
-        self.ranking_service: RankingService = RankingService(session=session)
+        self.ranking_service = RankingService(session=session)
 
     def _new_analysis(self) -> Analysis:
         analysis: Analysis = Analysis()
