@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, List
+from typing import Any, List, Dict
 from uuid import UUID
 
 from loguru import logger
@@ -37,3 +37,19 @@ class MarketCapService:
 
         corresponding.market_cap = market_cap
         db.commit()
+    
+    @show_runtime
+    def collect_and_return(self, cryptos_str: List[str]) -> List[Dict]:
+        logger.info(
+            f"Collecting market cap data for rankings at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        )
+        results = self.collector.collect(cryptos_str)
+        market_caps = []
+        for result in results:
+            market_cap_info = {
+                "symbol": result["symbol"],
+                "market_cap": result["quote"]["USD"]["market_cap"]
+            }
+            market_caps.append(market_cap_info)
+
+        return market_caps

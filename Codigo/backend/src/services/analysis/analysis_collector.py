@@ -16,6 +16,7 @@ from src.services.analysis.first_stage.daily_volume_service import DailyVolumeSe
 from src.services.analysis.first_stage.ema_calculator_service import EmaCalculatorService
 from src.services.analysis.first_stage.market_cap_service import MarketCapService
 from src.services.analysis.first_stage.week_percentage_val_service import WeekPercentageValorizationService
+from src.services.analysis.first_stage.ranking_service import RankingService
 from src.services.analysis.second_stage.variation_per_service import VariationPer
 from src.services.currencies_info_collector import CurrenciesLogoCollector
 from src.utilities.runtime import show_runtime
@@ -38,6 +39,7 @@ class AnalysisCollector:
         self.ema_calculator_service = EmaCalculatorService()
         self.market_cap_service = MarketCapService()
         self.volume_service = DailyVolumeService(session=session)
+        self.ranking_service = RankingService(session=session)
         self.variation_per_service = VariationPer(session=session)
 
     def _new_analysis(self) -> Analysis:
@@ -82,6 +84,7 @@ class AnalysisCollector:
             self.week_increse_service.calculate_all_week_percentage_valorization(cryptos_str, new_analysis.uuid)
             self.ema_calculator_service.append_ema8_and_relations(self.session, symbols, new_analysis.uuid)
             self.ema_calculator_service.calculate_crossovers(self.session, symbols, new_analysis.uuid)
+            self.ranking_service.update_market_cap_rankings(self.session, new_analysis, cryptos_str)
 
             thread1.start()
             thread2.start()
@@ -113,9 +116,7 @@ class AnalysisCollector:
         schedule: AnalysisInfoScheduleModel | None = self.schedule_repository.get_last_update(self.session)
 
         if last_analysis:
-            all_first_stage, paginated = self.prices_service.get_all_by_analysis_uuid(
-                last_analysis.uuid, limit, offset
-            )
+            all_first_stage, paginated = self.prices_service.get_all_by_analysis_uuid(last_analysis.uuid, limit, offset)
 
             try:
                 analysis = AnalysisInfo(
