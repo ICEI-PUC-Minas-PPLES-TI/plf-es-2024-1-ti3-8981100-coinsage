@@ -2,9 +2,9 @@ import fastapi
 
 from src.api.controllers.analysis import router as edwin_method_router
 from src.api.controllers.currencies import router as currencies_router
-from src.api.controllers.workbook import router as workbook_router
 from src.api.controllers.user import router as users_router
 from src.api.controllers.wallet import router as wallet_router
+from src.api.controllers.workbook import router as workbook_router
 
 router = fastapi.APIRouter()
 
