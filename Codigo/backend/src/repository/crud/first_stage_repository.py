@@ -186,3 +186,22 @@ def add_volume_analysis(db: Session, volume_analysis_data: List[VolumeAnalysis],
         logger.info(f"Erro ao adicionar análises: {e}")
     finally:
         db.close()
+
+
+def update_ranking(db: Session, symbol: str, new_ranking: int, analysis_uuid: Uuid):
+    entry = db.query(FirstStageAnalysisModel).join(
+        CurrencyBaseInfoModel,
+        FirstStageAnalysisModel.uuid_currency == CurrencyBaseInfoModel.uuid
+    ).filter(
+        CurrencyBaseInfoModel.symbol == symbol,
+        FirstStageAnalysisModel.uuid_analysis == analysis_uuid
+    ).first()
+
+    if entry:
+        entry.ranking = new_ranking
+        db.commit()
+        logger.info(f"Updated ranking to {new_ranking} for symbol {symbol} in analysis {analysis_uuid}.")
+        return entry
+    else:
+        logger.error(f"Currency with symbol {symbol} and analysis UUID {analysis_uuid} not found.")
+        return None

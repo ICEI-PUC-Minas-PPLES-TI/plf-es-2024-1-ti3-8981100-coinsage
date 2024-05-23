@@ -125,7 +125,7 @@ const renderEma8Validation = (item: any, index: number) => {
       <div style={{
         cursor: 'help'
       }}>
-        <TextColoredCondition value={item.ema8.toFixed(2)} condition={validator} key={index} openMoreInfo={handleHover} />
+        <TextColoredCondition value={item.ema8 ? item.ema8.toFixed(2) : 'N/A'} condition={validator} key={index} openMoreInfo={handleHover} />
       </div>
     </div>
   )
@@ -134,7 +134,7 @@ const renderEma8Validation = (item: any, index: number) => {
 const renderValorizationPercentage = (value: any, index: number, symbol: string) => {
   const validator: 'good' | 'bad' | 'normal' = symbol === 'BTC' ? (value >= 10.0 ? 'good' : (value < 0) ? 'bad' : 'normal') : (value >= 10.0 ? 'good' : (value < 0) ? 'bad' : 'normal');
 
-  return <TextColoredCondition value={value} condition={validator} key={index} />;
+  return <TextColoredCondition value={value !== null && value !== undefined ? value.toFixed(2) : 'N/A'} condition={validator} key={index} />;
 }
 
 const dataRowsMapper = (data: any) => {
