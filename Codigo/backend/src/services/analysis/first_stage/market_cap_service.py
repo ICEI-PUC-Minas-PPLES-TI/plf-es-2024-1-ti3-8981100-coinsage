@@ -39,9 +39,9 @@ class MarketCapService:
         db.commit()
     
     @show_runtime
-    def collect_and_return(self, db: Session, analysis: Analysis, cryptos_str: List[str]) -> List[Dict]:
+    def collect_and_return(self, cryptos_str: List[str]) -> List[Dict]:
         logger.info(
-            f"Collecting market cap data for analysis {analysis.uuid} at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            f"Collecting market cap data for rankings at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
         )
         results = self.collector.collect(cryptos_str)
         market_caps = []

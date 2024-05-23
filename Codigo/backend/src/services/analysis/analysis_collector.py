@@ -16,6 +16,7 @@ from src.services.analysis.first_stage.daily_volume_service import DailyVolumeSe
 from src.services.analysis.first_stage.ema_calculator_service import EmaCalculatorService
 from src.services.analysis.first_stage.market_cap_service import MarketCapService
 from src.services.analysis.first_stage.week_percentage_val_service import WeekPercentageValorizationService
+from src.services.analysis.first_stage.ranking_service import RankingService
 from src.services.currencies_info_collector import CurrenciesLogoCollector
 from src.utilities.runtime import show_runtime
 
@@ -37,6 +38,7 @@ class AnalysisCollector:
         self.ema_calculator_service = EmaCalculatorService()
         self.market_cap_service = MarketCapService()
         self.volume_service = DailyVolumeService(session=session)
+        self.ranking_service: RankingService = RankingService(session=session)
 
     def _new_analysis(self) -> Analysis:
         analysis: Analysis = Analysis()
@@ -72,12 +74,12 @@ class AnalysisCollector:
             thread1 = threading.Thread(target=self.prices_service.collect_current_price, args=(new_analysis.uuid,))
             thread2 = threading.Thread(target=self.volume_service.fetch_volume_data, args=(new_analysis.uuid,))
 
-            self.update_market_cap_rankings(new_analysis.uuid)
             self.prices_service.collect(analysis_indentifier=new_analysis.uuid)
             self.market_cap_service.collect(db=self.session, analysis=new_analysis, cryptos_str=cryptos_str)
             self.week_increse_service.calculate_all_week_percentage_valorization(cryptos_str, new_analysis.uuid)
             self.ema_calculator_service.append_ema8_and_relations(self.session, symbols, new_analysis.uuid)
             self.ema_calculator_service.calculate_crossovers(self.session, symbols, new_analysis.uuid)
+            self.ranking_service.update_market_cap_rankings(self.session, new_analysis, cryptos_str)
 
             thread1.start()
             thread2.start()
@@ -107,9 +109,7 @@ class AnalysisCollector:
         schedule: AnalysisInfoScheduleModel | None = self.schedule_repository.get_last_update(self.session)
 
         if last_analysis:
-            all_first_stage, paginated = self.prices_service.get_all_by_analysis_uuid(
-                last_analysis.uuid, limit, offset
-            )
+            all_first_stage, paginated = self.prices_service.get_all_by_analysis_uuid(last_analysis.uuid, limit, offset)
 
             try:
                 analysis = AnalysisInfo(
@@ -126,19 +126,3 @@ class AnalysisCollector:
                 )
 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No analysis found")
-    
-    def update_market_cap_rankings(self, analysis_indentifier: Uuid):
-        market_caps = self.market_cap_service.collect_and_return(
-            self.session, analysis_indentifier, self.get_crypto_symbols()
-        )
-        sorted_market_caps = sorted(market_caps, key=lambda x: x["quote"]["USD"]["market_cap"], reverse=True)
-
-        for index, cap in enumerate(sorted_market_caps):
-            symbol = cap["symbol"]
-            new_rank = index + 1
-            self.first_stage_repo.update_ranking(self.session, symbol, new_rank, analysis_indentifier)
-    
-    def get_crypto_symbols(self):
-        symbols = self.symbols_service.get_cryptos().last_update.data
-        cryptos_str: List[str] = [crypto.symbol for crypto in symbols]
-        return cryptos_str
