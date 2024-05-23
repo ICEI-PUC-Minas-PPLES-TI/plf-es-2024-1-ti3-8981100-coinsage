@@ -85,7 +85,6 @@ class VariationPer:
         btc_asset = BinanceSymbolsCollected(symbol="BTCUSDT", base_asset="BTC", quote_asset="USDT")
         btc_variation = self.process_symbol(btc_asset, dates_to_collect)
         for data in symbol_data:
-            print(data)
             if not data["year_variation_per"] or not data["semester_variation_per"]:
                 data["variation_greater_bitcoin"] = False
                 continue

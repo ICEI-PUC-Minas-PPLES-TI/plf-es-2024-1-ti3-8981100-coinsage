@@ -15,8 +15,8 @@ from src.services.analysis.first_stage.closing_price_service import PriceService
 from src.services.analysis.first_stage.daily_volume_service import DailyVolumeService
 from src.services.analysis.first_stage.ema_calculator_service import EmaCalculatorService
 from src.services.analysis.first_stage.market_cap_service import MarketCapService
-from src.services.analysis.first_stage.week_percentage_val_service import WeekPercentageValorizationService
 from src.services.analysis.first_stage.ranking_service import RankingService
+from src.services.analysis.first_stage.week_percentage_val_service import WeekPercentageValorizationService
 from src.services.analysis.second_stage.variation_per_service import VariationPer
 from src.services.currencies_info_collector import CurrenciesLogoCollector
 from src.utilities.runtime import show_runtime
@@ -74,7 +74,7 @@ class AnalysisCollector:
             cryptos_str: List[str] = [crypto.symbol for crypto in symbols]
 
             thread1 = threading.Thread(target=self.prices_service.collect_current_price, args=(new_analysis.uuid,))
-            thread2 = threading.Thread(target=self.volume_service.fetch_volume_data, args=(new_analysis.uuid,))
+            # thread2 = threading.Thread(target=self.volume_service.fetch_volume_data, args=(new_analysis.uuid,))
             thread3 = threading.Thread(
                 target=self.variation_per_service.fetch_variation_price, args=(new_analysis.uuid,)
             )
@@ -87,11 +87,11 @@ class AnalysisCollector:
             self.ranking_service.update_market_cap_rankings(self.session, new_analysis, cryptos_str)
 
             thread1.start()
-            thread2.start()
+            # thread2.start()
             thread3.start()
 
             thread1.join()
-            thread2.join()
+            # thread2.join()
             thread3.join()
 
             self.session.add(
@@ -116,7 +116,9 @@ class AnalysisCollector:
         schedule: AnalysisInfoScheduleModel | None = self.schedule_repository.get_last_update(self.session)
 
         if last_analysis:
-            all_first_stage, paginated = self.prices_service.get_all_by_analysis_uuid(last_analysis.uuid, limit, offset)
+            all_first_stage, paginated = self.prices_service.get_all_by_analysis_uuid(
+                last_analysis.uuid, limit, offset
+            )
 
             try:
                 analysis = AnalysisInfo(

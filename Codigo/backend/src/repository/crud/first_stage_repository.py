@@ -114,7 +114,7 @@ def save_all(db: Session, closing_prices: list[FirstStageAnalysisModel]):
 def update_current_price(
     db: Session, symbols_current_price: list[dict], analysis_indentifier: Uuid
 ) -> list[FirstStageAnalysisModel]:
-    update_current_price_encoded = []
+    update_current_price_encoded: list[Any] = []
     if symbols_current_price is None:
         raise ValueError(f"Failed to get current price for the symbols")
     for current_price in symbols_current_price:
@@ -137,11 +137,11 @@ def update_current_price(
 
             first_stage.current_price = current_price["price"]  # type:ignore
             db.commit()
-            db.add(new_analysis)
+            # db.add(new_analysis)
         else:
             logger.info(f"Moeda com símbolo {current_price['symbol']} não encontrada.")  # type:ignore
-        update_current_price_encoded.append(jsonable_encoder(first_stage))
-        db.commit()
+        # update_current_price_encoded.append(jsonable_encoder(first_stage))
+        # db.commit()
         db.close()
 
     return update_current_price_encoded
@@ -177,10 +177,10 @@ def add_volume_analysis(db: Session, volume_analysis_data: List[VolumeAnalysis],
                 first_stage.today_volume = data["today_volume"]
 
                 db.commit()
-                db.add(new_analysis)
+                # db.add(new_analysis)
             else:
                 logger.info(f"Moeda com símbolo {data['symbol']} não encontrada.")
-        db.commit()
+        # db.commit()
     except Exception as e:
         db.rollback()
         logger.info(f"Erro ao adicionar análises: {e}")
@@ -189,13 +189,12 @@ def add_volume_analysis(db: Session, volume_analysis_data: List[VolumeAnalysis],
 
 
 def update_ranking(db: Session, symbol: str, new_ranking: int, analysis_uuid: Uuid):
-    entry = db.query(FirstStageAnalysisModel).join(
-        CurrencyBaseInfoModel,
-        FirstStageAnalysisModel.uuid_currency == CurrencyBaseInfoModel.uuid
-    ).filter(
-        CurrencyBaseInfoModel.symbol == symbol,
-        FirstStageAnalysisModel.uuid_analysis == analysis_uuid
-    ).first()
+    entry = (
+        db.query(FirstStageAnalysisModel)
+        .join(CurrencyBaseInfoModel, FirstStageAnalysisModel.uuid_currency == CurrencyBaseInfoModel.uuid)
+        .filter(CurrencyBaseInfoModel.symbol == symbol, FirstStageAnalysisModel.uuid_analysis == analysis_uuid)
+        .first()
+    )
 
     if entry:
         entry.ranking = new_ranking
