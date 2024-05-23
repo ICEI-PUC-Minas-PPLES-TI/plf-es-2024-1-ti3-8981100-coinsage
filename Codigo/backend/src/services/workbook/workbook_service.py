@@ -5,11 +5,13 @@ from sqlalchemy.orm import Session
 
 from src.models.db.currency_base_info import CurrencyBaseInfoModel
 from src.models.db.first_stage_analysis import FirstStageAnalysisModel
+from src.services.analysis.first_stage.closing_price_service import PriceService
 
 
 class WorkbookService:
     def __init__(self, session: Session):
         self.session = session
+        self.price_service = PriceService(self.session)
 
     def create_workbook(self, headers: List[str]) -> Workbook:
         workbook = Workbook()
@@ -28,9 +30,13 @@ class WorkbookService:
         )
 
         header_to_model_attr = {
-            # "CATEGORY": ,
+            "CATEGORY": lambda item: (
+                self.price_service._get_sector_by_symbol(item.currency.uuid).title
+                if self.price_service._get_sector_by_symbol(item.currency.uuid).title != "Unknown"
+                else "N/A"
+            ),
             "SYMBOL": lambda item: item.currency.symbol if item.currency else "N/A",
-            # "RANKING": "ranking",
+            "RANKING": "ranking",
             "MARKET CAP": "market_cap",
             # "INCREASE DATE": "increase_date",
             "% WEEK INCREASE": "week_increase_percentage",
@@ -38,16 +44,16 @@ class WorkbookService:
             "LAST WEEK CLOSING PRICE": "last_week_closing_price",
             "OPEN PRICE": "open_price",
             "EMA8": "ema8",
-            "WEEK CLOSING PRICE > EMA8(w)": "ema8_less_close",
-            "EMA8 > WEEK OPEN PRICE": "ema8_greater_open",
-            "EMAs ALIGNED": "ema_aligned",
-            "INCREASE VOLUME(d) DATE": "increase_volume_day",
+            "WEEK CLOSING PRICE > EMA8(w)": lambda item: "YES" if item.ema8_less_close else "NO",
+            "EMA8 > WEEK OPEN PRICE": lambda item: "YES" if item.ema8_greater_open else "NO",
+            "EMAs ALIGNED": lambda item: "YES" if item.ema_aligned else "NO",
+            # "INCREASE VOLUME(d) DATE": "increase_volume_day",
             # "INCREASE VOLUME(w)": "week_increase_volume",
-            "INCREASE VOLUME": "increase_volume",
-            "TODAY VOLUME": "today_volume",
-            "VOLUME BEFORE INCREASE": "volume_before_increase",
+            # "INCREASE VOLUME": "increase_volume",
+            # "TODAY VOLUME": "today_volume",
+            # "VOLUME BEFORE INCREASE": "volume_before_increase",
             # "% VOLUME/VOLUME DAY BEFORE": "volumes_relation",
-            "VOLUME > 200%": "expressive_volume_increase",
+            # "VOLUME > 200%": "expressive_volume_increase",
             # "BUY SIGNAL": "buying_signal",
             "CURRENT PRICE": "current_price",
             # "1 YEAR": "year_variation_per",

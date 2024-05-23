@@ -75,9 +75,9 @@ class AnalysisCollector:
 
             thread1 = threading.Thread(target=self.prices_service.collect_current_price, args=(new_analysis.uuid,))
             # thread2 = threading.Thread(target=self.volume_service.fetch_volume_data, args=(new_analysis.uuid,))
-            thread3 = threading.Thread(
-                target=self.variation_per_service.fetch_variation_price, args=(new_analysis.uuid,)
-            )
+            # thread3 = threading.Thread(
+            #     target=self.variation_per_service.fetch_variation_price, args=(new_analysis.uuid,)
+            # )
 
             self.prices_service.collect(analysis_indentifier=new_analysis.uuid)
             self.market_cap_service.collect(db=self.session, analysis=new_analysis, cryptos_str=cryptos_str)
@@ -88,11 +88,11 @@ class AnalysisCollector:
 
             thread1.start()
             # thread2.start()
-            thread3.start()
+            # thread3.start()
 
             thread1.join()
             # thread2.join()
-            thread3.join()
+            # thread3.join()
 
             self.session.add(
                 AnalysisInfoScheduleModel(

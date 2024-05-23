@@ -199,7 +199,7 @@ def update_ranking(db: Session, symbol: str, new_ranking: int, analysis_uuid: Uu
     if entry:
         entry.ranking = new_ranking
         db.commit()
-        logger.info(f"Updated ranking to {new_ranking} for symbol {symbol} in analysis {analysis_uuid}.")
+        # logger.info(f"Updated ranking to {new_ranking} for symbol {symbol} in analysis {analysis_uuid}.")
         return entry
     else:
         logger.error(f"Currency with symbol {symbol} and analysis UUID {analysis_uuid} not found.")
