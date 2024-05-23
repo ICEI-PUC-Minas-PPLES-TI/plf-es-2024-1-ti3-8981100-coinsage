@@ -1,7 +1,8 @@
 import os
+from io import BytesIO
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy.orm import Session
 
 from src.api.dependencies.session import get_db
@@ -28,19 +29,19 @@ async def generate_workbook(db: Session = Depends(get_db)):
     filename = file_path
 
     headers = [
-        "CATEGORY",
-        "SYMBOL",
+        "SETOR",
+        "CRIPTOMOEDA",
         "RANKING",
-        "MARKET CAP",
-        # "INCREASE DATE",
-        "% WEEK INCREASE",
-        "CLOSING PRICE",
-        "LAST WEEK CLOSING PRICE",
-        "OPEN PRICE",
-        "EMA8",
-        "WEEK CLOSING PRICE > EMA8(w)",
-        "EMA8 > WEEK OPEN PRICE",
-        "EMAs ALIGNED",
+        "VALOR MERCADO (US$ BILHÕES)",
+        "DATA VALORIZ. SEMANAL > 10%",
+        "VALORIZ. NESTA DATA (%)",
+        "PREÇO NO MOMENTO (US$)",
+        "PREÇO SEMANAL FECHAMENTO (US$)",
+        "PREÇO SEMANAL ABERTURA (US$)",
+        "EMA(8) SEMANAL",
+        "PREÇO SEMANAL FECHAMENTO > EMA (8)",
+        "EMA (8) > PREÇO SEMANAL ABERTURA",
+        "MÉDIAS MÓVEIS DIÁRIAS ALINHADAS",
         # "INCREASE VOLUME(d) DATE",
         # "INCREASE VOLUME(w)",
         # "INCREASE VOLUME",
@@ -48,7 +49,6 @@ async def generate_workbook(db: Session = Depends(get_db)):
         # "VOLUME BEFORE INCREASE",
         # "% VOLUME/VOLUME DAY BEFORE",
         # "VOLUME > 200%",
-        "CURRENT PRICE",
         # "BUY SIGNAL",
         # "1 YEAR",
         # "180 DAYS",
@@ -61,14 +61,25 @@ async def generate_workbook(db: Session = Depends(get_db)):
     workbook_service = WorkbookService(db)
     workbook = workbook_service.create_workbook(headers)
     filled_workbook = workbook_service.fill_workbook(workbook, headers, str(last_analysis.uuid))
+    styled_workbook = workbook_service.style_workbook(filled_workbook)
+    formated_workbook = workbook_service.format_workbook(styled_workbook)
 
-    filled_workbook.save(file_path)
+    # formated_workbook.save(file_path)
+    file_stream = BytesIO()
+    formated_workbook.save(file_stream)
+    file_stream.seek(0)
 
-    if os.path.exists(file_path):
-        return FileResponse(
-            path=file_path,
-            filename=filename,
-            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        )
-    else:
-        raise HTTPException(status_code=404, detail="File not found.")
+    return StreamingResponse(
+        file_stream,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
+
+    # if os.path.exists(file_path):
+    #     return FileResponse(
+    #         path=file_path,
+    #         filename=filename,
+    #         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    #     )
+    # else:
+    #     raise HTTPException(status_code=404, detail="File not found.")
