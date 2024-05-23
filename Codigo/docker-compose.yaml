@@ -1,35 +1,76 @@
 version: '3.9'
 
 services:
-  # backend_app:
-  #   container_name: coinsage_api
-  #   restart: always
-  #   build:
-  #     dockerfile: Dockerfile
-  #     context: ./backend/
-  #   environment:
-  #     - ENVIRONMENT=${ENVIRONMENT}
-  #     - DEBUG=${DEBUG}
-  #     - SERVER_HOST=${SERVER_HOST}
-  #     - SERVER_PORT=${SERVER_PORT}
-  #     - SERVER_WORKERS=${SERVER_WORKERS}
-  #   volumes:
-  #     - ./backend/:/usr/backend/
-  #   expose:
-  #     - 8000
-  #   ports:
-  #     - 8000:8000
-  postgres_coinsage_db:
-    container_name: coinsage_db
-    restart: always
+  db:
     image: postgres:13
-    build:
-      context: ./backend/
+    container_name: coinsage_database
+    restart: always
+    expose:
+      - "5432"
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./backend/.env
     environment:
       - POSTGRES_USER=${DATABASE_USER}
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
       - POSTGRES_DB=${DATABASE_NAME}
     volumes:
-      - ./backend/:/usr/backend/
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgres_data:/var/lib/postgresql/data
+    networks:
+      - coinsage_network
+
+  backend_app:
+    container_name: coinsage_api
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./backend/
+    env_file:
+      - ./backend/.env
+    environment:
+      # FastAPI config
+      - ENVIRONMENT=${ENVIRONMENT}
+      - DEBUG=${DEBUG}
+      - SERVER_HOST=${SERVER_HOST}
+      - SERVER_PORT=${SERVER_PORT}
+      - SERVER_WORKERS=${SERVER_WORKERS}
+      # Database config
+      - DATABASE_HOST=db
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_USER=${DATABASE_USER}
+      # CMC API KEY
+      - CMC_API_KEY=${CMC_API_KEY}
+    volumes:
+      - ./backend:/usr/backend
     ports:
-      - 5432:5432
+      - 8000:8000
+    depends_on:
+      - db
+    networks:
+      - coinsage_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: coinsage_frontend
+    expose:
+      - "80"
+    ports:
+      - "80:80"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - backend_app
+    networks:
+      - coinsage_network
+
+volumes:
+  postgres_data:
+
+networks:
+  coinsage_network:
