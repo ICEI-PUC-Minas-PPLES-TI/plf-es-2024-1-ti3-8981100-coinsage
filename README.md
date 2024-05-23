@@ -19,6 +19,95 @@ Além disso, o CoinSage oferece uma interface que permite aos usuários acompanh
 * Lucas Henrique Pereira
 * Pedro Pongelupe Lopes
 
-## Instruções de utilização
+## Instruções de utilização (Execução Local)
 
-[Assim que a primeira versão do sistema estiver disponível, deverá complementar com as instruções de utilização. Descreva como instalar eventuais dependências e como executar a aplicação.]
+**Pré-requisitos**
+
+- Docker: [Windows](https://docs.docker.com/desktop/install/windows-install/) ou [Mac](https://docs.docker.com/desktop/install/mac-install/) ou [Linux](https://docs.docker.com/desktop/install/linux-install/)
+- Docker Compose: [Guia de instalação](https://docs.docker.com/compose/install/)
+
+**Obtendo uma Chave de API CoinMarketCap**
+
+1. Visite a documentação da API CoinMarketCap: [CMC Documentação](https://coinmarketcap.com/api/documentation/v1/#section/Quick-Start-Guide)
+2. Siga o guia de início rápido para criar uma conta e obter uma chave de API.
+3. Depois de fazer login, navegue até o painel da sua chave de API.
+4. Copie sua chave de API. Você precisará dela mais tarde para configurar as variáveis de ambiente.
+
+**Clonando o Repositório**
+
+Se você não tiver o código-fonte do CoinSage, clone-o usando Git:
+
+```bash
+git clone https://github.com/ICEI-PUC-Minas-PPLES-TI/plf-es-2024-1-ti3-8981100-coinsage/
+```
+
+**Configurando o Ambiente**
+
+1. Crie um arquivo `.env` na pasta [Codigo/backend](./Codigo/backend/) do projeto.
+2. Adicione as seguintes variáveis de ambiente ao arquivo `.env`, substituindo os marcadores de posição pelos seus valores reais:
+
+   ```
+   DATABASE_USER=seu_nome_de_usuario_do_banco_de_dados
+   DATABASE_PASSWORD=sua_senha_do_banco_de_dados
+   DATABASE_NAME=banco_de_dados_coinsage
+   DATABASE_PORT=5432
+   SERVER_HOST=localhost  # Ajuste se necessário
+   SERVER_PORT=8000
+   SERVER_WORKERS=4     # Ajuste com base nos recursos do seu sistema
+   DEBUG=true           # Defina como false para produção
+   ENVIRONMENT=DEV
+   CMC_API_KEY=sua_chave_de_api_coinmarketcap
+   ```
+
+**Executando a Aplicação**
+
+1. Abra um terminal no diretório do projeto.
+2. Exporte as variáveis de ambiente do arquivo `.env`:
+   1. Dentro da pasta [Codigo/backend](./Codigo/backend/), execute o seguinte comando:
+      1. No Windows:
+         ```bash
+         Get-Content .env | ForEach-Object { $_ -replace "`n", "`0" } | ForEach-Object { $_ -replace "`r", "" } | ForEach-Object { $env:$_ }
+         ```
+        2. No Linux/Mac:
+             ```bash
+                export $(cat .env | xargs)
+            ```
+        3. Se você estiver usando um terminal diferente, ajuste o comando conforme necessário.
+
+3. Execute o seguinte comando para iniciar os serviços usando Docker Compose na pasta [Codigo](./Codigo/):
+
+   ```bash
+   docker-compose up -d
+   ```
+
+   - A flag `-d` desliga os processos, permitindo que eles sejam executados em segundo plano.
+
+**Acessando a Aplicação**
+
+1. Depois que os contêineres estiverem em execução, você poderá acessar o front-end do CoinSage em seu navegador da web em:
+
+   ```
+   http://localhost:80
+   ```
+
+**Usando a API**
+
+Acessar a documentação da API em:
+
+   ```
+   http://localhost:8000/docs
+   ```
+
+**Observações Adicionais**
+
+- Para parar os contêineres em execução, use `docker-compose down`.
+- Para reconstruir os contêineres com as últimas alterações de código, use `docker-compose up -d --build`.
+- Para fins de desenvolvimento, manter `DEBUG=true` no arquivo `.env` é útil para depurar erros. Defina-o como `false` para implantações de produção.
+- O número de trabalhadores do servidor (`SERVER_WORKERS`) pode ser ajustado com base nos recursos do seu sistema e na carga esperada.
+- Considere proteger sua chave de API armazenando-a em um armazenamento de variável de ambiente seguro em vez de texto simples no arquivo `.env` para implantações de produção.
+
+**Solução de problemas**
+
+- Se você encontrar erros durante a inicialização, verifique os logs dos contêineres Docker para obter mais detalhes: `docker logs coinsage_database coinsage_api coinsage_frontend`.
+- Certifique-se de que suas credenciais de banco de dados e variáveis de ambiente estejam definidas corretamente no arquivo `.env`.
+- Verifique se você possui uma chave de API CoinMarketCap válida.
