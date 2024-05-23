@@ -17,6 +17,7 @@ from src.services.analysis.first_stage.ema_calculator_service import EmaCalculat
 from src.services.analysis.first_stage.market_cap_service import MarketCapService
 from src.services.analysis.first_stage.week_percentage_val_service import WeekPercentageValorizationService
 from src.services.analysis.first_stage.ranking_service import RankingService
+from src.services.analysis.second_stage.variation_per_service import VariationPer
 from src.services.currencies_info_collector import CurrenciesLogoCollector
 from src.utilities.runtime import show_runtime
 
@@ -39,6 +40,7 @@ class AnalysisCollector:
         self.market_cap_service = MarketCapService()
         self.volume_service = DailyVolumeService(session=session)
         self.ranking_service = RankingService(session=session)
+        self.variation_per_service = VariationPer(session=session)
 
     def _new_analysis(self) -> Analysis:
         analysis: Analysis = Analysis()
@@ -73,6 +75,9 @@ class AnalysisCollector:
 
             thread1 = threading.Thread(target=self.prices_service.collect_current_price, args=(new_analysis.uuid,))
             thread2 = threading.Thread(target=self.volume_service.fetch_volume_data, args=(new_analysis.uuid,))
+            thread3 = threading.Thread(
+                target=self.variation_per_service.fetch_variation_price, args=(new_analysis.uuid,)
+            )
 
             self.prices_service.collect(analysis_indentifier=new_analysis.uuid)
             self.market_cap_service.collect(db=self.session, analysis=new_analysis, cryptos_str=cryptos_str)
@@ -83,9 +88,11 @@ class AnalysisCollector:
 
             thread1.start()
             thread2.start()
+            thread3.start()
 
             thread1.join()
             thread2.join()
+            thread3.join()
 
             self.session.add(
                 AnalysisInfoScheduleModel(
