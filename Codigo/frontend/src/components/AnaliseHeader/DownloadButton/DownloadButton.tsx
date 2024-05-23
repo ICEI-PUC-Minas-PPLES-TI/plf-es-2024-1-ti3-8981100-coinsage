@@ -4,14 +4,17 @@ import { Endpoints } from "../../../constants/apiConfig.json";
 import api from "../../../service/api";
 
 import styles from './DownloadButton.module.css'
+import { useState } from 'react';
 
 interface DownloadPartProps {
     title: string;
-    loading?: boolean;
 }
 
-const DownloadButton: React.FC<DownloadPartProps> = ({ title, loading }) => {
+const DownloadButton: React.FC<DownloadPartProps> = ({ title }) => {
+    const [loading, setLoading] = useState<boolean>(false)
+
     const handleDownload = async () => {
+        setLoading(true)
         try {
             const response = await api.get(Endpoints.Workbook, {
                 responseType: 'blob',
@@ -27,10 +30,13 @@ const DownloadButton: React.FC<DownloadPartProps> = ({ title, loading }) => {
             link.setAttribute('download', filename);
             document.body.appendChild(link);
             link.click();
-            link.parentNode.removeChild(link);
+            if (link.parentNode) {
+                link.parentNode.removeChild(link);
+            }
         } catch (error) {
             console.error('Erro ao baixar o arquivo:', error);
         }
+        setLoading(false)
     };
 
     return (
