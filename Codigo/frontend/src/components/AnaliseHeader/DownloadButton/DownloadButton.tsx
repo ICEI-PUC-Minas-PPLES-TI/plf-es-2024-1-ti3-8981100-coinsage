@@ -1,4 +1,4 @@
-import { Button } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 import DownloadForOfflineRoundedIcon from '@mui/icons-material/DownloadForOfflineRounded';
 import { Endpoints } from "../../../constants/apiConfig.json";
 import api from "../../../service/api";
@@ -42,16 +42,16 @@ const DownloadButton: React.FC<DownloadPartProps> = ({ title }) => {
     return (
         <div className={styles.button}>
             <h2>{title}</h2>
-            <Button
+            <LoadingButton
                 className={styles.downloadButton}
-                disabled={loading}
+                loading={loading}
                 onClick={handleDownload}
                 size='small'
                 variant='outlined'
                 startIcon={<DownloadForOfflineRoundedIcon />}
             >
                 Baixar
-            </Button>
+            </LoadingButton>
         </div>
     );
 }
