@@ -70,7 +70,7 @@ docs/_build/
 /.pnp
 .pnp.js
 venv
-.env
+.env*
 env/
 ENV/
 env.bak/
