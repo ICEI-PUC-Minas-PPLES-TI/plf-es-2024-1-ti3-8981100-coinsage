@@ -16,7 +16,7 @@ rectangle "Legenda"{
     rectangle "Sprint 2" #LightGreen
     rectangle "Sprint 3" #LightCoral
     rectangle "Sprint 4" #LightYellow
-    ' rectangle "Sprint 5" #LightPink
+    rectangle "Sprint 5" #LightSalmon
 }
 
 rectangle "Coinsage"{
@@ -64,8 +64,12 @@ rectangle "Coinsage"{
     ' Sp4
     usecase "RF20 - Cadastrar compra de criptomoedas" as register_cripto #LightYellow
     usecase "RF08, RF13, RF14, RF19 - Visualizar planilha xlsl com dados da análise das criptomoedas" as view_xlsl #LightYellow
-    ' Sp4
     usecase "RF03 - Coletar rankings das criptomoedas" as collect_rankings #LightYellow
+    ' Sp5
+    usecase "RF23 - Excluir moeda da carteira" as delete_cripto #LightSalmon
+    usecase "RF24 - Visualizar histórico de moedas ativas em sua carteira e os detalhes da aquisição (xlsx)" as view_active_coins #LightSalmon
+    usecase "RF25 - Visualizar lucros mensais das moedas da carteira (xlsx)" as view_monthly_profits #LightSalmon
+
 }
 
 ' Schedules use cases
@@ -91,6 +95,7 @@ sch_sectors -- collect_sectors
 collect_sectors -- cmc
 collect_rankings -- binance
 collect_rankings -- cmc
+view_monthly_profits -- binance
 
 ' Investor use cases
 investor -- view_sectors
@@ -106,6 +111,9 @@ investor -- view_emas_aligned
 investor -- view_cripto_price_variations
 investor -- view_xlsl
 investor -- register_cripto
+investor -- view_monthly_profits
+investor -- view_active_coins
+investor -- delete_cripto
 
 
 ' Use cases relations
