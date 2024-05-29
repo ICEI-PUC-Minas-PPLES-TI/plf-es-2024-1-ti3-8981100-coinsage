@@ -1,4 +1,4 @@
-@startuml
+@startuml current
 title Coinsage - Sprint 4
 
 left to right direction
@@ -27,43 +27,43 @@ rectangle "Coinsage"{
     usecase "Schedule Coletar Informações das moedas" as sch_cripto_info #LightBlue
     usecase "Schedule Iniciar Análise" as sch_analysis #LightBlue
     ' Sp3
-    usecase "RF01 - Schedule Coletar Setores" as sch_sectors #LightCoral /' Should be sprint 2 but not ended '/
+    usecase "RF02 - Schedule Coletar Setores" as sch_sectors #LightCoral /' Should be sprint 2 but not ended '/
 
     ' Analyse use cases
     ' Sp1
-    usecase "RF06 - Coletar variação semanal" as collect_cripto_week_incresse #LightBlue
+    usecase "RF01 - Coletar variação semanal" as collect_cripto_week_incresse #LightBlue
     ' Sp2
-    usecase "RF01 - Coletar Setores" as collect_sectors #LightGreen
-    usecase "RF18 - Coletar preços de abertura e fechamento" as collect_cripto_open_close #LightGreen
-    usecase "RF17 - Calcular relações de ema8" as collect_ema8_relations #LightGreen
-    usecase "RF14 - Calcular relações de volume" as collect_volume_relations #LightGreen
+    usecase "RF02 - Coletar Setores" as collect_sectors #LightGreen
+    usecase "RF14 - Coletar preços de abertura e fechamento" as collect_cripto_open_close #LightGreen
+    usecase "RF15/RF17 - Calcular relações de ema8" as collect_ema8_relations #LightGreen
+    usecase "RF09/RF10/RF11 - Calcular relações de volume" as collect_volume_relations #LightGreen
     ' Sp3
     usecase "RF03 - Coletar valor de mercado em bilhões" as collect_market_cap #LightCoral /' Should be sprint 2 but not ended '/
     usecase "RF21 - Coletar o preço no momento da análise" as collect_cripto_current_price #LightCoral /' Should be sprint 2 but not ended '/
-    usecase "RF14 - Coletar aumento expressivo de volume" as collect_expressive_volume_date #LightCoral /' Should be sprint 2 but not ended '/
-    usecase "RF27 - Coletar alinhamento das médias móveis" as collect_emas_aligned #LightCoral
-    usecase "RF07 - Coletar vaiações de preço para: 1y, 6m, 3m, 1m e 7d" as collect_cripto_price_variations #LightCoral
+    usecase "RF09/RF10/RF11 - Coletar aumento expressivo de volume" as collect_expressive_volume_date #LightCoral /' Should be sprint 2 but not ended '/
+    usecase "RF17 - Coletar alinhamento das médias móveis" as collect_emas_aligned #LightCoral
+    usecase "RF19 - Coletar vaiações de preço para: 1y, 6m, 3m, 1m e 7d" as collect_cripto_price_variations #LightCoral
 
     ' Report use cases
     ' Sp1
     usecase "Vizualizar logo e nome das moedas" as view_cripto_info #LightBlue
-    usecase "RF06 - Vizualizar porcentagem de variação semanal" as view_cripto_week_incresse #LightBlue
+    usecase "RF01 - Vizualizar porcentagem de variação semanal" as view_cripto_week_incresse #LightBlue
     ' Sp2
-    usecase "RF01 - Visualizar Setores" as view_sectors #LightGreen
-    usecase "RF14 - Visualizar relações de volume" as view_volume_relations #LightGreen
+    usecase "RF02 - Visualizar Setores" as view_sectors #LightGreen
+    usecase "RF09/RF10/RF11 - Visualizar relações de volume" as view_volume_relations #LightGreen
     ' Sp3
     usecase "RF03 - Visualizar valor de mercado em bilhões" as view_market_cap #LightCoral /' Should be sprint 2 but not ended '/
     usecase "RF21 - Visualizar o preço no momento da análise" as view_cripto_current_price #LightCoral /' Should be sprint 2 but not ended '/
-    usecase "RF14 - Visualizar aumento do volume expressivo" as view_expressive_volume_increase #LightCoral /' Should be sprint 2 but not ended '/
-    usecase "RF17/RF19 - Visualizar relações de ema8" as view_ema8_relations #LightCoral /' Should be sprint 2 but not ended '/
-    usecase "RF18 - Visualizar preço de abertura e fechamento" as view_cripto_open_close #LightCoral /' Should be sprint 2 but not ended '/
-    usecase "RF27 - Visualizar alinhamento das médias móveis" as view_emas_aligned #LightCoral
-    usecase "RF07 - Visualizar vaiações de preço para: 1y, 6m, 3m, 1m e 7d" as view_cripto_price_variations #LightCoral
+    usecase "RF09/RF10/RF11 - Visualizar aumento do volume expressivo" as view_expressive_volume_increase #LightCoral /' Should be sprint 2 but not ended '/
+    usecase "RF15/RF17 - Visualizar relações de ema8" as view_ema8_relations #LightCoral /' Should be sprint 2 but not ended '/
+    usecase "RF14 - Visualizar preço de abertura e fechamento" as view_cripto_open_close #LightCoral /' Should be sprint 2 but not ended '/
+    usecase "RF17 - Visualizar alinhamento das médias móveis" as view_emas_aligned #LightCoral
+    usecase "RF19 - Visualizar vaiações de preço para: 1y, 6m, 3m, 1m e 7d" as view_cripto_price_variations #LightCoral
 
     ' Wallet usecases
     ' Sp4
     usecase "RF20 - Cadastrar compra de criptomoedas" as register_cripto #LightYellow
-    usecase "RF08, RF13, RF18, RF19 - Visualizar planilha xlsl com dados da análise das criptomoedas" as view_xlsl #LightYellow
+    usecase "RF08, RF13, RF14, RF19 - Visualizar planilha xlsl com dados da análise das criptomoedas" as view_xlsl #LightYellow
     ' Sp4
     usecase "RF03 - Coletar rankings das criptomoedas" as collect_rankings #LightYellow
 }
