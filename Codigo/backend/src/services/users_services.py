@@ -1,31 +1,38 @@
+import re
+
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from src.models.db.user import User as UserDB
+from src.models.db.user import UserModel
 from src.models.schemas.user import UserCreate, UserResponse
-from src.repository.crud.user_repository import create_user, get_user, get_user_by_email, get_users
-from src.repository.database import SessionLocal
+from src.repository.crud import user_repository
 
 
 class UserService:
-    def __init__(self, session: Session):
-        self.session = session
+    def __init__(self):
+        self.repository = user_repository
 
-    def create_user(self, user: UserCreate) -> UserResponse:
-        user_created: UserDB = create_user(self.session, user)
-        user_response: UserResponse = UserResponse(**user_created.__dict__)
-        return user_response
+    def create(self, db: Session, user: UserCreate) -> UserResponse:
+        if self.user_exists(db, user):
+            raise HTTPException(status_code=400, detail="User already exists")
 
-    def get_user(self, user_id: int) -> UserResponse:
-        user: UserDB = get_user(self.session, user_id)
-        user_response: UserResponse = UserResponse(**user.__dict__)
-        return user_response
+        self.validate_user(user)
 
-    def get_user_by_email(self, email: str) -> UserResponse:
-        user: UserDB = get_user_by_email(self.session, email)
-        user_response: UserResponse = UserResponse(**user.__dict__)
-        return user_response
+        user_created: UserModel = self.repository.create_user(db, user)
+        return UserResponse(id=user_created.id, email=user_created.email, name=user_created.name)
 
-    def get_users(self, skip: int = 0, limit: int = 100) -> list[UserResponse]:
-        users: list[UserDB] = get_users(self.session, skip, limit)
-        users_response: list[UserResponse] = [UserResponse(**user.__dict__) for user in users]
-        return users_response
+    def user_exists(self, db: Session, user: UserCreate) -> bool:
+        return self.repository.get_by_email(db, user.email) is not None
+
+    def validate_user(self, user: UserCreate):
+        self.validate_email(user.email)
+        self.validate_password(user.password)
+
+    def validate_email(self, email: str) -> bool:
+        pattern = r"\"?([-a-zA-Z0-9.`?{}]+@\w+\.\w+)\"?"
+        if re.match(pattern, email) is None:
+            raise HTTPException(status_code=400, detail="Invalid email format")
+
+    def validate_password(self, password: str) -> bool:
+        if not len(password) >= 6:
+            raise HTTPException(status_code=400, detail="Password must have at least 6 characters")
