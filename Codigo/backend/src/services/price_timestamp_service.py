@@ -20,7 +20,11 @@ class PriceAtTimestampService:
             raise HTTPException(status_code=404, detail="Criptomoeda não encontrada")
 
         try:
-            return BinancePriceAtTimestampService().get_by_symbol(symbol=packet.crypto, date_time=packet._date)
+            price = BinancePriceAtTimestampService().get_by_symbol(symbol=packet.crypto, date_time=packet._date)
+            if price is None:
+                logger.error(f"Preço não encontrado: {packet.crypto}")
+                raise HTTPException(status_code=404, detail="Preço não encontrado")
+            return price
         except Exception as e:
             logger.error(f"Erro ao buscar preço: {e}")
             raise HTTPException(status_code=404, detail="Preço não encontrado")

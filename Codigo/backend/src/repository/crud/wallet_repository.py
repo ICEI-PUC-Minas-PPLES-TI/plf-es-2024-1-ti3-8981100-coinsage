@@ -18,3 +18,7 @@ def create_buy(db: Session, buy: schemas.BuyWalletCreate, currency_uuid: Uuid) -
     db.commit()
     db.refresh(db_transaction)
     return db_transaction
+
+
+def get_by_uuid(db: Session, transaction_uuid: Uuid) -> WalletTransaction:
+    return db.query(WalletTransaction).filter(WalletTransaction.uuid == transaction_uuid).first()

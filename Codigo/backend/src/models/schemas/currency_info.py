@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List
+from uuid import UUID
 
 from src.models.schemas.base import BaseSchemaModel
 
@@ -23,3 +24,10 @@ class LastUpdate(BaseSchemaModel):
 class CurrencyInfoResponse(BaseSchemaModel):
     next_update: datetime
     last_update: LastUpdate
+
+
+class SimpleCrypto(BaseSchemaModel):
+    symbol: str
+    name: str
+    logo: str
+    uuid: UUID

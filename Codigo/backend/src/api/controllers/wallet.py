@@ -1,5 +1,6 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, status
-from loguru import logger
 from sqlalchemy.orm import Session
 
 from src.api.dependencies.session import get_db
@@ -25,3 +26,16 @@ router = APIRouter(
 )
 async def read_cryptos(create: schemas.BuyWalletCreate, db: Session = Depends(get_db)):
     return service.create_buy(create, db)
+
+
+@router.get(
+    path="/profit",
+    name="Lucro",
+    description="Verificar o lucro de uma criptomoeda, compando seu valor de compra, e valor comprado com o valor atual da criptomoeda.",
+    responses={
+        status.HTTP_200_OK: {"description": "Lucro calculado com sucesso."},
+    },
+    response_model=schemas.ResponseProfitCompare,
+)
+async def calculate_profit(uuid: UUID, db: Session = Depends(get_db)) -> schemas.ResponseProfitCompare:
+    return service.profit(db=db, transaction_uuid=uuid)
