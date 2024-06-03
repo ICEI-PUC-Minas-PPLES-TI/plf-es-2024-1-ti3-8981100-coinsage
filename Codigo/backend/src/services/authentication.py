@@ -50,7 +50,7 @@ class AuthenticationService:
         )
         return token
 
-    def decode_token(self, token: str, db: Session) -> UserCreate:
+    def decode_token(self, token: str, db: Session) -> UserResponse:
         try:
             payload = jwt.decode(token, settings.JWS_SECRET, algorithms=[settings.JWT_ALGORITHM])
             user = self.repository.get_by_email(db=db, email=payload.get("email"))
@@ -63,4 +63,4 @@ class AuthenticationService:
             raise HTTPException(status_code=401, detail="Invalid token")
         except Exception as e:
             logger.error(f"Error decoding token: {e}")
-            HTTPException(status_code=401, detail="Error decoding token")
+            raise HTTPException(status_code=401, detail="Error decoding token")

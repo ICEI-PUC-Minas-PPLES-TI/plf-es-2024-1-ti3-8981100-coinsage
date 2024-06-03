@@ -27,6 +27,7 @@ class BuyWalletCreate(BaseSchemaModel):
 class CompleteWalletTransaction(BuyWalletCreate):
     uuid: UUID
     created_at: datetime
+    user_id: int
 
     class Config:
         orm_mode = True
