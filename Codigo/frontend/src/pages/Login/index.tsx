@@ -1,8 +1,10 @@
 import { Grid, Typography } from '@mui/material';
 import LoginForm from '../../components/LoginForm';
-import SignInForm from '../../components/SignInForm';
+import SignUpForm from '../../components/SignInForm';
 import styles from './LoginPage.module.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import useAuth from '../../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
     const [form, setForm] = useState<'login' | 'signIn'>('login');
@@ -20,7 +22,7 @@ const Login: React.FC = () => {
                 </div>
             </Grid>
             <Grid item xs={12} sm={8} md={6} lg={4} className={styles.loginFormContainer}>
-                {form === 'login' ? <LoginForm formNavigator={setForm}/> : <SignInForm formNavigator={setForm}/>}
+                {form === 'login' ? <LoginForm formNavigator={setForm}/> : <SignUpForm formNavigator={setForm}/>}
             </Grid>
         </Grid>
     );

@@ -1,21 +1,99 @@
 import React, { useState } from 'react';
-import { TextField, Button, Checkbox, FormControlLabel, Typography,  Box, Link as MuiLink } from '@mui/material';
+import { TextField, Button, Typography, Box, Link as MuiLink } from '@mui/material';
 import styles from './SignInForm.module.css';
 import ProfilePic from '../Header/ProfilePic';
 import { Link } from 'react-router-dom';
 import { LoginFormProps } from '../LoginForm';
+import api from "../../service/api";
+import { Endpoints } from "../../constants/apiConfig.json";
+import { LoadingButton } from '@mui/lab';
 
-const SignInForm: React.FC<LoginFormProps> = ({formNavigator}) => {
+const SignUpForm: React.FC<LoginFormProps> = ({ formNavigator }) => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [emailInvalid, setEmailInvalid] = useState<boolean>(false);
+  const [passwordInvalid, setPasswordInvalid] = useState<boolean>(false);
+  const [confirmPasswordInvalid, setConfirmPasswordInvalid] = useState<boolean>(false);
+
+  const signUpUser = async () => {
+    setLoading(true);
+
+    api.post(`${Endpoints.SignUp}`, {
+      email: email,
+      name: name,
+      password: password,
+    }
+    ).then((response: any) => {
+      const data = response.data;
+      if (data) {
+        window.localStorage.setItem('token', data);
+        formNavigator('login');
+      }
+    }).catch((error) => {
+      if (error.response?.status !== 200)
+        setError("Erro ao criar conta, tente novamente em alguns minutos");
+    }).finally(() => {
+      setLoading(false);
+    })
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // criar conta
-    formNavigator('login');
+    if (!emailInvalid && !passwordInvalid && !confirmPasswordInvalid){
+      setError(null);
+      signUpUser();
+      return
+    }
+
+    setError("Preencha os campos corretamente");
   };
+
+  // @ts-ignore
+  const handleEmailFormat: boolean = (value: string) => {
+    setEmail(value);
+    if (value === '') {
+      setEmailInvalid(false);
+      return false;
+    }
+    const pattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (value.match(pattern)) {
+      setEmailInvalid(false);
+      return false;
+    }
+    setEmailInvalid(true);
+    return true;
+  }
+
+  // @ts-ignore
+  const handlePasswordFormat: boolean = (value: string) => {
+    setPassword(value);
+    if (value === '') {
+      setPasswordInvalid(false);
+      return false;
+    }
+    if (value.length >= 6) {
+      setPasswordInvalid(false);
+      return false;
+    }
+    setPasswordInvalid(true);
+    return true;
+  }
+
+  // @ts-ignore
+  const handlePasswordMatch = (value: string) => {
+    setConfirmPassword(value);
+    if (value === password) {
+      setConfirmPasswordInvalid(false);
+      return false;
+    }
+    setConfirmPasswordInvalid(true);
+    return true;
+  }
 
   return (
     <Box className={styles.container}>
@@ -37,7 +115,10 @@ const SignInForm: React.FC<LoginFormProps> = ({formNavigator}) => {
           autoComplete="email"
           autoFocus
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          error={emailInvalid}
+          helperText={emailInvalid ? "E-mail inválido" : ""}
+          // @ts-ignore
+          onChange={(e) => handleEmailFormat(e.target.value)}
         />
         <TextField
           variant="outlined"
@@ -49,6 +130,8 @@ const SignInForm: React.FC<LoginFormProps> = ({formNavigator}) => {
           name="name"
           autoComplete="name"
           value={name}
+          error={name === ''}
+          helperText={name === '' ? "Nome é obrigatório" : ""}
           onChange={(e) => setName(e.target.value)}
         />
         <TextField
@@ -62,7 +145,10 @@ const SignInForm: React.FC<LoginFormProps> = ({formNavigator}) => {
           id="password"
           autoComplete="current-password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          error={passwordInvalid}
+          helperText={passwordInvalid ? "Senha precisa ter no mínimo 6 caracteres" : ""}
+          // @ts-ignore
+          onChange={(e) => handlePasswordFormat(e.target.value)}
         />
         <TextField
           variant="outlined"
@@ -75,9 +161,12 @@ const SignInForm: React.FC<LoginFormProps> = ({formNavigator}) => {
           id="password"
           autoComplete="current-password"
           value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          error={confirmPasswordInvalid}
+          helperText={confirmPasswordInvalid ? "Senhas não conferem" : ""}
+          // @ts-ignore
+          onChange={(e) => handlePasswordMatch(e.target.value)}
         />
-        <Button
+        <LoadingButton
           style={{
             backgroundColor: 'black',
             color: 'white',
@@ -88,9 +177,11 @@ const SignInForm: React.FC<LoginFormProps> = ({formNavigator}) => {
           variant="contained"
           color="inherit"
           className={styles.submit}
+          loading={loading}
         >
           Criar conta
-        </Button>
+        </LoadingButton>
+        {error && <Typography variant="body2" color="error" align="center">{error}</Typography>}
         <Typography variant="body2" color="textSecondary" align="center" style={{ marginTop: '1rem' }}>
           Já possui uma conta?
           <div style={{
@@ -108,4 +199,4 @@ const SignInForm: React.FC<LoginFormProps> = ({formNavigator}) => {
   );
 };
 
-export default SignInForm;
+export default SignUpForm;

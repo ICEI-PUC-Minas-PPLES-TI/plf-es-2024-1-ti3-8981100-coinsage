@@ -1,14 +1,9 @@
 import { useState, useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode'
 
 const useAuth = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        setIsLoggedIn(!!token);
-    }, []);
-
-    return isLoggedIn;
+    const token = localStorage.getItem('token');
+    return !!token;
 };
 
 export default useAuth;
@@ -18,8 +13,11 @@ const useUserDetails = () => {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        if (token) {
-            setUserName('John Doe');
+        if (token && token !== 'undefined') {
+            const data = jwtDecode(token);
+            // @ts-ignore
+            const name = data?.name;
+            setUserName(name);
         }
     }, []);
 
