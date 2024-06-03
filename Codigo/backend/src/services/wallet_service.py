@@ -10,6 +10,7 @@ from src.models.db.currency_base_info import CurrencyBaseInfoModel
 from src.models.db.wallet_transaction import WalletTransaction
 from src.models.schemas.currency_info import SimpleCrypto
 from src.models.schemas.timestamp_price import TimestampPrice
+from src.models.schemas.user import UserResponse
 from src.models.schemas.wallet import ProfitCompare
 from src.repository.crud import currency_info_repository, wallet_repository
 from src.services.price_timestamp_service import PriceAtTimestampService
@@ -21,12 +22,15 @@ class WalletService:
         self.cryptos_repository = currency_info_repository
         self.price_service = PriceAtTimestampService()
 
-    def create_buy(self, create: schemas.BuyWalletCreate, db: Session = None):
+    def create_buy(self, create: schemas.BuyWalletCreate, user: UserResponse, db: Session = None):
+        user_id = user.id
+        if not user_id:
+            raise HTTPException(status_code=404, detail="User not found")
         crypto = self.cryptos_repository.get_currency_info_by_symbol(db=db, symbol=create.crypto)
         if not crypto:
             raise HTTPException(status_code=404, detail="Cryptocurrency not found")
 
-        created_model = self.repository.create_buy(db=db, buy=create, currency_uuid=crypto.uuid)
+        created_model = self.repository.create_buy(db=db, buy=create, currency_uuid=crypto.uuid, user_id=user_id)
         return schemas.CompleteWalletTransaction(
             date=created_model.date.strftime("%d-%m-%Y %H:%M"),
             crypto=create.crypto,
@@ -35,10 +39,16 @@ class WalletService:
             price_on_purchase=created_model.price_on_purchase,
             created_at=created_model.created_at,
             uuid=created_model.uuid,
+            user_id=created_model.user_id,
         )
 
-    def profit(self, db: Session, transaction_uuid: UUID) -> schemas.ResponseProfitCompare:
-        transaction = self.repository.get_by_uuid(db, transaction_uuid)
+    def profit(self, db: Session, transaction_uuid: UUID, user: UserResponse) -> schemas.ResponseProfitCompare:
+        user_id = user.id
+        if not user_id:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        transaction = self.repository.get_by_uuid(db, transaction_uuid, user_id)
+
         if transaction is None:
             raise HTTPException(status_code=404, detail="Transaction not found")
 

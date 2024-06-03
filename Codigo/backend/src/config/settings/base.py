@@ -43,6 +43,11 @@ class BackendBaseSettings(BaseSettings):
         10  # Minimum number of cryptos accepted for a sector to be considered as relevant
     )
 
+    # in days
+    JWT_EXPIRE: int = decouple.config("JWT_EXPIRE", cast=int)  # type: ignore
+    JWT_ALGORITHM: str = "HS256"
+    JWS_SECRET: str = decouple.config("JWS_SECRET", cast=str)
+
     # ===== Schedules =====
     SCHEDULES: dict[str, dict[str, int]] = {
         "update_currencies_info": {

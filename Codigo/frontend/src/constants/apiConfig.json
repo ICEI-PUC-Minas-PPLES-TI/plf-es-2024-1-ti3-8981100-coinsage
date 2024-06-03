@@ -5,6 +5,8 @@
       "Workbook": "/api/workbook/",
       "PriceAtTimestamp": "/api/currency/price",
       "QuerySymbol": "/api/currency/query",
-      "CreateWalletBuy": "/api/wallet"
+      "CreateWalletBuy": "/api/wallet",
+      "Login": "/api/login",
+      "SignUp": "/api/singin"
   }
 }
