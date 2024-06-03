@@ -96,7 +96,7 @@ class WalletService:
     def _profit_percentage(self, current_value: Decimal, buy_value: Decimal) -> Decimal:
         if not buy_value:
             return Decimal(0)
-        return Decimal((((current_value - buy_value) / buy_value) * 100) - 100)
+        return Decimal(round(((current_value - buy_value) / buy_value) * 100, 2))
 
     def _calculate_current_value(self, buy_value: Decimal, current_price: Decimal, buy_price: Decimal) -> Decimal:
         if not buy_price:

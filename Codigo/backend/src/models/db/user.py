@@ -6,7 +6,7 @@ from .base import Base
 class UserModel(Base):
     __tablename__ = "users"
 
-    id = Column(BigInteger, primary_key=True)
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
     email = Column(String, unique=True, index=True)
     password = Column(String)
     name = Column(String, nullable=False)
