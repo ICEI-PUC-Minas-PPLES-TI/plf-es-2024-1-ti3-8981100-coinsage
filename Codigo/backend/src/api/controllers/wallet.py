@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 
 from src.api.dependencies.session import get_db
 from src.models import schemas
+from src.models.schemas.user import UserCreate
+from src.security.authentication import get_current_user
 from src.services import WalletService
 
 service = WalletService()
@@ -23,5 +25,9 @@ router = APIRouter(
     },
     response_model=schemas.CompleteWalletTransaction,
 )
-async def read_cryptos(create: schemas.BuyWalletCreate, db: Session = Depends(get_db)):
-    return service.create_buy(create, db)
+async def read_cryptos(
+    new_transaction: schemas.BuyWalletCreate,
+    db: Session = Depends(get_db),
+    current_user: UserCreate = Depends(get_current_user),
+):
+    return service.create_buy(new_transaction, current_user, db)

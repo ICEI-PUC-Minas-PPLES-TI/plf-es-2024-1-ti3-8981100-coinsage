@@ -14,3 +14,4 @@ class WalletTransaction(Base):
     date = Column(DateTime, nullable=False)  # type: ignore
     price_on_purchase = Column(NUMERIC(precision=15, scale=8), nullable=False)  # type: ignore
     uuid_currency = Column(UUID(as_uuid=True), ForeignKey("currency_base_info.uuid"))
+    user_id = Column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)  # type: ignore

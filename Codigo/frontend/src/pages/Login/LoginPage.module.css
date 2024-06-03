@@ -1,0 +1,27 @@
+.root {
+    height: 100vh;
+    background-color: #FF6600;
+}
+
+.image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    padding: 16px;
+}
+
+.loginFormContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 2rem;
+}
+
+.tagline {
+    margin-top: 16px;
+}
