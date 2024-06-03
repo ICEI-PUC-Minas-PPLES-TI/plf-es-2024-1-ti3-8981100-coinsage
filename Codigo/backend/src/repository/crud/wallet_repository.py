@@ -21,3 +21,11 @@ def create_buy(
     db.commit()
     db.refresh(db_transaction)
     return db_transaction
+
+
+def get_by_uuid(db: Session, transaction_uuid: Uuid, user_id: BigInteger) -> WalletTransaction:
+    return (
+        db.query(WalletTransaction)
+        .filter(WalletTransaction.uuid == transaction_uuid, WalletTransaction.user_id == user_id)
+        .first()
+    )

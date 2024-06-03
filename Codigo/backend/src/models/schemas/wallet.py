@@ -6,6 +6,7 @@ from uuid import UUID
 from pydantic import Field
 
 from src.models.schemas.base import BaseSchemaModel
+from src.models.schemas.currency_info import SimpleCrypto
 
 
 class BuyWalletCreate(BaseSchemaModel):
@@ -22,6 +23,22 @@ class BuyWalletCreate(BaseSchemaModel):
     @property
     def _date(self):
         return datetime.strptime(self.date, "%d-%m-%Y %H:%M")
+
+
+class ProfitCompare(BaseSchemaModel):
+    buy_date: datetime
+    buy_price: Decimal
+    compare_date: datetime
+    current_price: Decimal
+    buy_value: Decimal
+    current_value: Decimal
+    profit: Decimal
+
+
+class ResponseProfitCompare(BaseSchemaModel):
+    transaction_uuid: UUID
+    crypto: SimpleCrypto
+    profit: ProfitCompare
 
 
 class CompleteWalletTransaction(BuyWalletCreate):
