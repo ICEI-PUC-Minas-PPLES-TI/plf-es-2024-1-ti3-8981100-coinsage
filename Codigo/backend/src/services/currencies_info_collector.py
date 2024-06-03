@@ -55,6 +55,7 @@ class CurrenciesLogoCollector:
                     symbol.logo = coin["logo"]
                     symbol.name = coin["name"]
                     symbol.description = coin["description"]
+                    symbol.active = True
                     self.session.commit()
                     continue
 
@@ -74,6 +75,8 @@ class CurrenciesLogoCollector:
 
             except Exception as e:
                 logger.error(f"Error on [{symbol}]:\n{e}")
+
+        self.repository.clear_inactive(self.session, self.cmc_symbols)
 
         logger.info(f"Parsing symbols took {(time.time() - start_time)/1000}ms")
 

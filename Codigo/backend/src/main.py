@@ -2,6 +2,9 @@ import os
 import threading
 import time
 
+import pytz
+from datetime import datetime
+
 import fastapi
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
@@ -31,11 +34,21 @@ def initialize_backend_application() -> fastapi.FastAPI:
 
 backend_app: fastapi.FastAPI = initialize_backend_application()
 
+def set_timezone():
+    if os.name != 'nt':  # Se não for Windows
+        os.environ["TZ"] = "America/Sao_Paulo"
+        time.tzset()
+    else:
+        # Defina o fuso horário usando pytz
+        sao_paulo_tz = pytz.timezone("America/Sao_Paulo")
+        sao_paulo_now = datetime.now(sao_paulo_tz)
+        print("Current time in São Paulo:", sao_paulo_now)
 
 @backend_app.on_event("startup")
 async def schedules() -> None:
-    os.environ["TZ"] = "America/Sao_Paulo"
-    time.tzset()
+    # os.environ["TZ"] = "America/Sao_Paulo"
+    # time.tzset()
+    set_timezone()
 
     with SessionLocal() as db:
         scheduler_thread = threading.Thread(target=start_schedules, args=(db,))
