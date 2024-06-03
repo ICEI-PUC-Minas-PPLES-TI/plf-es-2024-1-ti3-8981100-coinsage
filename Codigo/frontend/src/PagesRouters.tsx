@@ -1,16 +1,14 @@
-import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Analise from "./pages/Analise/Analise";
 import NotFoundPage from "./pages/NotFoundPage";
 import Carteira from "./pages/Carteira";
 import EditarCarteira from "./pages/Carteira/Editar";
 import Login from "./pages/Login";
 import ProtectedRoute from "./ProtectedRoute";
-import { useEffect } from "react";
 import useAuth from "./hooks/useAuth";
 
 const PagesRouters: React.FC = () => {
     const isAuthenticated = useAuth();
-    const navigate = useNavigate();
 
     return (
         <Routes>

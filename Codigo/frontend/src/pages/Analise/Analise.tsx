@@ -33,14 +33,14 @@ const Analise: React.FC = () => {
             setCount(data.last_update.data.total);
             setLastUpdate(data.last_update.time);
           } else {
-            console.log("ERROR USUARIO NAO CADASTRADO");
+            // console.log("ERROR USUARIO NAO CADASTRADO");
           }
         } else {
-          console.log("ERROR AO OBTER");
+          // console.log("ERROR AO OBTER");
         }
       })
       .catch(() => {
-        console.log("ULTIMO ERROR AO OBTER");
+        // console.log("ULTIMO ERROR AO OBTER");
       })
       .finally(() => {
         setInitialLoading(false);

@@ -1,16 +1,37 @@
 import styles from './NewTransactionForm.module.css'
 
-import { Autocomplete, Box, Button, FormLabel, TextField, Tooltip, Select, MenuItem, Slide, SlideProps, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, AlertTitle, Alert } from '@mui/material'
-import { RefreshOutlined, CheckOutlined } from '@mui/icons-material';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import {
+    Autocomplete,
+    Box,
+    Button,
+    FormLabel,
+    TextField,
+    Tooltip,
+    Select,
+    MenuItem,
+    Slide,
+    SlideProps,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    AlertTitle,
+    Alert,
+    IconButton,
+    Typography,
+    Collapse
+} from '@mui/material'
+import { RefreshOutlined, CheckOutlined, CloseOutlined } from '@mui/icons-material';
 import InputAdornment from '@mui/material/InputAdornment';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 import { forwardRef, Ref, useEffect, useState } from 'react';
 import api from '../../../service/api';
 import { Endpoints } from "../../../constants/apiConfig.json";
 import LogoSymbol from '../../Tabela/Logo/LogoSymbol';
 import { JSX } from 'react/jsx-runtime';
 import { useNavigate } from 'react-router-dom';
+import { StaticDateTimePicker } from '@mui/x-date-pickers';
+import Snackbar from '@mui/material/Snackbar';
+import React from 'react';
 
 interface SymbolInfo {
     label: string
@@ -37,6 +58,8 @@ const NewTransactionForm: React.FC = () => {
     const [symbolsList, setSymbolsList] = useState<SymbolInfo[] | []>([])
     const [creating, setCreating] = useState<boolean>(false)
     const [openSuccess, setOpenSuccess] = useState<boolean>(false)
+    const [openFeedback, setOpenFeedback] = useState<boolean>(false)
+    const [error, setError] = useState<string | null>(null)
 
     const isValidForm = !cryptoSelected || !priceAtTimestamp || !userInputPrice || isNaN(parseFloat(userInputPrice)) || !buyedValue || isNaN(parseFloat(buyedValue)) || parseFloat(buyedValue) < 0 || parseFloat(userInputPrice) < 0
 
@@ -104,12 +127,17 @@ const NewTransactionForm: React.FC = () => {
                 quantity: buyedSelectorType === 'quantity' && buyedValue ? parseFloat(buyedValue) : null,
                 amount: buyedSelectorType === 'price' && buyedValue ? parseFloat(buyedValue) : null,
                 price_on_purchase: userInputPrice ? parseFloat(userInputPrice) : null
-            })
-            .catch(error => {
-                alert('Erro ao criar transação')
+            }, {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token') || ''
+                }
             })
             .then(response => {
                 setOpenSuccess(true)
+            })
+            .catch(error => {
+                setOpenFeedback(true)
+                setError(error.response.data.detail || error.response.statusText)
             })
             .finally(() => {
                 setCreating(false)
@@ -191,11 +219,10 @@ const NewTransactionForm: React.FC = () => {
                     {cryptoSelected &&
                         <div className={styles.formItemContainer}>
                             <FormLabel className={styles.inputLabel}>Momento de compra</FormLabel>
-                            <DateTimePicker
+                            <StaticDateTimePicker
                                 loading={loadingPriceAtTimestamp}
                                 disabled={!cryptoSelected}
                                 disableFuture
-                                format='DD/MM/YYYY HH:MM'
                                 onAccept={handleBuyDateUpdate}
                             />
                         </div>
@@ -278,6 +305,34 @@ const NewTransactionForm: React.FC = () => {
                     Submit
                 </Button>
             </form>
+            <Snackbar
+                open={openFeedback}
+                autoHideDuration={5000}
+                onClose={() => setOpenFeedback(false)}
+                message={error}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Collapse in={openFeedback}>
+                    <Alert
+                        action={
+                            <IconButton
+                                aria-label="close"
+                                color="inherit"
+                                size="small"
+                                onClick={() => {
+                                    setOpenFeedback(false);
+                                }}
+                            >
+                                <CloseOutlined fontSize="inherit" />
+                            </IconButton>
+                        }
+                        sx={{ mb: 2 }}
+                        severity="error"
+                    >
+                        {error}
+                    </Alert>
+                </Collapse>
+            </Snackbar>
         </>
     )
 }
