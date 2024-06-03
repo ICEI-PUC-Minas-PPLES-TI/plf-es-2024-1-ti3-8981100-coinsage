@@ -22,5 +22,5 @@ async def current_user(user: UserResponse = Depends(get_current_user)):
 
 
 @router.post("/singin", response_model=UserResponse)
-def sign_up(obj_in: UserResponse, db: Session = Depends(get_db)) -> UserResponse:
+def sign_up(obj_in: UserCreate, db: Session = Depends(get_db)) -> UserResponse:
     return UserService().create(db=db, user=obj_in)
