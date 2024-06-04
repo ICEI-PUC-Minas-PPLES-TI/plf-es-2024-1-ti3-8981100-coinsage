@@ -1,8 +1,8 @@
 import datetime
 import uuid
 
-from sqlalchemy import Column, DateTime, Integer, String, Text, UUID
-from sqlalchemy.orm import validates, relationship
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text, UUID
+from sqlalchemy.orm import relationship, validates
 
 from .base import Base
 
@@ -21,6 +21,7 @@ class CurrencyBaseInfoModel(Base):
     _urls = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.now())
     last_updated = Column(DateTime, default=datetime.datetime.now())
+    active = Column(Boolean, default=True)
     first_stage_analysis = relationship("FirstStageAnalysisModel", back_populates="currency")
 
     @property

@@ -9,3 +9,4 @@
 - [Recommended vscode extensions](./recommended_ext.md)
 - [How to run the database on local machine](./running_local_db.md)
 - [How to run database migrations](./running_migrations.md)
+- [Example .env file](./jwt_env.md)

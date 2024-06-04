@@ -1,2 +1,2 @@
 from .timestamp_price import TimestampPrice
-from .wallet import BuyWalletCreate, CompleteWalletTransaction
+from .wallet import BuyWalletCreate, CompleteWalletTransaction, ResponseProfitCompare

@@ -126,3 +126,4 @@ cov.html
 venv/
 venv.bak/
 node_modules/
+postgres_data/
