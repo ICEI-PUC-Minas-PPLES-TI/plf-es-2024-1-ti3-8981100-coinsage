@@ -24,6 +24,7 @@ class FirstStageAnalysisResponse(BaseSchemaModel):
     ema8_less_close: bool | None
     ema_aligned: bool | None
     market_cap: float | None
+    ranking: int | None
 
 
 class VolumeAnalysis(BaseSchemaModel):
