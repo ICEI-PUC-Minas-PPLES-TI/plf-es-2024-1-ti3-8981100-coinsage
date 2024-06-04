@@ -13,30 +13,35 @@ def add_variation_analysis(
     db: Session, variation_analysis_data: List[VolumeAnalysis], analysis_indentifier: Uuid
 ) -> None:
     try:
+        second_stage_models: list[SecondStageAnalysisModel] = []
         for data in variation_analysis_data:
             currency_info = db.execute(
                 select(CurrencyBaseInfoModel).where(CurrencyBaseInfoModel.symbol == data["symbol"])
             ).scalar()
 
             if currency_info:
-                second_stage = db.execute(
-                    select(SecondStageAnalysisModel)
-                    .where(SecondStageAnalysisModel.uuid_analysis == analysis_indentifier)
-                    .where(SecondStageAnalysisModel.uuid_currency == currency_info.uuid)
-                ).scalar()
-
-                second_stage.year_variation_per = data["year_variation_per"]
-                second_stage.semester_variation_per = data["semester_variation_per"]
-                second_stage.quarter_variation_per = data["quarter_variation_per"]
-                second_stage.month_variation_perdata["month_variation_per"]
-                second_stage.week_variation_per = data["week_variation_per"]
-                second_stage.variation_greater_bitcoin = data["variation_greater_bitcoin"]
-
-                db.commit()
+                current_analysis = SecondStageAnalysisModel(
+                    uuid_analysis=analysis_indentifier,
+                    uuid_currency=currency_info.uuid,
+                    year_variation_per=data["year_variation_per"],
+                    semester_variation_per=data["semester_variation_per"],
+                    quarter_variation_per=data["quarter_variation_per"],
+                    month_variation_per=data["month_variation_per"],
+                    week_variation_per=data["week_variation_per"],
+                    variation_greater_bitcoin=data["variation_greater_bitcoin"],
+                )
+                second_stage_models.append(current_analysis)
             else:
                 logger.info(f"Moeda com símbolo {data['symbol']} não encontrada.")
+
+        save_all(db, second_stage_models)
+
     except Exception as e:
-        db.rollback()
         logger.info(f"Erro ao adicionar análises: {e}")
     finally:
         db.close()
+
+
+def save_all(db: Session, second_stage_analysis: list[SecondStageAnalysisModel]):
+    db.add_all(second_stage_analysis)
+    db.commit()
