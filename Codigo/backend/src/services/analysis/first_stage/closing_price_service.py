@@ -38,7 +38,6 @@ class PriceService:
 
     def _collect_binance_closing_prices(self, interval="1d", limit=7):
         symbols_str = [symbol.symbol for symbol in self.symbols_repository.get_cryptos(self.session)]
-        # symbols_str = ['BTC']
         return self.binance_closing_price_colletor.collect(symbols=symbols_str, interval=interval, limit=limit)
 
     @show_runtime
@@ -148,7 +147,7 @@ class PriceService:
                 ema8_less_close=bool(analyse.ema8_less_close),
                 ema_aligned=bool(analyse.ema_aligned),
                 market_cap=float(analyse.market_cap) if analyse.market_cap else None,
-                ranking=int(analyse.ranking) if analyse.ranking else None
+                ranking=int(analyse.ranking) if analyse.ranking else None,
             )
 
             responses.append(response)

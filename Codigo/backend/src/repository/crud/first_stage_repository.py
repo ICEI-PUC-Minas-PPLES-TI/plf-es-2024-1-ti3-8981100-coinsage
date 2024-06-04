@@ -161,15 +161,6 @@ def add_volume_analysis(db: Session, volume_analysis_data: List[VolumeAnalysis],
                     .where(FirstStageAnalysisModel.uuid_currency == currency_info.uuid)
                 ).scalar()
 
-                new_analysis = FirstStageAnalysisModel(
-                    uuid_analysis=analysis_indentifier,
-                    uuid_currency=currency_info.uuid,
-                    volume_before_increase=data["volume_before_increase"],
-                    increase_volume_day=data["increase_volume_day"],
-                    expressive_volume_increase=data["expressive_volume_increase"],
-                    increase_volume=data["increase_volume"],
-                    today_volume=data["today_volume"],
-                )
                 first_stage.volume_before_increase = data["volume_before_increase"]
                 first_stage.increase_volume_day = data["increase_volume_day"]
                 first_stage.expressive_volume_increase = data["expressive_volume_increase"]
@@ -177,10 +168,8 @@ def add_volume_analysis(db: Session, volume_analysis_data: List[VolumeAnalysis],
                 first_stage.today_volume = data["today_volume"]
 
                 db.commit()
-                # db.add(new_analysis)
             else:
                 logger.info(f"Moeda com símbolo {data['symbol']} não encontrada.")
-        # db.commit()
     except Exception as e:
         db.rollback()
         logger.info(f"Erro ao adicionar análises: {e}")

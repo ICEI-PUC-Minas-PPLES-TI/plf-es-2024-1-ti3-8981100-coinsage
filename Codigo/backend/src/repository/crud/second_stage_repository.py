@@ -13,13 +13,14 @@ def add_variation_analysis(
     db: Session, variation_analysis_data: List[VolumeAnalysis], analysis_indentifier: Uuid
 ) -> None:
     try:
+        second_stage_models: list[SecondStageAnalysisModel] = []
         for data in variation_analysis_data:
             currency_info = db.execute(
                 select(CurrencyBaseInfoModel).where(CurrencyBaseInfoModel.symbol == data["symbol"])
             ).scalar()
 
             if currency_info:
-                new_analysis = SecondStageAnalysisModel(
+                current_analysis = SecondStageAnalysisModel(
                     uuid_analysis=analysis_indentifier,
                     uuid_currency=currency_info.uuid,
                     year_variation_per=data["year_variation_per"],
@@ -29,14 +30,18 @@ def add_variation_analysis(
                     week_variation_per=data["week_variation_per"],
                     variation_greater_bitcoin=data["variation_greater_bitcoin"],
                 )
-
-                db.commit()
-                db.add(new_analysis)
+                second_stage_models.append(current_analysis)
             else:
                 logger.info(f"Moeda com símbolo {data['symbol']} não encontrada.")
-        db.commit()
+
+        save_all(db, second_stage_models)
+
     except Exception as e:
-        db.rollback()
         logger.info(f"Erro ao adicionar análises: {e}")
     finally:
         db.close()
+
+
+def save_all(db: Session, second_stage_analysis: list[SecondStageAnalysisModel]):
+    db.add_all(second_stage_analysis)
+    db.commit()
