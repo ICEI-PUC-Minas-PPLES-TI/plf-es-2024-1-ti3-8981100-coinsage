@@ -1,5 +1,6 @@
 import concurrent.futures
 import logging
+import time
 from datetime import datetime, timedelta
 from decimal import Decimal
 
@@ -42,6 +43,7 @@ class VariationPer:
         symbol_data = {"symbol": symbol.base_asset}
         for date_info in dates_to_collect:
             date_key, days_back = list(date_info.items())[0]
+            time.sleep(0.1)
             price = self.binance_price_at_timestamp.get_by_symbol(symbol.base_asset, days_back)
             symbol_data[date_key] = price
 
