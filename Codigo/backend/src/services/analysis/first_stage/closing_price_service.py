@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
 from binance.spot import Spot
@@ -126,8 +126,8 @@ class PriceService:
         return prices_responses
 
     @show_runtime
-    def get_all_by_analysis_uuid(self, uuid: UUID, limit: int, offset: int):
-        analysis, paginated = self.repository.get_paginated_by_uuid(self.session, uuid, limit, offset)  # type: ignore
+    def get_all_by_analysis_uuid(self, uuid: UUID, limit: int, offset: int, sort: List[str]):
+        analysis, paginated = self.repository.get_paginated_by_uuid(self.session, uuid, limit, offset, sort)  # type: ignore
         responses = []
 
         for analyse in analysis:
@@ -148,6 +148,7 @@ class PriceService:
                 ema_aligned=bool(analyse.ema_aligned),
                 market_cap=float(analyse.market_cap) if analyse.market_cap else None,
                 ranking=int(analyse.ranking) if analyse.ranking else None,
+                current_price=float(analyse.current_price) if analyse.current_price else None,
             )
 
             responses.append(response)
@@ -169,10 +170,11 @@ class PriceService:
             return SectorRead(
                 uuid=model.uuid,  # type: ignore
                 title=model.title,  # type: ignore
+                coins_quantity=model.coins_quantity,  # type: ignore
             )
         except Exception as e:
             # logger.error(f"Error on [{symbol_uuid}]:\n{e}")
-            return SectorRead(uuid=UUID("00000000-0000-0000-0000-000000000000"), title="Unknown")
+            return SectorRead(uuid=UUID("00000000-0000-0000-0000-000000000000"), title="Unknown", coins_quantity=0)
 
     def get_price_by_symbol(self, symbol_str: str, analysis_uuid) -> Optional[FirstStageAnalysisModel]:
         symbol = self.symbols_repository.get_currency_info_by_symbol(self.session, symbol_str)

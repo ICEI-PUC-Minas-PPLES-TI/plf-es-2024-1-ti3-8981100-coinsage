@@ -1,6 +1,8 @@
 from datetime import datetime
 from uuid import UUID
 
+from sqlalchemy import Enum
+
 from src.models.schemas.base import BaseSchemaModel
 from src.models.schemas.sector import SectorRead
 
@@ -25,6 +27,7 @@ class FirstStageAnalysisResponse(BaseSchemaModel):
     ema_aligned: bool | None
     market_cap: float | None
     ranking: int | None
+    current_price: float | None
 
 
 class VolumeAnalysis(BaseSchemaModel):

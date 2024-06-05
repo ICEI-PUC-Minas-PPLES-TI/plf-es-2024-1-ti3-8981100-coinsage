@@ -111,13 +111,13 @@ class AnalysisCollector:
         return datetime.datetime.now() + datetime.timedelta(days=1)
 
     @show_runtime
-    def get_last_first_stage_analysis(self, limit: int, offset: int):
+    def get_last_first_stage_analysis(self, limit: int, offset: int, sort: List[str]):
         last_analysis: Analysis | None = self.repository.get_last(self.session)
         schedule: AnalysisInfoScheduleModel | None = self.schedule_repository.get_last_update(self.session)
 
         if last_analysis:
             all_first_stage, paginated = self.prices_service.get_all_by_analysis_uuid(
-                last_analysis.uuid, limit, offset
+                last_analysis.uuid, limit, offset, sort
             )
 
             try:
