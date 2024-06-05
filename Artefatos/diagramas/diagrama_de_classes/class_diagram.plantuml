@@ -1,5 +1,5 @@
 @startuml Diagrama de Classes
-title Diagrama de Classes de Domínio | Coinsage - Sprint 4
+title Diagrama de Classes de Domínio | Coinsage - Sprint 5
 
 class Cryptocurrency {
     + uuid: UUID
@@ -86,6 +86,13 @@ class CryptoRanking {
     - ranking_value: Numeric
 }
 
+class User{
+    - id: Integer
+    - name: String
+    - email: String
+    - password: String
+}
+
 ' Relações entre as classes
 Cryptocurrency "1" -- "*" CurrencyInfoSchedule: schedules
 Cryptocurrency "1" -- "0..*" Sector
@@ -94,5 +101,6 @@ Analysis "1" -- "*" AnalysisInfoSchedule : schedules
 Analysis "1" -- "*" FirstStageAnalysis : includes
 Cryptocurrency "1" -- "*" CryptoRanking : "has ranking"
 WalletTransaction "1" -- "1" Cryptocurrency : "has"
+User "1" -- "*" WalletTransaction : "has"
 
 @enduml
