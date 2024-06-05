@@ -48,12 +48,7 @@ async def generate_workbook(db: Session = Depends(get_db)):
         "VOLUME ATUAL",
         "VOLUME ANTES DO AUMENTO",
         "VOLUME > 200%",
-        "SINAL DE COMPRA",
-        "1 ANO",
-        "180 DIAS",
-        "90 DIAS",
-        "30 DIAS",
-        "7 DIAS",
+        "SINAL DE COMPRA"
     ]
 
     workbook_service = WorkbookService(db)
