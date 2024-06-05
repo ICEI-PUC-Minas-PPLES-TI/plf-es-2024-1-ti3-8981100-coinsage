@@ -30,7 +30,7 @@ class FirstStageAnalysisResponse(BaseSchemaModel):
     current_price: float | None
     increase_volume_day: datetime | None
     increase_volume: float | None
-    today_volume: float
+    today_volume: float | None
     volume_before_increase: float | None
 
 
