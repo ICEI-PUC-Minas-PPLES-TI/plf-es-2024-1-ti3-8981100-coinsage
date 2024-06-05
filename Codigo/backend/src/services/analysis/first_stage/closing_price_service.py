@@ -149,6 +149,12 @@ class PriceService:
                 market_cap=float(analyse.market_cap) if analyse.market_cap else None,
                 ranking=int(analyse.ranking) if analyse.ranking else None,
                 current_price=float(analyse.current_price) if analyse.current_price else None,
+                increase_volume_day=analyse.increase_volume_day if analyse.increase_volume_day else None,  # type: ignore
+                increase_volume=float(analyse.increase_volume) if analyse.increase_volume else None,
+                today_volume=float(analyse.today_volume) if analyse.today_volume else None,
+                volume_before_increase=(
+                    float(analyse.volume_before_increase) if analyse.volume_before_increase else None
+                ),
             )
 
             responses.append(response)

@@ -2,7 +2,7 @@ from typing import Any, List
 
 from fastapi.encoders import jsonable_encoder
 from loguru import logger
-from sqlalchemy import func, select, union, Uuid
+from sqlalchemy import func, nulls_last, select, union, Uuid
 from sqlalchemy.orm import Session
 
 from src.models.db.currency_base_info import CurrencyBaseInfoModel
@@ -44,22 +44,38 @@ def get_paginated_by_uuid(
     )
 
     if len(sort) == 0:
-        items_query_regular = items_query_regular.order_by(FirstStageAnalysisModel.week_increase_percentage.desc())
+        items_query_regular = items_query_regular.order_by(
+            FirstStageAnalysisModel.week_increase_percentage.desc().nulls_last()
+        )
     else:
         column, direction = sort[0].split(",")
         column_attr = None
-        try:
-            column_attr = getattr(FirstStageAnalysisModel, column)
-        except AttributeError:
-            try:
-                column_attr = getattr(CurrencyBaseInfoModel, column)
-            except AttributeError:
-                logger.error(f"Column {column} not found in FirstStageAnalysisModel or CurrencyBaseInfoModel")
-        if column_attr:
+        if column == "volume_relation":
             if direction == "asc":
-                items_query_regular = items_query_regular.order_by(column_attr.asc())
+                items_query_regular = items_query_regular.order_by(
+                    (FirstStageAnalysisModel.increase_volume / FirstStageAnalysisModel.volume_before_increase)
+                    .asc()
+                    .nulls_last()
+                )
             else:
-                items_query_regular = items_query_regular.order_by(column_attr.desc())
+                items_query_regular = items_query_regular.order_by(
+                    (FirstStageAnalysisModel.increase_volume / FirstStageAnalysisModel.volume_before_increase)
+                    .desc()
+                    .nulls_last()
+                )
+        else:
+            try:
+                column_attr = getattr(FirstStageAnalysisModel, column)
+            except AttributeError:
+                try:
+                    column_attr = getattr(CurrencyBaseInfoModel, column)
+                except AttributeError:
+                    logger.error(f"Column {column} not found in FirstStageAnalysisModel or CurrencyBaseInfoModel")
+            if column_attr:
+                if direction == "asc":
+                    items_query_regular = items_query_regular.order_by(column_attr.asc().nulls_last())
+                else:
+                    items_query_regular = items_query_regular.order_by(column_attr.desc().nulls_last())
 
     items_query_regular = items_query_regular.limit(limit - 1 if specific_item is not None else limit).offset(offset)
 

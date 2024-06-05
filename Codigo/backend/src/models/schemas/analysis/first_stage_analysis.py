@@ -28,6 +28,10 @@ class FirstStageAnalysisResponse(BaseSchemaModel):
     market_cap: float | None
     ranking: int | None
     current_price: float | None
+    increase_volume_day: datetime | None
+    increase_volume: float | None
+    today_volume: float
+    volume_before_increase: float | None
 
 
 class VolumeAnalysis(BaseSchemaModel):
