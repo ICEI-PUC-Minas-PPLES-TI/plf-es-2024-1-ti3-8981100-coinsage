@@ -2,11 +2,12 @@ from typing import Any, List
 
 from fastapi.encoders import jsonable_encoder
 from loguru import logger
-from sqlalchemy import func, select, union, Uuid
+from sqlalchemy import func, nulls_last, select, union, Uuid
 from sqlalchemy.orm import Session
 
 from src.models.db.currency_base_info import CurrencyBaseInfoModel
 from src.models.db.first_stage_analysis import FirstStageAnalysisModel
+from src.models.db.setor import Setor
 from src.models.schemas.analysis.first_stage_analysis import VolumeAnalysis
 from src.models.schemas.generic_pagination import PaginatedResponse
 from src.utilities.runtime import show_runtime
@@ -22,7 +23,7 @@ def get_by_analysis_uuid(db: Session, uuid: str) -> list[FirstStageAnalysisModel
 
 
 def get_paginated_by_uuid(
-    db: Session, uuid: Uuid, limit: int, offset: int
+    db: Session, uuid: Uuid, limit: int, offset: int, sort: List[str]
 ) -> tuple[list[FirstStageAnalysisModel], PaginatedResponse]:
     # if offset == 0:
     query_btc = (
@@ -37,32 +38,53 @@ def get_paginated_by_uuid(
 
     items_query_regular = (
         select(FirstStageAnalysisModel)
-        .order_by(FirstStageAnalysisModel.week_increase_percentage.desc())
+        .join(CurrencyBaseInfoModel, FirstStageAnalysisModel.uuid_currency == CurrencyBaseInfoModel.uuid)
         .where(FirstStageAnalysisModel.uuid_analysis == uuid)
         .where(FirstStageAnalysisModel.uuid_currency != specific_item.uuid_currency if specific_item is not None else None)  # type: ignore
-        .limit(limit - 1 if specific_item is not None else limit)  # Remaining limit after the specific item
-        .offset(offset)
     )
+
+    if len(sort) == 0:
+        items_query_regular = items_query_regular.order_by(
+            FirstStageAnalysisModel.week_increase_percentage.desc().nulls_last()
+        )
+    else:
+        column, direction = sort[0].split(",")
+        column_attr = None
+        if column == "volume_relation":
+            if direction == "asc":
+                items_query_regular = items_query_regular.order_by(
+                    (FirstStageAnalysisModel.increase_volume / FirstStageAnalysisModel.volume_before_increase)
+                    .asc()
+                    .nulls_last()
+                )
+            else:
+                items_query_regular = items_query_regular.order_by(
+                    (FirstStageAnalysisModel.increase_volume / FirstStageAnalysisModel.volume_before_increase)
+                    .desc()
+                    .nulls_last()
+                )
+        else:
+            try:
+                column_attr = getattr(FirstStageAnalysisModel, column)
+            except AttributeError:
+                try:
+                    column_attr = getattr(CurrencyBaseInfoModel, column)
+                except AttributeError:
+                    logger.error(f"Column {column} not found in FirstStageAnalysisModel or CurrencyBaseInfoModel")
+            if column_attr:
+                if direction == "asc":
+                    items_query_regular = items_query_regular.order_by(column_attr.asc().nulls_last())
+                else:
+                    items_query_regular = items_query_regular.order_by(column_attr.desc().nulls_last())
+
+    items_query_regular = items_query_regular.limit(limit - 1 if specific_item is not None else limit).offset(offset)
 
     queried = db.execute(items_query_regular).scalars().all()
 
-    items = list(set([specific_item] + queried)) if specific_item is not None else queried  # type: ignore
-    items = sorted(items, key=lambda x: (x.week_increase_percentage is None, x.week_increase_percentage), reverse=True)  # type: ignore
-    items = [items.pop(items.index(specific_item))] + items if specific_item is not None else items  # type: ignore
-    # else:
-    #     items_query = (
-    #         select(FirstStageAnalysisModel)
-    #         .order_by(FirstStageAnalysisModel.week_increase_percentage.desc())
-    #         .where(FirstStageAnalysisModel.uuid_analysis == uuid)
-    #         .limit(limit)
-    #         .offset(offset)
-    #     )
-
-    #     items = db.execute(items_query).scalars().all()
     count = db.scalar(select(func.count()).where(FirstStageAnalysisModel.uuid_analysis == uuid))
     remaining = max(count - (limit + offset), 0)  # type: ignore
 
-    return items, PaginatedResponse(total=count, remaining=remaining, page=limit if count > limit else count)  # type: ignore
+    return list([specific_item] + queried), PaginatedResponse(total=count, remaining=remaining, page=limit if count > limit else count)  # type: ignore
 
 
 def get_by_symbol(db: Session, symbol: CurrencyBaseInfoModel, analysis_uuid: Uuid) -> FirstStageAnalysisModel | None:
