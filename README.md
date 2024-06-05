@@ -1,4 +1,9 @@
+Here's the updated README with the execution guide for both the deployed API and website:
+
+---
+
 [![CI - Backend Code Quality](https://github.com/ICEI-PUC-Minas-PPLES-TI/plf-es-2024-1-ti3-8981100-coinsage/actions/workflows/ci-backend.yaml/badge.svg)](https://github.com/ICEI-PUC-Minas-PPLES-TI/plf-es-2024-1-ti3-8981100-coinsage/actions/workflows/ci-backend.yaml)
+
 # CoinSage
 
 O CoinSage é um software projetado para automatizar e simplificar a análise de criptomoedas. Utilizando dados da [Binance](https://binance.com/), o CoinSage aplica critérios técnicos para identificar as moedas com maior potencial de valorização, fornecendo relatórios detalhados que orientam decisões de compra e venda.
@@ -19,7 +24,11 @@ Além disso, o CoinSage oferece uma interface que permite aos usuários acompanh
 * Lucas Henrique Pereira
 * Pedro Pongelupe Lopes
 
-## Instruções de utilização (Execução Local)
+## Instruções de utilização
+
+<details>
+<summary>Instruções de utilização (Execução Local)</summary>
+</br>
 
 **Pré-requisitos**
 
@@ -68,11 +77,11 @@ git clone https://github.com/ICEI-PUC-Minas-PPLES-TI/plf-es-2024-1-ti3-8981100-c
          ```bash
          Get-Content .env | ForEach-Object { $_ -replace "`n", "`0" } | ForEach-Object { $_ -replace "`r", "" } | ForEach-Object { $env:$_ }
          ```
-        2. No Linux/Mac:
-             ```bash
-                export $(cat .env | xargs)
-            ```
-        3. Se você estiver usando um terminal diferente, ajuste o comando conforme necessário.
+      2. No Linux/Mac:
+         ```bash
+         export $(cat .env | xargs)
+         ```
+      3. Se você estiver usando um terminal diferente, ajuste o comando conforme necessário.
 
 3. Execute o seguinte comando para iniciar os serviços usando Docker Compose na pasta [Codigo](./Codigo/):
 
@@ -97,17 +106,20 @@ Acessar a documentação da API em:
    ```
    http://localhost:8000/docs
    ```
+</details>
 
-**Observações Adicionais**
+<details>
+<summary>Instruções de utilização (API e Website Implantados)</summary>
+</br>
 
-- Para parar os contêineres em execução, use `docker-compose down`.
-- Para reconstruir os contêineres com as últimas alterações de código, use `docker-compose up -d --build`.
-- Para fins de desenvolvimento, manter `DEBUG=true` no arquivo `.env` é útil para depurar erros. Defina-o como `false` para implantações de produção.
-- O número de trabalhadores do servidor (`SERVER_WORKERS`) pode ser ajustado com base nos recursos do seu sistema e na carga esperada.
-- Considere proteger sua chave de API armazenando-a em um armazenamento de variável de ambiente seguro em vez de texto simples no arquivo `.env` para implantações de produção.
+**Acessando a Aplicação Implantada**
 
-**Solução de problemas**
+1. Acesse o site CoinSage em seu navegador da web:
+> [FrontEnd](https://coinsage-dev.vercel.app/)
 
-- Se você encontrar erros durante a inicialização, verifique os logs dos contêineres Docker para obter mais detalhes: `docker logs coinsage_database coinsage_api coinsage_frontend`.
-- Certifique-se de que suas credenciais de banco de dados e variáveis de ambiente estejam definidas corretamente no arquivo `.env`.
-- Verifique se você possui uma chave de API CoinMarketCap válida.
+**Usando a API Implantada**
+
+A documentação da API implantada pode ser acessada em:
+>[API](https://coinsage-dev-api.onrender.com/docs)
+
+</details>
