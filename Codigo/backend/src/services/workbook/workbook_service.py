@@ -165,7 +165,6 @@ class WorkbookService:
             "AUMENTO DE VOLUME": lambda item: item.increase_volume if item.increase_volume else "N/A",
             "VOLUME ATUAL": lambda item: item.today_volume if item.today_volume else "N/A",
             "VOLUME ANTES DO AUMENTO": lambda item: item.volume_before_increase if item.volume_before_increase else "N/A",
-            "% VOLUME/ VOLUME DIA ANTERIOR": lambda item: item.volumes_relation if item.volumes_relation else "N/A",
             "VOLUME > 200%": lambda item: "SIM" if item.expressive_volume_increase else "NÃO",
             "SINAL DE COMPRA": lambda item: "SIM" if item.buying_signal else "NÃO",
             "1 ANO": lambda item: item.year_variation_per if item.year_variation_per else "N/A",
@@ -175,6 +174,18 @@ class WorkbookService:
             "7 DIAS": lambda item: item.week_variation_per if item.week_variation_per else "N/A",
         }
 
+    def fill_workbook(self, workbook: Workbook, headers: List[str], analysis_uuid: str) -> Workbook:
+        worksheet = workbook.active
+        data = (
+            self.session.query(FirstStageAnalysisModel)
+            .filter(FirstStageAnalysisModel.uuid_analysis == analysis_uuid)
+            .join(CurrencyBaseInfoModel, FirstStageAnalysisModel.uuid_currency == CurrencyBaseInfoModel.uuid)
+        )
+
+        btc = data.filter(CurrencyBaseInfoModel.symbol == "BTC").first()
+        data = data.filter(CurrencyBaseInfoModel.symbol != "BTC").all()
+        data = [btc] + data
+
         for row_idx, item in enumerate(data, start=2):
             for header in headers:
                 col_idx = headers.index(header) + 1
@@ -183,7 +194,7 @@ class WorkbookService:
                 value = (
                     model_attr(item)
                     if callable(model_attr)
-                    else getattr(item, model_attr, "N/A") if model_attr is not None else "N/A"  # type: ignore
+                    else getattr(item, model_attr, "N/A") if model_attr is not None else "N/A"
                 )
                 worksheet.cell(row=row_idx, column=col_idx, value=value)
         return workbook
