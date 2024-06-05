@@ -170,11 +170,6 @@ class WorkbookService:
             "VOLUME ANTES DO AUMENTO": lambda item: item.volume_before_increase if item.volume_before_increase else "N/A",
             "VOLUME > 200%": lambda item: "SIM" if item.expressive_volume_increase else "NÃO",
             "SINAL DE COMPRA": lambda item: "SIM" if item.buying_signal else "NÃO",
-            "1 ANO": lambda item: item.year_variation_per if item.year_variation_per else "N/A",
-            "180 DIAS": lambda item: item.semester_variation_per if item.semester_variation_per else "N/A",
-            "90 DIAS": lambda item: item.quarter_variation_per if item.quarter_variation_per else "N/A",
-            "30 DIAS": lambda item: item.month_variation_per if item.month_variation_per else "N/A",
-            "7 DIAS": lambda item: item.week_variation_per if item.week_variation_per else "N/A",
         }
 
         for row_idx, item in enumerate(data, start=2):
