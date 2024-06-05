@@ -112,7 +112,7 @@ class WorkbookService:
             for cell in col:
                 if cell.col_idx == start_col and cell.row != 1 and wrap_text:
                     cell.alignment = cell.alignment.copy(wrap_text=wrap_text)
-                # collor fill
+                # color fill
                 redFill = PatternFill(start_color=color_hex, end_color=color_hex, fill_type="solid")
                 cell.fill = redFill
                 # border
@@ -135,8 +135,11 @@ class WorkbookService:
         )
 
         btc = data.filter(CurrencyBaseInfoModel.symbol == "BTC").first()
-        data = data.filter(CurrencyBaseInfoModel.symbol != "BTC").all()
-        data = [btc] + data
+        if btc:
+            data = data.filter(CurrencyBaseInfoModel.symbol != "BTC").all()
+            data = [btc] + data  # btc is added at the beginning of the list
+        else:
+            data = data.all()
 
         header_to_model_attr = {
             "SETOR": lambda item: (
@@ -173,18 +176,6 @@ class WorkbookService:
             "30 DIAS": lambda item: item.month_variation_per if item.month_variation_per else "N/A",
             "7 DIAS": lambda item: item.week_variation_per if item.week_variation_per else "N/A",
         }
-
-    def fill_workbook(self, workbook: Workbook, headers: List[str], analysis_uuid: str) -> Workbook:
-        worksheet = workbook.active
-        data = (
-            self.session.query(FirstStageAnalysisModel)
-            .filter(FirstStageAnalysisModel.uuid_analysis == analysis_uuid)
-            .join(CurrencyBaseInfoModel, FirstStageAnalysisModel.uuid_currency == CurrencyBaseInfoModel.uuid)
-        )
-
-        btc = data.filter(CurrencyBaseInfoModel.symbol == "BTC").first()
-        data = data.filter(CurrencyBaseInfoModel.symbol != "BTC").all()
-        data = [btc] + data
 
         for row_idx, item in enumerate(data, start=2):
             for header in headers:
