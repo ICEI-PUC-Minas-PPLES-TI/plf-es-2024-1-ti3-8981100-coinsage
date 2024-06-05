@@ -46,6 +46,10 @@ const columns: readonly Column[] = [
   { id: "week_increase_percentage", label: "% Valorização semanal" },
   { id: "current_price", label: "Preço(USD)" },
   { id: "ema_aligned", label: "EMAs (d) Alinhados" },
+  { id: "increase_volume_day", label: "Data Valorização Volume (d)"},
+  { id: "increase_volume", label: "Quantidade Volume na Valorização"},
+  { id: "volume_before_increase", label: "Quantidade Volume dia anterior"},
+  { id: "volume_relation", label: "% Dia Valorização / Dia Anterior"},
   {
     id: "ema8",
     // @ts-ignore
@@ -138,8 +142,8 @@ const renderEma8Validation = (item: any, index: number) => {
   )
 }
 
-const renderValorizationPercentage = (value: any, index: number, symbol: string) => {
-  const validator: 'good' | 'bad' | 'normal' = symbol === 'BTC' ? (value >= 10.0 ? 'good' : (value < 0) ? 'bad' : 'normal') : (value >= 10.0 ? 'good' : (value < 0) ? 'bad' : 'normal');
+const renderValorizationPercentage = (value: any, index: number, symbol: string, comparasion_value: number = 10.0) => {
+  const validator: 'good' | 'bad' | 'normal' = symbol === 'BTC' ? (value >= comparasion_value ? 'good' : (value < 0) ? 'bad' : 'normal') : (value >= comparasion_value ? 'good' : (value < 0) ? 'bad' : 'normal');
 
   return <TextColoredCondition value={value !== null && value !== undefined ? value : 'N/A'} condition={validator} key={index} />;
 }
@@ -156,6 +160,10 @@ const dataRowsMapper = (data: any) => {
     ema8: item.ema8 ? renderEma8Validation(item, index) : "N/A",
     currency: item.currency,
     emas: item.emas,
+    increase_volume_day: item.increase_volume_day ? new Date(item.increase_volume_day).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '-',
+    increase_volume: item.increase_volume ? item.increase_volume.toFixed(2) : '-',
+    volume_before_increase: item.volume_before_increase ? item.volume_before_increase.toFixed(2) : '-',
+    volume_relation: renderValorizationPercentage(item.increase_volume && item.volume_before_increase ? (((item.increase_volume / item.volume_before_increase) * 100)).toFixed(2) : null, index, item.currency.symbol, 200.0),
   }));
 
   return newData;
@@ -232,7 +240,7 @@ export default function CustomPaginationActionsTable(
                 align={column.align}
                 style={{ minWidth: column.minWidth }}
               >
-                {['ema8', 'setor'].includes(column.id) ? column.label : (
+                {['ema8', 'setor', 'volume_before_increase', 'increase_volume'].includes(column.id) ? column.label : (
                   <TableSortLabel
                     active={sortConfig.some((sort) => sort.column === column.id)}
                     direction={
@@ -267,6 +275,10 @@ export default function CustomPaginationActionsTable(
                 <TableCell align="left">{row.week_increase_percentage}</TableCell>
                 <TableCell align="left">{row.current_price}</TableCell>
                 <TableCell align="left">{row.ema_aligned}</TableCell>
+                <TableCell align="left">{row.increase_volume_day}</TableCell>
+                <TableCell align="left">{row.increase_volume}</TableCell>
+                <TableCell align="left">{row.volume_before_increase}</TableCell>
+                <TableCell align="left">{row.volume_relation}</TableCell>
                 <TableCell align="left">{row.ema8}</TableCell>
               </TableRow>
             ))
