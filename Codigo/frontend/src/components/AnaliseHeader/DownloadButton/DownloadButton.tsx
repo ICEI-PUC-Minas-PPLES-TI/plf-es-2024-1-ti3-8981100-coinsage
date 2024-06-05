@@ -13,8 +13,7 @@ interface DownloadPartProps {
 const DownloadButton: React.FC<DownloadPartProps> = ({ title }) => {
     const [loading, setLoading] = useState<boolean>(false)
 
-    const handleDownload = async () => {
-        setLoading(true)
+    const handleSheetDownload = async () => {
         try {
             const response = await api.get(Endpoints.Workbook, {
                 responseType: 'blob',
@@ -36,12 +35,53 @@ const DownloadButton: React.FC<DownloadPartProps> = ({ title }) => {
         } catch (error) {
             console.error('Erro ao baixar o arquivo:', error);
         }
+    };
+
+    // TODO: implementar download da carteira no backend
+    const handleWalletDownload = async () => {
+        try {
+            const response = await api.get(Endpoints.SheetWallet, {
+                responseType: 'blob',
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+
+            const date = new Date();
+            const formattedDate = `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear().toString().slice(-2)}`;
+            const filename = `carteira ${formattedDate}.xlsx`;
+
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+            if (link.parentNode) {
+                link.parentNode.removeChild(link);
+            }
+        } catch (error) {
+            console.error('Erro ao baixar o arquivo:', error);
+        }
+    };
+
+    const handleDownload = async () => {
+        setLoading(true)
+        if(title === 'Planilha excel') {
+            handleSheetDownload()
+        }else{
+            handleWalletDownload()
+        }
         setLoading(false)
     };
 
     return (
         <div className={styles.button}>
-            <h2>{title}</h2>
+            <h2 style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                maxWidth: '50%',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
+            }}>{title}</h2>
             <LoadingButton
                 className={styles.downloadButton}
                 loading={loading}

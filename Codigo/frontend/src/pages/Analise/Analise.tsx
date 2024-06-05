@@ -5,7 +5,7 @@ import styles from "./Analise.module.css";
 import { Endpoints } from "../../constants/apiConfig.json";
 import api from "../../service/api";
 import LoadingTableComponent from "../../components/Tabela/LoadingTableComponent/LoadingTableComponent";
-import AnaliseDownloadContainer from "../../components/AnaliseHeader/AnaliseDownloadContainer";
+import DownloadContainer from "../../components/AnaliseHeader/AnaliseDownloadContainer";
 
 const Analise: React.FC = () => {
   const [page, setPage] = useState(0);
@@ -86,7 +86,7 @@ const Analise: React.FC = () => {
       {!initialLoading &&
         <div className={`${styles.analyseHeader} ${styles.completeLogContainer}`}>
           <Title title="Relatório Completo" />
-          <AnaliseDownloadContainer />
+          <DownloadContainer />
         </div>
       }
     </>
