@@ -112,7 +112,7 @@ class WorkbookService:
             for cell in col:
                 if cell.col_idx == start_col and cell.row != 1 and wrap_text:
                     cell.alignment = cell.alignment.copy(wrap_text=wrap_text)
-                # collor fill
+                # color fill
                 redFill = PatternFill(start_color=color_hex, end_color=color_hex, fill_type="solid")
                 cell.fill = redFill
                 # border
@@ -135,8 +135,11 @@ class WorkbookService:
         )
 
         btc = data.filter(CurrencyBaseInfoModel.symbol == "BTC").first()
-        data = data.filter(CurrencyBaseInfoModel.symbol != "BTC").all()
-        data = [btc] + data
+        if btc:
+            data = data.filter(CurrencyBaseInfoModel.symbol != "BTC").all()
+            data = [btc] + data  # btc is added at the beginning of the list
+        else:
+            data = data.all()
 
         header_to_model_attr = {
             "SETOR": lambda item: (
@@ -160,19 +163,13 @@ class WorkbookService:
             "PREÇO SEMANAL FECHAMENTO > EMA (8)": lambda item: "SIM" if item.ema8_less_close else "NÃO",
             "EMA (8) > PREÇO SEMANAL ABERTURA": lambda item: "SIM" if item.ema8_greater_open else "NÃO",
             "MÉDIAS MÓVEIS DIÁRIAS ALINHADAS": lambda item: "SIM" if item.ema_aligned else "NÃO",
-            # "INCREASE VOLUME(d) DATE": "increase_volume_day",
-            # "INCREASE VOLUME(w)": "week_increase_volume",
-            # "INCREASE VOLUME": "increase_volume",
-            # "TODAY VOLUME": "today_volume",
-            # "VOLUME BEFORE INCREASE": "volume_before_increase",
-            # "% VOLUME/VOLUME DAY BEFORE": "volumes_relation",
-            # "VOLUME > 200%": "expressive_volume_increase",
-            # "BUY SIGNAL": "buying_signal",
-            # "1 YEAR": "year_variation_per",
-            # "180 DAYS": "semester_variation_per",
-            # "90 DAYS": "quarter_variation_per",
-            # "30 DAYS": "month_variation_per",
-            # "7 DAYS": "week_variation_per"
+            "DATA AUMENTO DE VOLUME (d)": lambda item: item.increase_volume_day if item.increase_volume_day else "N/A",
+            "AUMENTO DE VOLUME (w)": lambda item: item.increase_volume if item.increase_volume else "N/A",
+            "AUMENTO DE VOLUME": lambda item: item.increase_volume if item.increase_volume else "N/A",
+            "VOLUME ATUAL": lambda item: item.today_volume if item.today_volume else "N/A",
+            "VOLUME ANTES DO AUMENTO": lambda item: item.volume_before_increase if item.volume_before_increase else "N/A",
+            "VOLUME > 200%": lambda item: "SIM" if item.expressive_volume_increase else "NÃO",
+            "SINAL DE COMPRA": lambda item: "SIM" if item.buying_signal else "NÃO",
         }
 
         for row_idx, item in enumerate(data, start=2):
@@ -183,7 +180,7 @@ class WorkbookService:
                 value = (
                     model_attr(item)
                     if callable(model_attr)
-                    else getattr(item, model_attr, "N/A") if model_attr is not None else "N/A"  # type: ignore
+                    else getattr(item, model_attr, "N/A") if model_attr is not None else "N/A"
                 )
                 worksheet.cell(row=row_idx, column=col_idx, value=value)
         return workbook

@@ -30,7 +30,7 @@ class VariationPer:
         dates_to_collect = self.dates_to_collect()
         variation_per_list = []
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=30) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
             future_to_symbol = {
                 executor.submit(self.process_symbol, symbol, dates_to_collect): symbol for symbol in all_symbols
             }

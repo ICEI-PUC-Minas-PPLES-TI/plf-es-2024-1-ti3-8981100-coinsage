@@ -42,20 +42,13 @@ async def generate_workbook(db: Session = Depends(get_db)):
         "PREÇO SEMANAL FECHAMENTO > EMA (8)",
         "EMA (8) > PREÇO SEMANAL ABERTURA",
         "MÉDIAS MÓVEIS DIÁRIAS ALINHADAS",
-        # "INCREASE VOLUME(d) DATE",
-        # "INCREASE VOLUME(w)",
-        # "INCREASE VOLUME",
-        # "TODAY VOLUME",
-        # "VOLUME BEFORE INCREASE",
-        # "% VOLUME/VOLUME DAY BEFORE",
-        # "VOLUME > 200%",
-        # "BUY SIGNAL",
-        # "1 YEAR",
-        # "180 DAYS",
-        # "90 DAYS",
-        # "30 DAYS",
-        # "7 DAYS",
-        # "APPRECIATION IS GREATER THAN BITCOIN"
+        "DATA AUMENTO DE VOLUME (d)",
+        "AUMENTO DE VOLUME (w)",
+        "AUMENTO DE VOLUME",
+        "VOLUME ATUAL",
+        "VOLUME ANTES DO AUMENTO",
+        "VOLUME > 200%",
+        "SINAL DE COMPRA"
     ]
 
     workbook_service = WorkbookService(db)
