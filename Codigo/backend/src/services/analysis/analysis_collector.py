@@ -42,6 +42,25 @@ class AnalysisCollector:
         self.ranking_service = RankingService(session=session)
         self.variation_per_service = VariationPer(session=session)
 
+    def manually_start_analysis(self):
+        analysis = self.repository.get_last(self.session)
+        if analysis is None:
+            self.start_analysis()
+            return {"message": "No analysis found, starting new one"}
+        if analysis.date.date() != datetime.datetime.now().date():
+            self.start_analysis()
+            return {"message": "Analysis is late, starting new one"}
+        if analysis.ended:
+            return {"message": "Analysis already finished"}
+
+        last_schedule = self.schedule_repository.get_last_update(self.session)
+        if last_schedule.last_update_time.date() == datetime.datetime.now().date():
+            self._delete_analysis_related(analysis)
+            self.start_analysis()
+            return {"message": "Analysis not finished, starting new one"}
+
+        return {"message": "Analysis already started"}
+
     def _new_analysis(self) -> Analysis:
         analysis: Analysis = Analysis()
         self.session.add(analysis)

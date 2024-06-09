@@ -39,6 +39,17 @@ class CurrenciesLogoCollector:
             for crypto in founded
         ]
 
+    def manually_collect_symbols(self):
+        currencies = self.repository.get_cryptos(self.session)
+        if len(currencies) == 0:
+            self.collect_symbols_info()
+            return {"message": "No symbols found, starting new one"}
+        if currencies[0].last_updated.date() != datetime.datetime.now().date():
+            self.collect_symbols_info()
+            return {"message": "Symbols are late, starting new one"}
+
+        return {"message": "Symbols already updated"}
+
     def collect_symbols_info(self):
         self.cmc_symbols = CmcSymbolCollector(BinanceSymbolCollector().get_base_assets_as_str()).get_symbols()
         self.cmc_symbols.pop("EUR")
