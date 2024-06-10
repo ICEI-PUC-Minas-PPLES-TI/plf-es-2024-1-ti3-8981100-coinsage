@@ -164,7 +164,6 @@ def update_current_price(
             logger.info(f"Moeda com símbolo {current_price['symbol']} não encontrada.")  # type:ignore
         # update_current_price_encoded.append(jsonable_encoder(first_stage))
         # db.commit()
-        db.close()
 
     return update_current_price_encoded
 
@@ -193,10 +192,7 @@ def add_volume_analysis(db: Session, volume_analysis_data: List[VolumeAnalysis],
             else:
                 logger.info(f"Moeda com símbolo {data['symbol']} não encontrada.")
     except Exception as e:
-        db.rollback()
         logger.info(f"Erro ao adicionar análises: {e}")
-    finally:
-        db.close()
 
 
 def update_ranking(db: Session, symbol: str, new_ranking: int, analysis_uuid: Uuid):
