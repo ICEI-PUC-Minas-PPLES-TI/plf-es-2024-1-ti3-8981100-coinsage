@@ -24,6 +24,18 @@ class SectorsCollector:
     def passed_min_coins(self, sector) -> bool:
         return sector["num_tokens"] >= self.MIN_CRYPOS_COUNT
 
+    def manually_collect_sectors(self, db_session: Session):
+        sectors = self.repository.get_all(db_session)
+
+        if len(sectors) == 0:
+            self.collect(db_session)
+            return {"message": "No sectors found, starting new one"}
+        if sectors[0].last_updated.date() != datetime.now().date():
+            self.collect(db_session)
+            return {"message": "Sectors are late, starting new one"}
+
+        return {"message": "Sectors already updated"}
+
     @show_runtime
     def collect(self, db_session: Session):
         logger.info(f"Starting sectors collection at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")

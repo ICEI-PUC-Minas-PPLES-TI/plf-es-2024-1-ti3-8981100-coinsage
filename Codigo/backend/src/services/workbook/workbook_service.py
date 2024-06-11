@@ -112,7 +112,7 @@ class WorkbookService:
             for cell in col:
                 if cell.col_idx == start_col and cell.row != 1 and wrap_text:
                     cell.alignment = cell.alignment.copy(wrap_text=wrap_text)
-                # collor fill
+                # color fill
                 redFill = PatternFill(start_color=color_hex, end_color=color_hex, fill_type="solid")
                 cell.fill = redFill
                 # border
@@ -135,8 +135,11 @@ class WorkbookService:
         )
 
         btc = data.filter(CurrencyBaseInfoModel.symbol == "BTC").first()
-        data = data.filter(CurrencyBaseInfoModel.symbol != "BTC").all()
-        data = [btc] + data
+        if btc:
+            data = data.filter(CurrencyBaseInfoModel.symbol != "BTC").all()
+            data = [btc] + data  # btc is added at the beginning of the list
+        else:
+            data = data.all()
 
         header_to_model_attr = {
             "SETOR": lambda item: (
@@ -165,14 +168,8 @@ class WorkbookService:
             "AUMENTO DE VOLUME": lambda item: item.increase_volume if item.increase_volume else "N/A",
             "VOLUME ATUAL": lambda item: item.today_volume if item.today_volume else "N/A",
             "VOLUME ANTES DO AUMENTO": lambda item: item.volume_before_increase if item.volume_before_increase else "N/A",
-            "% VOLUME/ VOLUME DIA ANTERIOR": lambda item: item.volumes_relation if item.volumes_relation else "N/A",
             "VOLUME > 200%": lambda item: "SIM" if item.expressive_volume_increase else "NÃO",
             "SINAL DE COMPRA": lambda item: "SIM" if item.buying_signal else "NÃO",
-            "1 ANO": lambda item: item.year_variation_per if item.year_variation_per else "N/A",
-            "180 DIAS": lambda item: item.semester_variation_per if item.semester_variation_per else "N/A",
-            "90 DIAS": lambda item: item.quarter_variation_per if item.quarter_variation_per else "N/A",
-            "30 DIAS": lambda item: item.month_variation_per if item.month_variation_per else "N/A",
-            "7 DIAS": lambda item: item.week_variation_per if item.week_variation_per else "N/A",
         }
 
         for row_idx, item in enumerate(data, start=2):
@@ -183,7 +180,7 @@ class WorkbookService:
                 value = (
                     model_attr(item)
                     if callable(model_attr)
-                    else getattr(item, model_attr, "N/A") if model_attr is not None else "N/A"  # type: ignore
+                    else getattr(item, model_attr, "N/A") if model_attr is not None else "N/A"
                 )
                 worksheet.cell(row=row_idx, column=col_idx, value=value)
         return workbook

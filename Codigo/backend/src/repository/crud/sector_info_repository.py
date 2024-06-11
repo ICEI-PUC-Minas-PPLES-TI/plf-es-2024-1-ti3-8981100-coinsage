@@ -7,6 +7,10 @@ from src.models.db.rel_setor_currency_base_info import SetorCurrencyBaseInfo
 from src.models.db.setor import Setor
 
 
+def get_all(db: Session) -> List[Setor]:
+    return db.query(Setor).all()
+
+
 def get_sector_by_cmc_id(db: Session, cmc_id: int) -> Optional[Setor]:
     return db.query(Setor).filter(Setor.cmc_id == cmc_id).first()
 

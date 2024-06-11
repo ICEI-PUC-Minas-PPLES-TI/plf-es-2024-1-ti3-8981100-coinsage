@@ -38,8 +38,6 @@ def add_variation_analysis(
 
     except Exception as e:
         logger.info(f"Erro ao adicionar análises: {e}")
-    finally:
-        db.close()
 
 
 def save_all(db: Session, second_stage_analysis: list[SecondStageAnalysisModel]):
