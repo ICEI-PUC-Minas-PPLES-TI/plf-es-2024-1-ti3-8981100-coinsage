@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from src.config.manager import settings
 from src.schedules.update_analysis_info import check_update_analysis_info, update_analysis_info
+from src.schedules.update_sectors import check_update_sectors, update_sectors
 
 # App schedules
 from .update_currencies_info import check_update_currencies_info, update_currencies_info
@@ -43,6 +44,7 @@ def check_all_schedules():
 
     check_update_currencies_info(db=db, settings=settings.SCHEDULES["update_currencies_info"])
     check_update_analysis_info(db=db, settings=settings.SCHEDULES["update_all_analysis"])
+    check_update_sectors(db=db, settings=settings.SCHEDULES["update_sectors"])
 
 
 # =======  All app schedules =======
@@ -72,3 +74,17 @@ def schedule_update_analysis_info():
         logger.critical("Database session is not available")
         return
     update_analysis_info(db=db)
+
+
+@scheduler.scheduled_job(
+    "cron",
+    hour=settings.SCHEDULES["update_sectors"]["hour"],
+    minute=settings.SCHEDULES["update_sectors"]["minute"],
+    second=settings.SCHEDULES["update_sectors"]["second"],
+    id="update_sectors",
+)
+def schedule_update_sectors():
+    if db is None:
+        logger.critical("Database session is not available")
+        return
+    update_sectors(db=db)

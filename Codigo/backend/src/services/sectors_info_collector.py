@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List
 from uuid import UUID
 
@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from src.config.manager import settings
 from src.models.db.rel_setor_currency_base_info import SetorCurrencyBaseInfo
+from src.models.db.sector_info_schedule import SectorInfoScheduleModel
 from src.models.db.setor import Setor
 from src.repository.crud import currency_info_repository, sector_info_repository
 from src.services.externals.cmc_sectors_collector import CmcSectorsCollector
@@ -67,6 +68,9 @@ class SectorsCollector:
                 self.add_coins_to_sector(db_session, sector_db, sector["symbols"])
                 continue
 
+        db_session.add(SectorInfoScheduleModel(next_scheduled_time=self.calculate_next_time()))
+        db_session.commit()
+
     def add_coins_to_sector(self, db_session: Session, sector: Setor, symbols: List[str]):
         symbols = self.exclude_existing_coins(db_session, sector, symbols)
 
@@ -93,3 +97,6 @@ class SectorsCollector:
         sector_list = self.repository.get_by_symbol_uuid(db_session, symbol_uuid)  # type: ignore
         sector_list.sort(key=lambda x: x.coins_quantity, reverse=True)  # type: ignore
         return sector_list
+
+    def calculate_next_time(self) -> datetime:
+        return datetime.now() + timedelta(days=1)
