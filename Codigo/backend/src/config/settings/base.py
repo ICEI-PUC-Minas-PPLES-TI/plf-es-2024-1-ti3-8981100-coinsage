@@ -55,6 +55,11 @@ class BackendBaseSettings(BaseSettings):
             "minute": 0,
             "second": 0,
         },
+        "update_sectors": {
+            "hour": 10,
+            "minute": 0,
+            "second": 0,
+        },
     }
 
     class Config(pydantic.BaseConfig):
