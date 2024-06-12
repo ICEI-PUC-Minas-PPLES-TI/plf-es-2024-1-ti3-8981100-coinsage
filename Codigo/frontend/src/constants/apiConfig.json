@@ -8,6 +8,7 @@
       "CreateWalletBuy": "/api/wallet",
       "Login": "/api/login",
       "SignUp": "/api/singin",
-      "SheetWallet": "/api/sheet/wallet"
+      "SheetWallet": "/api/sheet/wallet",
+      "WorkbookWallet": "/api/workbook/wallet"
   }
 }
