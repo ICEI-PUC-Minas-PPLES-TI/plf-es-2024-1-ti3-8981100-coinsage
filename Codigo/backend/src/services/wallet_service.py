@@ -102,3 +102,20 @@ class WalletService:
         if not buy_price:
             return Decimal(0)
         return Decimal((current_price * buy_value) / buy_price)
+
+
+    def list_transactions_by_user(self, db: Session, user: UserResponse) -> list[schemas.CompleteWalletTransaction]:
+        user_id = user.id
+        transactions = self.repository.list_all_transactions_by_user(db, user_id)
+        return [
+            schemas.CompleteWalletTransaction(
+                uuid=transaction.uuid,
+                crypto=transaction.crypto,
+                date=transaction.date.strftime("%d-%m-%Y %H:%M"),
+                quantity=transaction.quantity,
+                amount=transaction.amount,
+                price_on_purchase=transaction.price_on_purchase,
+                created_at=transaction.created_at,
+                user_id=transaction.user_id,
+            ) for transaction in transactions
+        ]
