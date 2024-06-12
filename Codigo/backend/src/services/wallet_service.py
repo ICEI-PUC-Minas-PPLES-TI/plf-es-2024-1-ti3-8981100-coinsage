@@ -128,3 +128,11 @@ class WalletService:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error on listing transactions"
             )
+
+    def delete_transaction_by_uuid(self, uuid: UUID, db: Session, user: UserResponse) -> bool:
+        transaction = self.repository.get_by_uuid(db, uuid, user.id)
+        if transaction and transaction.user_id == user.id:
+            db.delete(transaction)
+            db.commit()
+            return True
+        return False
