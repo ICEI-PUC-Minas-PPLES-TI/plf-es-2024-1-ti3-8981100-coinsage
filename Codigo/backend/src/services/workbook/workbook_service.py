@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 
 from src.models.db.currency_base_info import CurrencyBaseInfoModel
 from src.models.db.first_stage_analysis import FirstStageAnalysisModel
-from src.services.analysis.first_stage.closing_price_service import PriceService
 from src.models.db.wallet_transaction import WalletTransaction
+from src.services.analysis.first_stage.closing_price_service import PriceService
 
 
 class WorkbookService:
@@ -168,7 +168,9 @@ class WorkbookService:
             "AUMENTO DE VOLUME (w)": lambda item: item.increase_volume if item.increase_volume else "N/A",
             "AUMENTO DE VOLUME": lambda item: item.increase_volume if item.increase_volume else "N/A",
             "VOLUME ATUAL": lambda item: item.today_volume if item.today_volume else "N/A",
-            "VOLUME ANTES DO AUMENTO": lambda item: item.volume_before_increase if item.volume_before_increase else "N/A",
+            "VOLUME ANTES DO AUMENTO": lambda item: (
+                item.volume_before_increase if item.volume_before_increase else "N/A"
+            ),
             "VOLUME > 200%": lambda item: "SIM" if item.expressive_volume_increase else "NÃO",
             "SINAL DE COMPRA": lambda item: "SIM" if item.buying_signal else "NÃO",
         }
@@ -185,7 +187,7 @@ class WorkbookService:
                 )
                 worksheet.cell(row=row_idx, column=col_idx, value=value)
         return workbook
-    
+
     def create_wallet_workbook(self, headers: List[str]) -> Workbook:
         workbook = Workbook()
         worksheet = workbook.active
@@ -201,13 +203,14 @@ class WorkbookService:
     def fill_wallet_workbook(self, workbook: Workbook, headers: List[str], user_id: int) -> Workbook:
         worksheet = workbook.active
         transactions = (
-            self.session.query(WalletTransaction)
+            self.session.query(WalletTransaction, CurrencyBaseInfoModel)
+            .where(WalletTransaction.uuid_currency == CurrencyBaseInfoModel.uuid)
             .filter(WalletTransaction.user_id == user_id)
             .all()
         )
 
         header_to_model_attr = {
-            "CRIPTOMOEDA": lambda item: item.currency.symbol if item.currency else "N/A",
+            "CRIPTOMOEDA": lambda item: item.symbol if item.symbol else "N/A",
             "QUANTIDADE": lambda item: item.quantity if item.quantity else "N/A",
             "VALOR (US$)": lambda item: item.amount if item.amount else "N/A",
             "DATA": lambda item: item.date.strftime("%d/%m/%Y") if item.date else "N/A",
@@ -218,10 +221,17 @@ class WorkbookService:
             for header in headers:
                 col_idx = headers.index(header) + 1
                 model_attr = header_to_model_attr.get(header)
+                val = None
+                if header == "CRIPTOMOEDA":
+                    val = model_attr(item[1])
+                else:
+                    val = model_attr(item[0])
                 value = (
-                    model_attr(item)
+                    val
                     if callable(model_attr)
                     else getattr(item, model_attr, "N/A") if model_attr is not None else "N/A"
                 )
+
+                print(f"row_idx: {row_idx}, col_idx: {col_idx}, value: {value}")
                 worksheet.cell(row=row_idx, column=col_idx, value=value)
         return workbook
