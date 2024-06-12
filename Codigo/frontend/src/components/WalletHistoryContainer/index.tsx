@@ -55,7 +55,8 @@ const WalletHistoryContainer: React.FC = () => {
                                 currency: {
                                     logo: row.crypto.logo,
                                     symbol: row.crypto.symbol
-                                }
+                                },
+                                uuid: row.transaction_uuid,
                             }
                         }));
                         setCount(data.total);
@@ -94,6 +95,7 @@ const WalletHistoryContainer: React.FC = () => {
                 setPage={setPage}
                 rowsPerPage={rowsPerPage}
                 setRowsPerPage={setRowsPerPage}
+                refresh={() => setPage(0)}
             />
         </div>
     );

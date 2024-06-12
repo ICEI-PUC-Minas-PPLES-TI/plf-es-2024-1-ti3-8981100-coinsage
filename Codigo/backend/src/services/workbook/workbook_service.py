@@ -232,6 +232,5 @@ class WorkbookService:
                     else getattr(item, model_attr, "N/A") if model_attr is not None else "N/A"
                 )
 
-                print(f"row_idx: {row_idx}, col_idx: {col_idx}, value: {value}")
                 worksheet.cell(row=row_idx, column=col_idx, value=value)
         return workbook
