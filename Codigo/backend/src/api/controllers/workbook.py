@@ -8,6 +8,8 @@ from sqlalchemy.orm import Session
 from src.api.dependencies.session import get_db
 from src.repository.crud.analysis_info_repository import get_last
 from src.services.workbook.workbook_service import WorkbookService
+from src.security.authentication import get_current_user
+from src.models.schemas.user import UserResponse
 
 router = APIRouter(prefix="/workbook", tags=["Workbook"])
 
@@ -76,3 +78,24 @@ async def generate_workbook(db: Session = Depends(get_db)):
     #     )
     # else:
     #     raise HTTPException(status_code=404, detail="File not found.")
+    
+@router.get("/wallet", name="Workbook Wallet", response_class=StreamingResponse)
+async def generate_wallet_workbook(
+    db: Session = Depends(get_db), 
+    current_user: UserResponse = Depends(get_current_user)
+):
+    headers = ["CRIPTOMOEDA", "QUANTIDADE", "VALOR (US$)", "DATA", "PREÇO NA COMPRA (US$)"]
+    workbook_service = WorkbookService(db)
+    workbook = workbook_service.create_wallet_workbook(headers)
+    filled_workbook = workbook_service.fill_wallet_workbook(workbook, headers, current_user.id)
+    
+    file_stream = BytesIO()
+    filled_workbook.save(file_stream)
+    file_stream.seek(0)
+    filename = f"wallet_{current_user.id}.xlsx"
+
+    return StreamingResponse(
+        file_stream,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
