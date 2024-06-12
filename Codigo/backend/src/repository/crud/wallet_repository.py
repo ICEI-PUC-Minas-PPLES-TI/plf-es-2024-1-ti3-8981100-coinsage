@@ -29,3 +29,7 @@ def get_by_uuid(db: Session, transaction_uuid: Uuid, user_id: BigInteger) -> Wal
         .filter(WalletTransaction.uuid == transaction_uuid, WalletTransaction.user_id == user_id)
         .first()
     )
+
+
+def list_all_transactions_by_user(db: Session, user_id: BigInteger) -> list[WalletTransaction]:
+    return db.query(WalletTransaction).filter(WalletTransaction.user_id == user_id).all()

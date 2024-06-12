@@ -48,3 +48,17 @@ class CompleteWalletTransaction(BuyWalletCreate):
 
     class Config:
         orm_mode = True
+
+
+class CompleteWalletTransaction(BaseSchemaModel):
+    uuid: UUID
+    crypto: str
+    date: datetime
+    quantity: Decimal
+    amount: Decimal
+    price_on_purchase: Decimal
+    created_at: datetime
+    user_id: int
+
+    class Config:
+        orm_mode = True
