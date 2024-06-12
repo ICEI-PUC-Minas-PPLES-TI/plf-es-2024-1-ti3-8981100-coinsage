@@ -15,11 +15,7 @@ const WalletHistoryContainer: React.FC = () => {
     const [count, setCount] = useState<number>(0);
     const [sortConfig, setSortConfig] = useState<SortConfig[]>([]);
 
-    useEffect(() => {
-        // retryRequest();
-        setTableLoading(true);
-        setRows([]);
-        const sortParams = sortConfig.map((sort) => `&sort=${sort.column},${sort.direction}`).join('');
+    const request = (sortParams: any = '') => {
         api
             .get(
                 `${Endpoints.ListWallet}?limit=${rowsPerPage}&offset=${page * rowsPerPage ?? 0}${sortParams}`,
@@ -70,6 +66,15 @@ const WalletHistoryContainer: React.FC = () => {
                 setInitialLoading(false);
                 setTableLoading(false);
             });
+    }
+
+    useEffect(() => {
+        // retryRequest();
+        setTableLoading(true);
+        setRows([]);
+        const sortParams = sortConfig.map((sort) => `&sort=${sort.column},${sort.direction}`).join('');
+        request(sortParams)
+
     }, [page, rowsPerPage, sortConfig]);
 
     const sort = (column: string) => {
@@ -95,7 +100,7 @@ const WalletHistoryContainer: React.FC = () => {
                 setPage={setPage}
                 rowsPerPage={rowsPerPage}
                 setRowsPerPage={setRowsPerPage}
-                refresh={() => setPage(0)}
+                refresh={request}
             />
         </div>
     );

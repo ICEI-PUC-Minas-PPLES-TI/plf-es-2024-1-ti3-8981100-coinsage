@@ -1,7 +1,7 @@
 from typing import Any, List
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from src.api.dependencies.session import get_db
@@ -66,3 +66,23 @@ async def list_transactions(
 ):
     response = service.list_transactions_by_user(db, current_user, limit, offset, sort)
     return response
+
+@router.delete(
+        "/{uuid}",
+        name="Deletar Transação",
+        description="Deletar uma transação específica.",
+        responses={
+            status.HTTP_204_NO_CONTENT: {"description": "Transação deletada com sucesso."},
+            status.HTTP_404_NOT_FOUND: {"description": "Transação não encontrada."},
+            status.HTTP_403_FORBIDDEN: {"description": "Ação não permitida."},
+        }
+)
+async def delete_transaction(
+    uuid: UUID,
+    db: Session = Depends(get_db),
+    current_user: UserResponse = Depends(get_current_user),
+) -> None:
+    success = service.delete_transaction_by_uuid(uuid, db, current_user)
+    if not success:
+        raise HTTPException(status_code=404, detail="Transação não encontrada para o usuário.")
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
