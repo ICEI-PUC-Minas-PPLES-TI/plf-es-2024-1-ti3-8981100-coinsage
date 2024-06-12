@@ -70,20 +70,30 @@ const rowsDataMapper = (rows: any) => {
 
 const WalletHistory: React.FC<WalletHistoryProps> = ({ rows, tableLoading, sortConfig, setSortConfig, page, setPage, rowsPerPage, setRowsPerPage, count, refresh }) => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
+    const [alertDetail, setAlertDetail] = useState<{
+        msg: string,
+        type: string
+    } | null>(null);
 
     const handleDeleteTransaction = (uuid: string) => {
-        // Logic to delete the transaction
         api.delete(`${Endpoints.DeleteTransaction}/${uuid}`, {
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('token') || ''
             }
         })
             .then(() => {
+                setAlertDetail({
+                    msg: 'Transação deletada com sucesso',
+                    type: 'success'
+                });
+                setOpenSnackbar(true);
                 refresh()
             })
             .catch((error) => {
-                setErrorMessage('Falha ao deletar transação, por favor tente novamente');
+                setAlertDetail({
+                    msg: 'Falha ao deletar transação, por favor tente novamente',
+                    type: 'error'
+                });
                 setOpenSnackbar(true);
             });
     };
@@ -189,9 +199,10 @@ const WalletHistory: React.FC<WalletHistoryProps> = ({ rows, tableLoading, sortC
                     </TableFooter>
                 </Table>
             </TableContainer>
-            <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
-                <Alert onClose={() => setOpenSnackbar(false)} severity="error" sx={{ width: '100%' }}>
-                    {errorMessage}
+            <Snackbar open={openSnackbar} autoHideDuration={2000} onClose={() => setOpenSnackbar(false)}>
+                {/* @ts-ignore */}
+                <Alert onClose={() => setOpenSnackbar(false)} severity={alertDetail?.type || 'info'} sx={{ width: '100%' }}>
+                    {alertDetail?.msg}
                 </Alert>
             </Snackbar>
         </>
