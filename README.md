@@ -9,7 +9,6 @@ Além disso, o CoinSage oferece uma interface que permite aos usuários acompanh
 ## Alunos integrantes da equipe
 
 * [Frederico Martins Rodrigues](https://github.com/fredmrodrigues)
-* [João Gabriel Amorim Pádua](https://github.com/jgapadua)
 * [José Victor Mendes Dias](https://github.com/zezit)
 * [Kimberly Liz Spencer Lourenço](https://github.com/kspencerl)
 * [Rubens Marcelo Ramos dos Santos](https://github.com/rubensm33)
