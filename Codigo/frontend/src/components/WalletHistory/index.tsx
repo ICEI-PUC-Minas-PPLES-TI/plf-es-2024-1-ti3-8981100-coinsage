@@ -17,6 +17,7 @@ import EmasAlignedCell from "../Tabela/EmasAlignedCell/EmasAlignedCell";
 import LogoSymbol from "../Tabela/Logo/LogoSymbol";
 import React from "react";
 import TablePaginationActions from "../Tabela/TablePaginationActions/TablePaginationActions";
+import { renderValorizationPercentage } from "../Tabela/Tabela";
 
 interface WalletHistoryProps {
     rows: any;
@@ -34,10 +35,17 @@ interface WalletHistoryProps {
 const columns = [
     { id: "date", label: "Data da Compra", minWidth: 100 },
     { id: "crypto", label: "Moeda", minWidth: 100 },
-    { id: "quantity", label: "Quantidade", minWidth: 100 },
+    { id: "quantity", label: "Valor comprado (USD)", minWidth: 100 },
     // { id: "amount", label: "Amount", minWidth: 100 },
     { id: "price_on_purchase", label: "Preço na Compra (USD)", minWidth: 100 },
+    { id: "current_price", label: "Preço Atual (USD)", minWidth: 100 },
+    { id: "current_profit", label: "Lucro Atual (%)", minWidth: 100 },
 ];
+
+// remove righ zeros
+const removeRightZeros = (value: string) => {
+    return value.replace(/0+$/, '');
+}
 
 // Function to render logo symbol
 const renderLogoSymbol = (logo: string, symbol: string, index: number) => (
@@ -49,8 +57,11 @@ const renderRow = (row: any, index: number) => (
     <TableRow key={index} style={{ height: 40 }} className={tableStyles.oddRowStyle}>
         <TableCell>{row.date}</TableCell>
         <TableCell>{row.crypto}</TableCell>
-        <TableCell>{row.quantity}</TableCell>
-        <TableCell>{row.price_on_purchase}</TableCell>
+        <TableCell>{removeRightZeros(row.quantity)}</TableCell>
+        <TableCell>{removeRightZeros(row.price_on_purchase)}</TableCell>
+        <TableCell>{removeRightZeros(row.price_now)}</TableCell>
+        {/* <TableCell>{row.current_profit}</TableCell> */}
+        <TableCell>{renderValorizationPercentage(row.current_profit, index, 'symbol', 0)}</TableCell>
     </TableRow>
 );
 

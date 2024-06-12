@@ -6,6 +6,7 @@
       "PriceAtTimestamp": "/api/currency/price",
       "QuerySymbol": "/api/currency/query",
       "CreateWalletBuy": "/api/wallet",
+      "ListWallet": "/api/wallet",
       "Login": "/api/login",
       "SignUp": "/api/singin",
       "SheetWallet": "/api/sheet/wallet"

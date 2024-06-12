@@ -67,7 +67,7 @@ const NewTransactionForm: React.FC = () => {
         if (!cryptoSelected) return
         setLoadingPriceAtTimestamp(true)
         setBuyDate(date)
-        api.get(`${Endpoints.PriceAtTimestamp}/${cryptoSelected}/${date?.format('DD-MM-YYYY HH:MM')}`)
+        api.get(`${Endpoints.PriceAtTimestamp}/${cryptoSelected}/${date?.format('DD-MM-YYYY H:m')}`)
             .then(response => {
                 setPriceAtTimestamp(response.data)
                 setUserInputPrice(response.data.toString())
@@ -123,7 +123,7 @@ const NewTransactionForm: React.FC = () => {
         api
             .post(Endpoints.CreateWalletBuy, {
                 crypto: cryptoSelected,
-                date: buyDate?.format('DD-MM-YYYY HH:MM'),
+                date: buyDate?.format('DD-MM-YYYY H:m'),
                 quantity: buyedSelectorType === 'quantity' && buyedValue ? parseFloat(buyedValue) : null,
                 amount: buyedSelectorType === 'price' && buyedValue ? parseFloat(buyedValue) : null,
                 price_on_purchase: userInputPrice ? parseFloat(userInputPrice) : null
