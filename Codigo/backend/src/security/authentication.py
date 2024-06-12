@@ -1,5 +1,6 @@
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
+from loguru import logger
 from sqlalchemy.orm import Session
 
 from src.api.dependencies import session
@@ -14,5 +15,6 @@ def get_current_user(db_session: Session = Depends(session.get_db), token: str =
     try:
         user = AuthenticationService().decode_token(token=token, db=db_session)
         yield user
-    except Exception:
-        raise HTTPException(status_code=401, detail="Invalid token")
+    except Exception as err:
+        logger.error(err)
+        raise

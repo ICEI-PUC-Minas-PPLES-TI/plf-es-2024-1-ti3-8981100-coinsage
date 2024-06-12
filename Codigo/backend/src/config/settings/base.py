@@ -46,7 +46,7 @@ class BackendBaseSettings(BaseSettings):
     # in days
     JWT_EXPIRE: int = decouple.config("JWT_EXPIRE", cast=int)  # type: ignore
     JWT_ALGORITHM: str = "HS256"
-    JWS_SECRET: str = decouple.config("JWS_SECRET", cast=str)
+    JWT_SECRET: str = decouple.config("JWT_SECRET", cast=str)
 
     # ===== Schedules =====
     SCHEDULES: dict[str, dict[str, int]] = {

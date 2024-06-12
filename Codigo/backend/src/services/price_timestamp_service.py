@@ -22,8 +22,8 @@ class PriceAtTimestampService:
         try:
             price = BinancePriceAtTimestampService().get_by_symbol(symbol=packet.crypto, date_time=packet._date)
             if price is None:
-                logger.error(f"Preço não encontrado: {packet.crypto}")
-                raise HTTPException(status_code=404, detail="Preço não encontrado")
+                logger.error(f"Preço não encontrado: {packet.crypto} {packet._date}")
+                return Decimal(-1)
             return price
         except Exception as e:
             logger.error(f"Erro ao buscar preço: {e}")

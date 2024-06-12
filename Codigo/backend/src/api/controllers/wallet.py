@@ -1,6 +1,7 @@
+from typing import Any, List
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from src.api.dependencies.session import get_db
@@ -50,17 +51,18 @@ async def calculate_profit(
 
 
 @router.get(
-    "/transactions",
+    path="/",
     name="Lista de Transações",
     description="Listar todas as transações de compra passadas.",
-    response_model=list[schemas.CompleteWalletTransaction],
+    response_model=schemas.WalletListResponse,
     responses={status.HTTP_200_OK: {"description": "Transações listadas com sucesso."}},
 )
 async def list_transactions(
     db: Session = Depends(get_db),
-    current_user: UserResponse = Depends(get_current_user)
-) -> list[schemas.CompleteWalletTransaction]:
-    transactions = service.list_transactions_by_user(db, current_user)
-    if transactions is None:
-        raise HTTPException(status_code=404, detail="Nenhuma transação encontrada.")
-    return transactions
+    current_user: UserResponse = Depends(get_current_user),
+    limit: int = Query(20, ge=0),
+    offset: int = Query(0, ge=0),
+    sort: List[str] = Query([]),
+):
+    response = service.list_transactions_by_user(db, current_user, limit, offset, sort)
+    return response
