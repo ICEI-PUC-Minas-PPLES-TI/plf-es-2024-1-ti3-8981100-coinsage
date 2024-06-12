@@ -1,8 +1,10 @@
 from datetime import datetime
 from decimal import Decimal
+from typing import Any, List
 from uuid import UUID
 
-from fastapi import HTTPException
+from fastapi import HTTPException, status
+from loguru import logger
 from sqlalchemy.orm import Session
 
 from src.models import schemas
@@ -32,6 +34,7 @@ class WalletService:
 
         created_model = self.repository.create_buy(db=db, buy=create, currency_uuid=crypto.uuid, user_id=user_id)
         return schemas.CompleteWalletTransaction(
+            # format dd/mm/yyyy/ h:m
             date=created_model.date.strftime("%d-%m-%Y %H:%M"),
             crypto=create.crypto,
             quantity=created_model.quantity,
@@ -103,19 +106,25 @@ class WalletService:
             return Decimal(0)
         return Decimal((current_price * buy_value) / buy_price)
 
-
-    def list_transactions_by_user(self, db: Session, user: UserResponse) -> list[schemas.CompleteWalletTransaction]:
+    def list_transactions_by_user(self, db: Session, user: UserResponse, limit: int, offset: int, sort: List[str]):
         user_id = user.id
-        transactions = self.repository.list_all_transactions_by_user(db, user_id)
-        return [
-            schemas.CompleteWalletTransaction(
-                uuid=transaction.uuid,
-                crypto=transaction.crypto,
-                date=transaction.date.strftime("%d-%m-%Y %H:%M"),
-                quantity=transaction.quantity,
-                amount=transaction.amount,
-                price_on_purchase=transaction.price_on_purchase,
-                created_at=transaction.created_at,
-                user_id=transaction.user_id,
-            ) for transaction in transactions
-        ]
+        transactions, paginated = self.repository.list_all_transactions_by_user(db, user_id, limit, offset, sort)
+        responses: List[schemas.ResponseProfitCompare] = []
+
+        if len(transactions) > 0:
+            for transaction in transactions:
+                response = self._calculate_profit(transaction[0], transaction[1], db)
+                responses.append(response)
+
+        try:
+            return schemas.WalletListResponse(
+                data=responses,
+                page=paginated.page,
+                total=paginated.total,
+                remaining=paginated.remaining,
+            )
+        except Exception as err:
+            logger.error(f"Error on list_transactions_by_user: {err}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error on listing transactions"
+            )

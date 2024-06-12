@@ -46,13 +46,13 @@ class AuthenticationService:
                 "iat": datetime.now(),
             },
             algorithm=settings.JWT_ALGORITHM,
-            key=settings.JWS_SECRET,
+            key=settings.JWT_SECRET,
         )
         return token
 
     def decode_token(self, token: str, db: Session) -> UserResponse:
         try:
-            payload = jwt.decode(token, settings.JWS_SECRET, algorithms=[settings.JWT_ALGORITHM])
+            payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
             user = self.repository.get_by_email(db=db, email=payload.get("email"))
             return UserResponse(**user.__dict__)
         except jwt.ExpiredSignatureError:

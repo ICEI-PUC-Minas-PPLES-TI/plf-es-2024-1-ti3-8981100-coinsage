@@ -142,7 +142,7 @@ const renderEma8Validation = (item: any, index: number) => {
   )
 }
 
-const renderValorizationPercentage = (value: any, index: number, symbol: string, comparasion_value: number = 10.0) => {
+export const renderValorizationPercentage = (value: any, index: number, symbol: string, comparasion_value: number = 10.0) => {
   const validator: 'good' | 'bad' | 'normal' = symbol === 'BTC' ? (value >= comparasion_value ? 'good' : (value < 0) ? 'bad' : 'normal') : (value >= comparasion_value ? 'good' : (value < 0) ? 'bad' : 'normal');
 
   return <TextColoredCondition value={value !== null && value !== undefined ? value : 'N/A'} condition={validator} key={index} />;

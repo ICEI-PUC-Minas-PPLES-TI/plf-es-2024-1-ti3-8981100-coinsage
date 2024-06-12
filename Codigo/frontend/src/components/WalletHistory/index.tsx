@@ -9,14 +9,22 @@ import {
     TableRow,
     Paper,
     LinearProgress,
-    TableSortLabel
+    TableSortLabel,
+    IconButton,
+    Snackbar,
+    Alert,
+    Tooltip
 } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Unstable_Popup as BasePopup } from '@mui/base/Unstable_Popup';
 import tableStyles from "../Tabela/Tabela.module.css";
 import EmasAlignedCell from "../Tabela/EmasAlignedCell/EmasAlignedCell";
 import LogoSymbol from "../Tabela/Logo/LogoSymbol";
-import React from "react";
+import React, { useState } from "react";
 import TablePaginationActions from "../Tabela/TablePaginationActions/TablePaginationActions";
+import { renderValorizationPercentage } from "../Tabela/Tabela";
+import { Endpoints } from "../../constants/apiConfig.json";
+import api from "../../service/api";
 
 interface WalletHistoryProps {
     rows: any;
@@ -28,30 +36,29 @@ interface WalletHistoryProps {
     rowsPerPage: number;
     setRowsPerPage: React.Dispatch<React.SetStateAction<number>>;
     count: number;
+    refresh: () => void;
 }
 
 // Define columns
 const columns = [
     { id: "date", label: "Data da Compra", minWidth: 100 },
     { id: "crypto", label: "Moeda", minWidth: 100 },
-    { id: "quantity", label: "Quantidade", minWidth: 100 },
+    { id: "quantity", label: "Valor comprado (USD)", minWidth: 100 },
     // { id: "amount", label: "Amount", minWidth: 100 },
     { id: "price_on_purchase", label: "Preço na Compra (USD)", minWidth: 100 },
+    { id: "current_price", label: "Preço Atual (USD)", minWidth: 100 },
+    { id: "current_profit", label: "Lucro Atual (%)", minWidth: 100 },
+    { id: "actions", label: "Ações", minWidth: 50 },
 ];
+
+// remove righ zeros
+const removeRightZeros = (value: string) => {
+    return value.replace(/0+$/, '');
+}
 
 // Function to render logo symbol
 const renderLogoSymbol = (logo: string, symbol: string, index: number) => (
     <LogoSymbol logo={logo} symbol={symbol} key={index} />
-);
-
-// Function to render each row of data
-const renderRow = (row: any, index: number) => (
-    <TableRow key={index} style={{ height: 40 }} className={tableStyles.oddRowStyle}>
-        <TableCell>{row.date}</TableCell>
-        <TableCell>{row.crypto}</TableCell>
-        <TableCell>{row.quantity}</TableCell>
-        <TableCell>{row.price_on_purchase}</TableCell>
-    </TableRow>
 );
 
 const rowsDataMapper = (rows: any) => {
@@ -61,9 +68,46 @@ const rowsDataMapper = (rows: any) => {
     }))
 }
 
-const WalletHistory: React.FC<WalletHistoryProps> = ({ rows, tableLoading, sortConfig, setSortConfig, page, setPage, rowsPerPage, setRowsPerPage, count }) => {
+const WalletHistory: React.FC<WalletHistoryProps> = ({ rows, tableLoading, sortConfig, setSortConfig, page, setPage, rowsPerPage, setRowsPerPage, count, refresh }) => {
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const handleDeleteTransaction = (uuid: string) => {
+        // Logic to delete the transaction
+        api.delete(`${Endpoints.DeleteTransaction}/${uuid}`, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token') || ''
+            }
+        })
+            .then(() => {
+                refresh()
+            })
+            .catch((error) => {
+                setErrorMessage('Falha ao deletar transação, por favor tente novamente');
+                setOpenSnackbar(true);
+            });
+    };
 
     const mappedRows = rowsDataMapper(rows)
+
+    const renderRow = (row: any, index: number) => (
+        <TableRow key={index} style={{ height: 40 }} className={tableStyles.oddRowStyle}>
+            <TableCell>{row.date}</TableCell>
+            <TableCell>{row.crypto}</TableCell>
+            <TableCell>{removeRightZeros(row.quantity)}</TableCell>
+            <TableCell>{removeRightZeros(row.price_on_purchase)}</TableCell>
+            <TableCell>{removeRightZeros(row.price_now)}</TableCell>
+            {/* <TableCell>{row.current_profit}</TableCell> */}
+            <TableCell>{renderValorizationPercentage(row.current_profit, index, 'symbol', 0)}</TableCell>
+            <TableCell>
+                <Tooltip title="Deletar transação" arrow>
+                    <IconButton onClick={() => handleDeleteTransaction(row.uuid)} aria-label="delete">
+                        <DeleteIcon />
+                    </IconButton>
+                </Tooltip>
+            </TableCell>
+        </TableRow>
+    );
 
     const handleSortRequest = (column: string) => {
         // Handle sort request logic here
@@ -86,64 +130,71 @@ const WalletHistory: React.FC<WalletHistoryProps> = ({ rows, tableLoading, sortC
     };
 
     return (
-        <TableContainer component={Paper} style={{ padding: '0 1.2rem' }}>
-            <Table aria-label="custom pagination table">
-                <TableHead>
-                    <TableRow>
-                        {columns.map((column) => (
-                            <TableCell
-                                key={column.id}
-                                align="left"
-                                style={{ minWidth: column.minWidth }}
-                            >
-                                <TableSortLabel
-                                    active={sortConfig.some((sort: any) => sort.column === column.id)}
-                                    direction={
-                                        sortConfig.find((sort: any) => sort.column === column.id)?.direction || 'asc'
-                                    }
-                                    onClick={() => handleSortRequest(column.id)}
+        <>
+            <TableContainer component={Paper} style={{ padding: '0 1.2rem' }}>
+                <Table aria-label="custom pagination table">
+                    <TableHead>
+                        <TableRow>
+                            {columns.map((column) => (
+                                <TableCell
+                                    key={column.id}
+                                    align="left"
+                                    style={{ minWidth: column.minWidth }}
                                 >
-                                    {column.label}
-                                </TableSortLabel>
-                            </TableCell>
-                        ))}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {tableLoading ? (
-                        <TableRow style={{ height: 40 }}>
-                            <TableCell colSpan={4}>
-                                <LinearProgress color="warning" />
-                            </TableCell>
+                                    <TableSortLabel
+                                        active={sortConfig.some((sort: any) => sort.column === column.id)}
+                                        direction={
+                                            sortConfig.find((sort: any) => sort.column === column.id)?.direction || 'asc'
+                                        }
+                                        onClick={() => handleSortRequest(column.id)}
+                                    >
+                                        {column.label}
+                                    </TableSortLabel>
+                                </TableCell>
+                            ))}
                         </TableRow>
-                    ) : (
-                        mappedRows.map((row: any, index: number) => renderRow(row, index))
-                    )}
-                </TableBody>
-                <TableFooter>
-                    <TableRow>
-                        <TablePagination
-                            rowsPerPageOptions={[10, 20, 50, 100]}
-                            colSpan={columns.length}
-                            count={count}
-                            rowsPerPage={rowsPerPage}
-                            page={page}
-                            slotProps={{
-                                select: {
-                                    inputProps: {
-                                        "aria-label": "rows per page",
+                    </TableHead>
+                    <TableBody>
+                        {tableLoading ? (
+                            <TableRow style={{ height: 40 }}>
+                                <TableCell colSpan={4}>
+                                    <LinearProgress color="warning" />
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            mappedRows.map((row: any, index: number) => renderRow(row, index))
+                        )}
+                    </TableBody>
+                    <TableFooter>
+                        <TableRow>
+                            <TablePagination
+                                rowsPerPageOptions={[10, 20, 50, 100]}
+                                colSpan={columns.length}
+                                count={count}
+                                rowsPerPage={rowsPerPage}
+                                page={page}
+                                slotProps={{
+                                    select: {
+                                        inputProps: {
+                                            "aria-label": "rows per page",
+                                        },
+                                        native: true,
                                     },
-                                    native: true,
-                                },
-                            }}
-                            onPageChange={handleChangePage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}
-                            ActionsComponent={TablePaginationActions}
-                        />
-                    </TableRow>
-                </TableFooter>
-            </Table>
-        </TableContainer>
+                                }}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                                ActionsComponent={TablePaginationActions}
+                            />
+                        </TableRow>
+                    </TableFooter>
+                </Table>
+            </TableContainer>
+            <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
+                <Alert onClose={() => setOpenSnackbar(false)} severity="error" sx={{ width: '100%' }}>
+                    {errorMessage}
+                </Alert>
+            </Snackbar>
+        </>
     );
 };
 
