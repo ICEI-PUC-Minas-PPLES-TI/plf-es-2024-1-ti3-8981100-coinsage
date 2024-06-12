@@ -1,7 +1,3 @@
-Here's the updated README with the execution guide for both the deployed API and website:
-
----
-
 [![CI - Backend Code Quality](https://github.com/ICEI-PUC-Minas-PPLES-TI/plf-es-2024-1-ti3-8981100-coinsage/actions/workflows/ci-backend.yaml/badge.svg)](https://github.com/ICEI-PUC-Minas-PPLES-TI/plf-es-2024-1-ti3-8981100-coinsage/actions/workflows/ci-backend.yaml)
 
 # CoinSage
