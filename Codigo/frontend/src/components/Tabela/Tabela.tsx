@@ -17,6 +17,7 @@ import TablePaginationActions from "./TablePaginationActions/TablePaginationActi
 import tableStyles from "./Tabela.module.css";
 import TextColoredCondition from "./TextColoredCondition/TextColoredCondition";
 import { useState } from "react";
+import dayjs from "dayjs";
 
 export interface SortConfig {
   column: string;
@@ -160,7 +161,7 @@ const dataRowsMapper = (data: any) => {
     ema8: item.ema8 ? renderEma8Validation(item, index) : "-",
     currency: item.currency,
     emas: item.emas ?? '-',
-    increase_volume_day: item.increase_volume_day ? new Date(item.increase_volume_day).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '-',
+    increase_volume_day: item.increase_volume_day ? item.increase_volume_day.split(' ')[0].replace('-', '/').replace('-', '/') : '-',
     increase_volume: item.increase_volume ? item.increase_volume.toFixed(2) : '-',
     volume_before_increase: item.volume_before_increase ? item.volume_before_increase.toFixed(2) : '-',
     volume_relation: renderValorizationPercentage(item.increase_volume && item.volume_before_increase ? (((item.increase_volume / item.volume_before_increase) * 100)).toFixed(2) : null, index, item.currency.symbol, 200.0),
@@ -258,7 +259,7 @@ export default function CustomPaginationActionsTable(
         <TableBody>
           {tableLoading ? (
             <TableRow style={{ height: 40 }}>
-              <TableCell colSpan={10}>
+              <TableCell colSpan={columns.length}>
                 <LinearProgress color="warning" />
               </TableCell>
             </TableRow>

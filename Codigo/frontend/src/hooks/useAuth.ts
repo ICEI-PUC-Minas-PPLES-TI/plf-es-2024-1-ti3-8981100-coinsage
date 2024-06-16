@@ -6,7 +6,15 @@ const useAuth = () => {
     return !!token;
 };
 
-export default useAuth;
+const useSessionExpired = () => {
+    const token = localStorage.getItem('token');
+    if (token && token !== 'undefined') {
+        const data = jwtDecode(token);
+        // @ts-ignore
+        return Date.now() >= data?.exp * 1000;
+    }
+    return true;
+}
 
 const useUserDetails = () => {
     const [userName, setUserName] = useState('');
@@ -14,6 +22,10 @@ const useUserDetails = () => {
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token && token !== 'undefined') {
+            if (useSessionExpired()) {
+                localStorage.removeItem('token');
+                return;
+            }
             const data = jwtDecode(token);
             // @ts-ignore
             const name = data?.name;
@@ -24,4 +36,5 @@ const useUserDetails = () => {
     return { userName};
 }
 
-export { useUserDetails };
+export default useAuth;
+export { useUserDetails, useSessionExpired };

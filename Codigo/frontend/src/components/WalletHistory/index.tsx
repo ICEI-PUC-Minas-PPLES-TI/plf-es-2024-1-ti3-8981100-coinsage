@@ -167,7 +167,7 @@ const WalletHistory: React.FC<WalletHistoryProps> = ({ rows, tableLoading, sortC
                     <TableBody>
                         {tableLoading ? (
                             <TableRow style={{ height: 40 }}>
-                                <TableCell colSpan={4}>
+                                <TableCell colSpan={columns.length}>
                                     <LinearProgress color="warning" />
                                 </TableCell>
                             </TableRow>
