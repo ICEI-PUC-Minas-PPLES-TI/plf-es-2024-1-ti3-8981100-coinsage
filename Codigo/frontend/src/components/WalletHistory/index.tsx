@@ -13,18 +13,21 @@ import {
     IconButton,
     Snackbar,
     Alert,
-    Tooltip
+    Tooltip,
+    CircularProgress
 } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Unstable_Popup as BasePopup } from '@mui/base/Unstable_Popup';
 import tableStyles from "../Tabela/Tabela.module.css";
 import EmasAlignedCell from "../Tabela/EmasAlignedCell/EmasAlignedCell";
 import LogoSymbol from "../Tabela/Logo/LogoSymbol";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TablePaginationActions from "../Tabela/TablePaginationActions/TablePaginationActions";
 import { renderValorizationPercentage } from "../Tabela/Tabela";
 import { Endpoints } from "../../constants/apiConfig.json";
 import api from "../../service/api";
+import { useNavigate } from "react-router-dom";
+import { useSessionExpired } from "../../hooks/useAuth";
 
 interface WalletHistoryProps {
     rows: any;
@@ -74,8 +77,21 @@ const WalletHistory: React.FC<WalletHistoryProps> = ({ rows, tableLoading, sortC
         msg: string,
         type: string
     } | null>(null);
+    const [loadingDelete, setLoadingDelete] = useState(false);
+    const [deletingTransactionId, setDeletingTransactionId] = useState<string | null>(null);
+    const navigate = useNavigate();
+    const isSessionExpired = useSessionExpired()
+
+    useEffect(() => {
+        if (isSessionExpired) {
+            navigate('/login');
+        }
+    }, [isSessionExpired]);
 
     const handleDeleteTransaction = (uuid: string) => {
+        setLoadingDelete(true);
+        setDeletingTransactionId(uuid)
+
         api.delete(`${Endpoints.DeleteTransaction}/${uuid}`, {
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('token') || ''
@@ -95,7 +111,15 @@ const WalletHistory: React.FC<WalletHistoryProps> = ({ rows, tableLoading, sortC
                     type: 'error'
                 });
                 setOpenSnackbar(true);
-            });
+                if (error.response.status === 401) {
+                    localStorage.removeItem('token')
+                    navigate('/login')
+                }
+            })
+            .finally(() => {
+                setLoadingDelete(false);
+                setDeletingTransactionId(null)
+            })
     };
 
     const mappedRows = rowsDataMapper(rows)
@@ -112,7 +136,7 @@ const WalletHistory: React.FC<WalletHistoryProps> = ({ rows, tableLoading, sortC
             <TableCell>
                 <Tooltip title="Deletar transação" arrow>
                     <IconButton onClick={() => handleDeleteTransaction(row.uuid)} aria-label="delete">
-                        <DeleteIcon />
+                        {loadingDelete && deletingTransactionId === row.uuid ? <CircularProgress /> : <DeleteIcon />}
                     </IconButton>
                 </Tooltip>
             </TableCell>
@@ -151,7 +175,7 @@ const WalletHistory: React.FC<WalletHistoryProps> = ({ rows, tableLoading, sortC
                                     align="left"
                                     style={{ minWidth: column.minWidth }}
                                 >
-                                    <TableSortLabel
+                                    {/* <TableSortLabel
                                         active={sortConfig.some((sort: any) => sort.column === column.id)}
                                         direction={
                                             sortConfig.find((sort: any) => sort.column === column.id)?.direction || 'asc'
@@ -159,7 +183,8 @@ const WalletHistory: React.FC<WalletHistoryProps> = ({ rows, tableLoading, sortC
                                         onClick={() => handleSortRequest(column.id)}
                                     >
                                         {column.label}
-                                    </TableSortLabel>
+                                    </TableSortLabel> */}
+                                    {column.label}
                                 </TableCell>
                             ))}
                         </TableRow>

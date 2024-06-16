@@ -37,6 +37,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ formNavigator }) => {
         setError("Erro ao fazer login, tente novamente em alguns minutos");
       else if (error.response?.status === 404)
         setError("Usuário ou senha inválidos");
+      else
+        setError("Erro ao fazer login: [" + (error.response?.data?.detail || "Erro desconhecido") + "] ");
 
     }).finally(() => {
       setLoading(false);

@@ -4,6 +4,8 @@ import WalletHistory from "../WalletHistory"
 import { SortConfig } from "../Tabela/Tabela";
 import { Endpoints } from "../../constants/apiConfig.json";
 import api from "../../service/api";
+import { useNavigate } from "react-router-dom";
+import { useSessionExpired } from "../../hooks/useAuth";
 
 const WalletHistoryContainer: React.FC = () => {
     const [page, setPage] = useState(0);
@@ -14,6 +16,14 @@ const WalletHistoryContainer: React.FC = () => {
     const [tableLoading, setTableLoading] = useState<boolean>(true);
     const [count, setCount] = useState<number>(0);
     const [sortConfig, setSortConfig] = useState<SortConfig[]>([]);
+    const navigate = useNavigate();
+    const isSessionExpired = useSessionExpired()
+
+    useEffect(() => {
+        if (isSessionExpired) {
+            navigate('/login');
+        }
+    }, [isSessionExpired]);
 
     const request = (sortParams: any = '') => {
         api
@@ -30,37 +40,55 @@ const WalletHistoryContainer: React.FC = () => {
                     const data = response.data;
                     if (data) {
                         const read = data.data
-                        setRows(read.map((row: any) => {
-                            // date in format dd/mm/yy/ hh:mm
-                            const formatedBuyTime = row.profit.buy_date ?
-                                new Intl.DateTimeFormat('en-GB', {
-                                    year: "numeric",
-                                    month: "numeric",
-                                    day: "numeric",
-                                    hour: "numeric",
-                                    minute: "numeric",
-                                    second: "numeric",
-                                    timeZone: "America/Sao_Paulo"
-                                }).format(new Date(row.profit.buy_date)) : '-';
+                        console.log(read)
+                        const formatedData = read.map((row: any) => {
+                            let formatedBuyTime = 'Invalid Date';
+                            try {
+                                if (row.profit.buy_date) {
+                                    let [datePart, timePart] = row.profit.buy_date.split(' ');
+                                    let [day, month, year] = datePart.split('-');
+                                    let formattedDate = `${year}-${month}-${day}T${timePart}`;
+                                    formatedBuyTime = new Intl.DateTimeFormat('en-GB', {
+                                        year: "numeric",
+                                        month: "numeric",
+                                        day: "numeric",
+                                        hour: "numeric",
+                                        minute: "numeric",
+                                        second: "numeric",
+                                        timeZone: "America/Sao_Paulo"
+                                    }).format(new Date(formattedDate));
+                                } else {
+                                    formatedBuyTime = '-';
+                                }
+                            } catch (e) {
+                                console.error(e);
+                            }
+
                             return {
                                 date: formatedBuyTime,
                                 quantity: row.profit.buy_value,
                                 price_on_purchase: row.profit.buy_price,
                                 price_now: row.profit.current_price < 0 ? 'N/A' : row.profit.current_price,
-                                current_profit: row.profit.current_price ? row.profit.profit : 'N/A',
+                                current_profit: row.profit.current_price >= 0 ? row.profit.profit : 'N/A',
                                 currency: {
                                     logo: row.crypto.logo,
                                     symbol: row.crypto.symbol
                                 },
                                 uuid: row.transaction_uuid,
                             }
-                        }));
+                        })
+                        console.log(`formatedData: ${formatedData}`)
+                        setRows(formatedData);
                         setCount(data.total);
                     } else {
                     }
                 }
             })
-            .catch(() => {
+            .catch((error) => {
+                if (error.response.status === 401) {
+                    localStorage.removeItem('token')
+                    navigate('/login')
+                }
             })
             .finally(() => {
                 setInitialLoading(false);

@@ -138,6 +138,10 @@ const NewTransactionForm: React.FC = () => {
             .catch(error => {
                 setOpenFeedback(true)
                 setError(error.response.data.detail || error.response.statusText)
+                if(error.response.status === 401) {
+                    localStorage.removeItem('token')
+                    navigate('/login')
+                }
             })
             .finally(() => {
                 setCreating(false)
