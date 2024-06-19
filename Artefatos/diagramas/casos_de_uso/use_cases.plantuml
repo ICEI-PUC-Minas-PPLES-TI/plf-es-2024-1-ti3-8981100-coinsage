@@ -1,5 +1,5 @@
 @startuml current
-title Coinsage - Sprint 4
+title Coinsage - Sprint 5
 
 left to right direction
 actor "Investidor" as investor
