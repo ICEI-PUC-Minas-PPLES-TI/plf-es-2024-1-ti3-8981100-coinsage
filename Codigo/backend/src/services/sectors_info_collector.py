@@ -43,7 +43,13 @@ class SectorsCollector:
         cryptos = self.symbols_repository.get_cryptos(db_session)
         raw_sector_info = self.external_collector([crypto.symbol for crypto in cryptos])  # type: ignore
         for sector in raw_sector_info:
-            sector_db = self.repository.get_sector_by_cmc_id(db_session, sector["cmc_id"])
+            sector_db = None
+            try:
+                sector_db = self.repository.get_sector_by_cmc_id(db_session, sector["cmc_id"])
+            except Exception as err:
+                db_session.rollback()
+                logger.error(f"Error getting sector {sector['name']}: {err}")
+                continue
 
             # New sector on the databse
             if sector_db is None and self.passed_min_coins(sector):
