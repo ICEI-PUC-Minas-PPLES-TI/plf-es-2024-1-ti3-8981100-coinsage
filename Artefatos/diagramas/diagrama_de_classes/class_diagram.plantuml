@@ -1,6 +1,21 @@
 @startuml Diagrama de Classes
 title Diagrama de Classes de Domínio | Coinsage - Sprint 5
 
+class User{
+    - id: Integer
+    - name: String
+    - email: String
+    - password: String
+}
+
+class WalletTransaction {
+    + uudi: UUID
+    - quantity: Numeric
+    - amount: Numeric
+    - date: DateTime
+    - price_on_purchase: Numeric
+}
+
 class Cryptocurrency {
     + uuid: UUID
     - symbol: String
@@ -19,7 +34,6 @@ class CurrencyInfoSchedule {
     + id: Integer
     - last_update_time: DateTime
     - next_scheduled_time: DateTime
-
 }
 
 class Sector {
@@ -29,6 +43,12 @@ class Sector {
     - coins_quantity: Integer
     - cmc_id: String
     - active: Boolean
+}
+
+class SectorInfoSchedule {
+    + id: Integer
+    - last_update_time: DateTime
+    - next_scheduled_time: DateTime
 }
 
 class Analysis {
@@ -70,14 +90,6 @@ class FirstStageAnalysis {
     - today: DateTime
 }
 
-class WalletTransaction {
-    + uudi: UUID
-    - quantity: Numeric
-    - amount: Numeric
-    - date: DateTime
-    - price_on_purchase: Numeric
-}
-
 class CryptoRanking {
     - uuid: UUID
     - symbol: String
@@ -86,21 +98,15 @@ class CryptoRanking {
     - ranking_value: Numeric
 }
 
-class User{
-    - id: Integer
-    - name: String
-    - email: String
-    - password: String
-}
-
 ' Relações entre as classes
+User "1" -- "*" WalletTransaction : "has"
+WalletTransaction "1" -- "1" Cryptocurrency : "has"
 Cryptocurrency "1" -- "*" CurrencyInfoSchedule: schedules
 Cryptocurrency "1" -- "0..*" Sector
+Sector "1" -- "*" SectorInfoSchedule : schedules
 Cryptocurrency "1" -- "0..*" Analysis
 Analysis "1" -- "*" AnalysisInfoSchedule : schedules
 Analysis "1" -- "*" FirstStageAnalysis : includes
 Cryptocurrency "1" -- "*" CryptoRanking : "has ranking"
-WalletTransaction "1" -- "1" Cryptocurrency : "has"
-User "1" -- "*" WalletTransaction : "has"
 
 @enduml
