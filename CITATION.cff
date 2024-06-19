@@ -1,35 +1,33 @@
 cff-version: 1.0.1
 message: Please cite this software using these metadata.
-title:
+title: CoinSage
 authors:
-  - family-names: Ramos
+  - family-names: Ramos dos Santos
     given-names: Rubens Marcelo
-  - family-names: Martins
+  - family-names: Martins Rodrigues
     given-names: Frederico
-  - family-names: Spencer
+  - family-names: Spencer Lourenço
     given-names: Kimberly Liz
-  - family-names: Mendes
-    given-names: José Dias
-
+  - family-names: Mendes Dias
+    given-names: José Victor
   - name-suffix: Professor
     affiliation: PUC Minas
-    family-names: Veloso 
-    given-names: Eveline Veloso
+    family-names: Alonso Veloso 
+    given-names: Eveline
   - name-suffix: Professor
     affiliation: PUC Minas
     family-names: Pereira
     given-names: Lucas Henrique
   - name-suffix: Professor
     affiliation: PUC Minas
-    family-names: Lopes
-    given-names: Pedro Pongelupe
-
+    family-names: Pongelupe Lopes
+    given-names: Pedro
 keywords:
   - "Modelagem de Processos de Negócio"
   - "Investimento"
   - "Online"
 repository-code: https://github.com/ICEI-PUC-Minas-PPLES-TI/plf-es-2024-1-ti3-8981100-coinsage
-abstract: "O objetivo do projeto é a automatização de análises de investimento de CryptoMoedas."
+abstract: "O objetivo do projeto é a automatização de análises de investimento de Criptomoedas."
 license: CC-BY-4.0
 version: 1.0.0
 date-released: 2024-06-19
